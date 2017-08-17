@@ -68,6 +68,9 @@ export class ArticleEffects {
     @Effect()
     private unFavorite$ = sliceFunctions.deleteFromRemote$(this.actions$, slices.ARTICLE, this.dataService, actions.FAVORITE, new ArticleActions.FavoriteSuccess(), new ArticleActions.FavoriteFail());
 
+    @Effect()
+    private addComment$ = sliceFunctions.postToRemote$(this.actions$, slices.ARTICLE, this.dataService, actions.ADD_COMMENT, new ArticleActions.AddCommentSuccess(), new ArticleActions.AddCommentFail());
+
     constructor(
         private store: Store<Article>,
         private actions$: Actions<PayloadAction>,

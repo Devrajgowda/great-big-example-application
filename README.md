@@ -122,17 +122,18 @@ lower authority yielding to the higher one:
 4. [Redux Docs](http://redux.js.org/) Redux.org
 5. [JHipster Example - AoT](https://github.com/deepu105/ngtools-sample) by [@deepu105](https://github.com/deepu105)
 6. [JHipster Example - Chat](https://github.com/ruddell/jhipster-chat-example) by [@ruddell](https://github.com/ruddell)
-7. [ng2-admin - Admin App](https://github.com/akveo/ng2-admin) by [@nnxiaa](https://github.com/nnixaa) and community
-8. [clean-to-the-core - Recipe book](https://github.com/adriancarriger/clean-to-the-core) by [@adriancarriger](https://github.com/adriancarriger)
-9. [ngrx State Management - Rate/Watch talks](https://blog.nrwl.io/using-ngrx-4-to-manage-state-in-angular-applications-64e7a1f84b7b) by [@vsavkin](https://github.com/vsavkin)
-10. [scalable-architecture-demo - P2P Typing Game](https://github.com/mgechev/scalable-architecture-demo) by [@mgechev](https://github.com/mgechev)
-11. [ngrx example app - book collection](https://github.com/ngrx/platform/tree/master/example-app) by [@MikeRyan52](https://github.com/MikeRyan52) and [@brandonroberts](https://github.com/brandonroberts)
-12. [ng2-state-talk - drag/editable notes](https://github.com/JavascriptMick/ng2-state-talk) by [@JavascriptMick](https://github.com/JavascriptMick)
-13. [rangle-starter Angular 2 with TypeScript and Redux version - counter](https://www.npmjs.com/package/rangle-starter) by [@SethDavenport](https://github.com/SethDavenport)
+7. [Real World - Medium blog clone](https://github.com/gothinkster/angular-realworld-example-app) by [@EricSimons](https://github.com/EricSimons)
+8. [ng2-admin - Admin App](https://github.com/akveo/ng2-admin) by [@nnxiaa](https://github.com/nnixaa) and community
+9. [clean-to-the-core - Recipe book](https://github.com/adriancarriger/clean-to-the-core) by [@adriancarriger](https://github.com/adriancarriger)
+10. [ngrx State Management - Rate/Watch talks](https://blog.nrwl.io/using-ngrx-4-to-manage-state-in-angular-applications-64e7a1f84b7b) by [@vsavkin](https://github.com/vsavkin)
+11. [scalable-architecture-demo - P2P Typing Game](https://github.com/mgechev/scalable-architecture-demo) by [@mgechev](https://github.com/mgechev)
+12. [ngrx example app - book collection](https://github.com/ngrx/platform/tree/master/example-app) by [@MikeRyan52](https://github.com/MikeRyan52) and [@brandonroberts](https://github.com/brandonroberts)
+13. [ng2-state-talk - drag/editable notes](https://github.com/JavascriptMick/ng2-state-talk) by [@JavascriptMick](https://github.com/JavascriptMick)
+14. [rangle-starter Angular 2 with TypeScript and Redux version - counter](https://www.npmjs.com/package/rangle-starter) by [@SethDavenport](https://github.com/SethDavenport)
 
 In addition to the features from these demos, I added one of my own. I replaced
 
-14. [this other project](http://www.bernierebuttals.org) which was made with JQuery and Google Scripts. The data is
+15. [this other project](http://www.bernierebuttals.org) which was made with JQuery and Google Scripts. The data is
 contained in [this Google Sheet](https://docs.google.com/spreadsheets/d/1RdIhMdNCRJ-xtl6IgbT2SdChtLIYW8VXeloq7rR1lqY/edit#gid=50602236)
 and served as JSON by a Google script. Well, I tried to anyway. This still isn't working.
 
@@ -184,8 +185,8 @@ code for a given slice into the same directory as one of the features that uses 
 
 2. As much as practical the names of files in a directory begin with the directory name. I did this to prevent directories from having a mixture of
 unrelated concerns. If a directory in a source demo had files for two different things, I created more directories. I thought about
-removing that part of the file name, `src/app/app.page.ts` -> `src/app/page.ts`, for the sake of DRY, but that makes it too confusing when
-you are working on multiple files with the same names and different directories.
+removing that part of the file name, `src/app/features/counter.page.ts` -> `src/app/features/counter/page.ts`, for the sake of DRY, but
+that makes it too confusing when you are working on multiple files with the same names and different directories.
 
 3. I noticed a lot of duplication and boilerplate of identical CRUD code for each of my types of entities. So I made utility functions and
 the related actions and models for each of three types of store slice - [entities](https://github.com/dancancro/great-big-example-application/tree/master/src/main/webapp/app/core/store/entity), [id lists](https://github.com/dancancro/great-big-example-application/tree/master/src/main/webapp/app/core/store/id), and [slices](https://github.com/dancancro/great-big-example-application/tree/master/src/main/webapp/app/core/store/slice) (everything else).
@@ -193,12 +194,12 @@ the related actions and models for each of three types of store slice - [entitie
 4. I came up with a mini lexicon of file types to keep file names shorter and more expressive. A "page" is understood to be a smart `@Component`
 class that fills the page and might have a router-outlet and route configurations. A "guard" is understood to be an `@Injectable` "service" class that
 returns a boolean. A "routing" is a `@NgModule` class that contains route configurations. So I memorize this simple lexicon, and drop the
-redundant, less-clear words from the names. For example, I use the name `app.page.ts` rather than `app.component.ts` or `app-page.component.ts`.
+redundant, less-clear words from the names. For example, I use the name `counter.page.ts` rather than `counter.component.ts` or `counter-page.component.ts`.
 I use `auth.guard.ts` instead of `auth-guard.service.ts`. I use `books.routing.ts` instead of `books-routing.module.ts`.
 
 | A | is a class decorated with | that | Example file name | Example class name |
 |:--- | :--- | :--- | :--- | :--- |
-| page | @Component | more or less fills the screen - a "smart" component that gets data from something other than `@Input`s and dispatches actions to change state | app.page.ts | AppPage |
+| page | @Component | more or less fills the screen - a "smart" component that gets data from something other than `@Input`s and dispatches actions to change state | counter.page.ts | CounterPage |
 | component | @Component | has to be contained by a page or other components - a "dumb" component that only gets data from `@Input`s | login.component.ts | LoginComponent |
 | guard | @Injectable | returns a boolean and [does whatever an Angular guard does](https://angular.io/docs/ts/latest/guide/router.html#!#guards) | auth.guard.ts | AuthGuard |
 | service | @Injectable | provides a service or data | auth.service.ts | AuthService |
@@ -569,7 +570,7 @@ In-memory server-side database|[UNIQUE.](http:// "H2")| | | | |
 [i18n, localization (?)](https://github.com/dancancro/great-big-example-application/blob/master/src/main/resources/i18n "Internationalization or localization    Text for different languages are stored in separate places and used to fill in placeholders in the view depending on the user's preferences")|[X](https://github.com/dancancro/great-big-example-application/blob/master/src/main/resources/i18n)| |[X](https://github.com/NathanWalker/angular-seed-advanced/tree/master/src/client/app/shared/i18n)| | |
 [Many-to-many data](https://github.com/dancancro/great-big-example-application/blob/master/src/main/webapp/app/core/store/index.ts#L265 "")|[UNIQUE](https://github.com/dancancro/great-big-example-application/blob/master/src/main/webapp/app/core/store/index.ts#L265)| | | | |
 [Modals (popups, dialogs) (?)](https://github.com/dancancro/great-big-example-application/blob/master/src/main/webapp/app/admin/user-management/user-management-dialog.component.html "A popup window that when opened disables the rest of the application")|[UNIQUE](https://github.com/dancancro/great-big-example-application/blob/master/src/main/webapp/app/admin/user-management/user-management-dialog.component.html)| | | | |
-[Navigation bar](https://github.com/dancancro/great-big-example-application/blob/master/src/main/webapp/app/layouts/navbar "")|[X](https://github.com/dancancro/great-big-example-application/blob/master/src/main/webapp/app/layouts/navbar)|[X](https://github.com/dancancro/great-big-example-application/blob/master/src/main/webapp/app/app.page.html)| | | |
+[Navigation bar](https://github.com/dancancro/great-big-example-application/blob/master/src/main/webapp/app/layouts/navbar "")|[X](https://github.com/dancancro/great-big-example-application/blob/master/src/main/webapp/app/layouts/navbar)|[X](https://github.com/dancancro/great-big-example-application/blob/master/src/main/webapp/app/layouts/navbar/navbar.component.html)| | | |
 [Notifications](https://github.com/dancancro/great-big-example-application/blob/master/src/main/webapp/app/shared/alert "")|[UNIQUE](https://github.com/dancancro/great-big-example-application/blob/master/src/main/webapp/app/shared/alert)| | | | |
 [Offline sync (?)](https://github.com/dancancro/great-big-example-application/blob/master/src/main/webapp/sw.js "In general, mobile applications need to be able to operate without constant network connectivity.  This means the client app must synchronize data with the server application after a disconnected period.")|[UNIQUE](https://github.com/dancancro/great-big-example-application/blob/master/src/main/webapp/sw.js)| | | | |
 [Pagination, paging (client-side)](https://github.com/dancancro/great-big-example-application/blob/master/src/main/webapp/app/entities/claim/claim.component.ts#L10 "")|[UNIQUE](https://github.com/dancancro/great-big-example-application/blob/master/src/main/webapp/app/entities/claim/claim.component.ts#L10)| | | | |

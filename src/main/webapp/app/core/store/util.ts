@@ -38,6 +38,7 @@ export function typeFor(slice: string, action: string) {
 
 export const slices = {
     ARTICLE: 'article',
+    AUTHOR: 'author',
     BOOK: 'book',
     CRISIS: 'crisis',
     CLAIM: 'claim',
@@ -54,7 +55,7 @@ export const slices = {
     REBUTTAL: 'rebuttal',
     SEARCH: 'search',
     SESSION: 'session',
-    TAG: 'tag',
+    TAG_LIST: 'tagList',
     TALK: 'talk'
 };
 

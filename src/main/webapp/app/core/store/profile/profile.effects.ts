@@ -12,12 +12,12 @@ import * as functions from '../entity/entity.functions';
 
 @Injectable()
 export class ProfileEffects {
-    @Effect()
-    private loadFromRemote$ = functions.loadFromRemote$(this.actions$, slices.PROFILE, this.dataService);
-    @Effect()
-    private updateToRemote$ = functions.updateToRemote$(this.actions$, slices.PROFILE, this.dataService, this.store);
-    @Effect()
-    private addToRemote$ = functions.addToRemote$(this.actions$, slices.PROFILE, this.dataService, this.store);
+    // @Effect()
+    // private loadFromRemote$ = functions.loadFromRemote$(this.actions$, slices.PROFILE, this.dataService);
+    // @Effect()
+    // private updateToRemote$ = functions.updateToRemote$(this.actions$, slices.PROFILE, this.dataService, this.store);
+    // @Effect()
+    // private addToRemote$ = functions.addToRemote$(this.actions$, slices.PROFILE, this.dataService, this.store);
 
     @Effect()
     private follow$ = sliceFunctions.postToRemote$(this.actions$, slices.ARTICLE, this.dataService, actions.FOLLOW, new ProfileActions.FollowSuccess(), new ProfileActions.FollowFail());

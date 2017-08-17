@@ -40,6 +40,23 @@ export class LayoutEffects {
         }
         );
 
+    // ADD COMMENT SUCCESS
+    // this.commentControl.reset(''); // TODO: clear control on success
+
+    // this.commentsService
+    //     .add(this.article.slug, commentBody)
+    //     .subscribe(
+    //     (comment) => {
+    //         this.comments.unshift(comment);
+    //         this.commentControl.reset('');
+    //         this.isSubmitting = false;
+    //     },
+    //     (errors) => {
+    //         this.isSubmitting = false;
+    //         this.commentFormErrors = errors;
+    //     }
+    //     );
+
     constructor(
         private watchService: WatchService,
         private actions$: Actions,

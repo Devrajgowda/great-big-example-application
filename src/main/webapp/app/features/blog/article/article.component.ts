@@ -5,6 +5,7 @@ import { Store } from '@ngrx/store';
 import { JhiEventManager } from 'ng-jhipster';
 import { Observable } from 'rxjs/Observable';
 import { Subscription } from 'rxjs/Subscription';
+import { JhiAlertService } from 'ng-jhipster';
 
 import * as fromRoot from '../../../core/store';
 import { Article } from '../../../core/store/article/article.model';
@@ -12,18 +13,19 @@ import { Comment } from '../../../core/store/comment/comment.model';
 import { User } from '../../../core/store/user/user.model';
 import { slices } from '../../../core/store/util';
 import * as EntityActions from '../../../core/store/entity/entity.actions';
-import { JhiAlertService } from 'ng-jhipster';
+import * as ArticleActions from '../../../core/store/article/article.actions';
+import { Account, Principal } from '../../../shared';
 
 @Component({
     selector: 'jhi-article-component',
     templateUrl: './article.component.html'
 })
 export class ArticleComponent implements OnInit, OnDestroy {
-    user$: Observable<User>;
     comments$: Observable<Comment[]>;
     commentsSub: Subscription;
     article$: Observable<Article>;
     article: Article;
+    articleSub: Subscription;
     currentUser: User;
     canModify: boolean;
     comments: Comment[];
@@ -31,8 +33,11 @@ export class ArticleComponent implements OnInit, OnDestroy {
     commentFormErrors = {};
     isSubmitting = false;
     isDeleting = false;
+    identity$: Promise<Account>;
+    identitySub: Subscription;
 
     constructor(
+        private principal: Principal,
         private eventManager: JhiEventManager,
         private store: Store<fromRoot.RootState>,
         private alertService: JhiAlertService,
@@ -41,17 +46,18 @@ export class ArticleComponent implements OnInit, OnDestroy {
     ) { }
 
     ngOnInit() {
-        this.user$ = this.store.select(fromRoot.getUserState);
+        this.identity$ = this.principal.identity();
         this.article$ = this.store.select(fromRoot.getSelectedArticle);
+        this.articleSub = this.article$.subscribe((article) => this.article = article);
         this.comments$ = this.store.select(fromRoot.getCommentsForSelectedArticle);
         this.commentsSub = this.comments$.subscribe((comments) => this.comments = comments);
 
         // Load the current user's data
-        this.user$.subscribe(
-            (userData: User) => {
-                this.currentUser = userData;
+        this.identitySub = Observable.combineLatest(this.identity$, this.article$).subscribe(
+            ([identityData, article]) => {
+                this.currentUser = identityData;
 
-                this.canModify = (this.currentUser.login === this.article.author.username);
+                this.canModify = (this.currentUser.login === article.author.username);
             }
         );
     }
@@ -84,23 +90,8 @@ export class ArticleComponent implements OnInit, OnDestroy {
         this.isSubmitting = true;
         this.commentFormErrors = {};
 
-        const comment = { articleId: this.article.id, ...this.commentControl.value };
-        this.store.dispatch(new EntityActions.Add(slices.COMMENT, comment));
-        // this.commentControl.reset(''); // TODO: clear control on success
-
-        // this.commentsService
-        //     .add(this.article.slug, commentBody)
-        //     .subscribe(
-        //     (comment) => {
-        //         this.comments.unshift(comment);
-        //         this.commentControl.reset('');
-        //         this.isSubmitting = false;
-        //     },
-        //     (errors) => {
-        //         this.isSubmitting = false;
-        //         this.commentFormErrors = errors;
-        //     }
-        //     );
+        const requestObject = { comment: { body: this.commentControl.value } };
+        this.store.dispatch(new ArticleActions.AddComment(this.article.slug, requestObject));
     }
 
     onDeleteComment(comment) {
@@ -119,5 +110,7 @@ export class ArticleComponent implements OnInit, OnDestroy {
 
     ngOnDestroy() {
         this.commentsSub && this.commentsSub.unsubscribe();
+        this.identitySub && this.identitySub.unsubscribe();
+        this.articleSub && this.articleSub.unsubscribe();
     }
 }

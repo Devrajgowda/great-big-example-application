@@ -4,7 +4,8 @@ import org.exampleapps.greatbig.service.dto.ProfileDTO;
 import java.io.Serializable;
 import java.util.Objects;
 import java.time.ZonedDateTime;
-import javax.persistence.Lob;
+import javax.persistence.*;
+// import javax.persistence.Lob;
 
 /**
  * A DTO for the Comment entity.
@@ -23,42 +24,11 @@ import javax.persistence.Lob;
  * }
  *}
  */
-public class CommentDTO implements Serializable {
 
-    private Long id;
-
-    private ZonedDateTime createdAt;
-
-    private ZonedDateTime updatedAt;
+class CommentDTOInner implements Serializable {
 
     @Lob
     private String body;
-
-    private ProfileDTO author;
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public void setCreatedAt(ZonedDateTime createdAt) {
-        this.createdAt = createdAt;
-    }
-
-    public ZonedDateTime getCreatedAt() {
-        return createdAt;
-    }
-
-    public void setUpdatedAt(ZonedDateTime updatedAt) {
-        this.updatedAt = updatedAt;
-    }
-
-    public ZonedDateTime getUpdatedAt() {
-        return updatedAt;
-    }
 
     public void setBody(String body) {
         this.body = body;
@@ -68,12 +38,42 @@ public class CommentDTO implements Serializable {
         return body;
     }
 
-    public void setAuthor(ProfileDTO author) {
-        this.author = author;
+    @Override
+    public String toString() {
+        return "comment: {" +
+            "body='" + getBody() + "'" +
+            "}";
     }
 
-    public ProfileDTO getAuthor() {
-        return author;
+}
+
+public class CommentDTO implements Serializable {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "sequenceGenerator")
+    @SequenceGenerator(name = "sequenceGenerator")
+    private Long id;
+
+    private CommentDTOInner comment;
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public void setComment(CommentDTOInner comment) {
+        this.comment = comment;
+    }
+
+    public CommentDTOInner getComment() {
+        return comment;
+    }
+
+    public String getBody() {
+        return comment.getBody();
     }
 
     @Override
@@ -101,10 +101,7 @@ public class CommentDTO implements Serializable {
     public String toString() {
         return "comment: {" +
             "id=" + getId() +
-            ", createdAt='" + getCreatedAt() + "'" +
-            ", updatedAt='" + getUpdatedAt() + "'" +
-            ", body='" + getBody() + "'" +
-            ", author='" + getAuthor().toString() + "'" +
+            ", comment='" + getComment().toString() + "'" +
             "}";
     }
 }

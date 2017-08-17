@@ -5,6 +5,7 @@ import 'rxjs/add/operator/filter';
 import 'rxjs/add/operator/combineLatest';
 
 import { Article } from './article/article.model';
+import { Author } from './author/author.model';
 import { Book } from './book/book.model';
 import { Claim } from './claim/claim.model';
 import { Comment } from './comment/comment.model';
@@ -18,6 +19,7 @@ import { Note } from './note/note.model';
 import { Rebuttal, initialRebuttal } from './rebuttal/rebuttal.model';
 import { Session } from './session/session.model';
 import { User } from './user/user.model';
+import { TagList } from './tag-list/tag-list.model';
 import { BlogPageLayout } from '../../features/blog/blog.layout';
 import { Talk } from './talk/talk.model';
 
@@ -46,6 +48,7 @@ import { storeFreeze } from 'ngrx-store-freeze';
  * notation packages up all of the exports into a single object.
  */
 import * as fromArticles from './article/article.reducer';
+import * as fromAuthors from './author/author.reducer';
 import * as fromBooks from './book/book.reducer';
 import * as fromClaimRebuttals from './claim-rebuttal/claim-rebuttal.reducer';
 import * as fromClaims from './claim/claim.reducer';
@@ -62,7 +65,7 @@ import * as fromNotes from './note/note.reducer';
 import * as fromRebuttals from './rebuttal/rebuttal.reducer';
 import * as fromSearch from './search/search.reducer';
 import * as fromSession from './session/session.reducer';
-import * as fromTags from './tag/tag.reducer';
+import * as fromTagList from './tag-list/tag-list.reducer';
 import * as fromTalks from './talk/talk.reducer';
 import { gameReducer, gamesReducer, p2pGameReducer } from './game/game.reducer';
 import { Entities } from './entity/entity.model';
@@ -75,6 +78,7 @@ import { IDs } from './id/id.model';
 export interface RootState {
     book: Entities<Book>;
     article: Entities<Article>;
+    author: Entities<Author>;
     claimRebuttal: Entities<ClaimRebuttal>;
     claim: Entities<Claim>;
     collection: IDs;
@@ -93,7 +97,7 @@ export interface RootState {
     router: fromRouter.RouterReducerState;
     search: IDs;
     session: Session;
-    tag: string[];
+    tagList: TagList;
     talk: Entities<Talk>;
 }
 
@@ -108,6 +112,7 @@ export const reducers: ActionReducerMap<RootState> = {
     // ngrx ones
     book: fromBooks.reducer,
     article: fromArticles.reducer,
+    author: fromAuthors.reducer,
     claim: fromClaims.reducer,
     claimRebuttal: fromClaimRebuttals.reducer,
     contact: fromContacts.reducer,
@@ -125,9 +130,9 @@ export const reducers: ActionReducerMap<RootState> = {
     router: fromRouter.routerReducer,
     search: fromSearch.reducer,
     session: fromSession.reducer,
-    tag: fromTags.reducer,
     comment: fromComments.reducer,
     talk: fromTalks.reducer,
+    tagList: fromTagList.reducer
 };
 
 /**
@@ -477,6 +482,21 @@ export const getComments = createSelector(getCommentEntities, getCommentIds, (en
 });
 
 /**
+ * Authors Selectors
+ */
+export const getAuthorsState = (state: RootState): Entities<Author> => state.author;
+export const getAuthorEntities = createSelector(getAuthorsState, fromAuthors.getEntities);
+export const getAuthorIds = createSelector(getAuthorsState, fromAuthors.getIds);
+export const getAuthors = createSelector(getAuthorEntities, getAuthorIds, (entities, ids) => {
+    return ids.map((id) => entities[id]);
+});
+
+/**
+ * TagList Selectors
+ */
+export const getTags = (state: RootState): string[] => state.tagList.tags;
+
+/**
  * Articles Selectors
  */
 export const getArticlesState = (state: RootState): Entities<Article> => state.article;
@@ -488,20 +508,17 @@ export const getTempArticle = createSelector(getArticlesState, fromArticles.getT
 export const getArticles = createSelector(getArticleEntities, getArticleIds, (entities, ids) => {
     return ids.map((id) => entities[id]);
 });
-export const getArticlesForQuery = createSelector(getArticles, getBlogPageLayout, (articles, blogPageLayout: BlogPageLayout) => {
-    return articles.filter((article) => {
-        return !blogPageLayout.filters.author || blogPageLayout.filters.author === article.author.username &&
-            !blogPageLayout.filters.tag || article.tagList.some((tag) => tag === blogPageLayout.filters.tag);
-    })
-})
-export const getCommentsForSelectedArticle = createSelector(getComments, getSelectedArticleId, (comments, articleId) => {
-    return comments.filter((comment) => comment.articleId === articleId)
-})
+export const getArticlesForQuery = createSelector(getArticles, getBlogPageLayout, getAuthors,
+    (articles: Article[], blogPageLayout: BlogPageLayout, authors: Author[]) => {
+        return articles.filter((article) => {
+            return !blogPageLayout.filters.author || blogPageLayout.filters.author === article.author.username &&
+                !blogPageLayout.filters.tag || article.tagList.some((tag) => tag === blogPageLayout.filters.tag);
+        });
+    });
 
-/**
- * Tags Selectors
- */
-export const getTags = (state: RootState): string[] => state.tag;
+export const getCommentsForSelectedArticle = createSelector(getComments, getSelectedArticleId, (comments, articleId) => {
+    return comments.filter((comment) => comment.articleId === articleId);
+});
 
 /**
  * Talks Selectors

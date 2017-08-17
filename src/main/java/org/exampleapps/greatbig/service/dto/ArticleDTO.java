@@ -161,7 +161,7 @@ public class ArticleDTO implements Serializable {
             ", title='" + getTitle() + "'" +
             ", description='" + getDescription() + "'" +
             ", body='" + getBody() + "'" +
-            ", tagList='" + getTagList().toString() + "'" +
+            ", tagList='" + (getTagList() == null ? "none" : getTagList()).toString() + "'" +
             ", createdAt='" + getCreatedAt() + "'" +
             ", updatedAt='" + getUpdatedAt() + "'" +
             "}";

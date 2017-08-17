@@ -95,7 +95,7 @@ public class AuthorResource {
     @Timed
     public List<Author> getAllAuthors() {
         log.debug("REST request to get all Authors");
-        return authorRepository.findAllWithEagerRelationships();
+        return authorRepository.findAll();
     }
 
     /**

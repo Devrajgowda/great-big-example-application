@@ -101,6 +101,10 @@ export function deleteFromRemote$(actions$: Actions, slice: string, dataService,
     return httpToRemote$('delete', actions$, slice, dataService, triggerAction, successAction, errorAction, transform);
 }
 
+export function getFromRemote$(actions$: Actions, slice: string, dataService, triggerAction: string, successAction: SliceAction, errorAction: SliceAction, transform: Function = ((resp) => resp)): Observable<Action> {
+    return httpToRemote$('get', actions$, slice, dataService, triggerAction, successAction, errorAction, transform);
+}
+
 function httpToRemote$(method: string, actions$: Actions, slice: string, dataService, triggerAction: string, successAction: SliceAction, errorAction: SliceAction, transform: Function = ((resp) => resp)): Observable<Action> {
     return actions$
         .ofType(typeFor(slice, triggerAction))

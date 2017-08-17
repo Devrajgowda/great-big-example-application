@@ -5,18 +5,24 @@ package org.exampleapps.greatbig.web.rest;
 
 import com.codahale.metrics.annotation.Timed;
 import org.exampleapps.greatbig.domain.Article;
-import org.exampleapps.greatbig.domain.Tag;
 import org.exampleapps.greatbig.domain.Author;
+import org.exampleapps.greatbig.domain.Comment;
+import org.exampleapps.greatbig.domain.Tag;
 import org.exampleapps.greatbig.domain.User;
 
 import org.exampleapps.greatbig.service.ProfileService;
 import org.exampleapps.greatbig.service.dto.ArticleDTO;
+import org.exampleapps.greatbig.service.dto.CommentDTO;
 import org.exampleapps.greatbig.repository.ArticleRepository;
 import org.exampleapps.greatbig.repository.AuthorRepository;
+import org.exampleapps.greatbig.repository.CommentRepository;
 import org.exampleapps.greatbig.repository.TagRepository;
 import org.exampleapps.greatbig.repository.UserRepository;
 import org.exampleapps.greatbig.repository.search.ArticleSearchRepository;
+import org.exampleapps.greatbig.repository.search.AuthorSearchRepository;
+import org.exampleapps.greatbig.repository.search.CommentSearchRepository;
 import org.exampleapps.greatbig.repository.search.TagSearchRepository;
+import org.exampleapps.greatbig.repository.search.AuthorSearchRepository;
 import org.exampleapps.greatbig.security.SecurityUtils;
 import org.exampleapps.greatbig.web.rest.util.HeaderUtil;
 import org.exampleapps.greatbig.web.rest.util.PaginationUtil;
@@ -64,22 +70,35 @@ public class ArticleResource {
 
     private final TagRepository tagRepository;
 
+    private final CommentRepository commentRepository;
+
     private final TagSearchRepository tagSearchRepository;
 
+    private final CommentSearchRepository commentSearchRepository;
+
     private final ArticleSearchRepository articleSearchRepository;
+
+    private final AuthorSearchRepository authorSearchRepository;
 
     public ArticleResource(ArticleRepository articleRepository,
                            ArticleSearchRepository articleSearchRepository,
                            UserRepository userRepository,
                            TagRepository tagRepository,
                            TagSearchRepository tagSearchRepository,
-                           AuthorRepository authorRepository) {
+                           AuthorRepository authorRepository,
+                           AuthorSearchRepository authorSearchRepository,
+                           CommentRepository commentRepository,
+                           CommentSearchRepository commentSearchRepository
+                           ) {
         this.articleRepository = articleRepository;
         this.articleSearchRepository = articleSearchRepository;
         this.userRepository = userRepository;
         this.tagRepository = tagRepository;
         this.tagSearchRepository = tagSearchRepository;
         this.authorRepository = authorRepository;
+        this.authorSearchRepository = authorSearchRepository;
+        this.commentRepository = commentRepository;
+        this.commentSearchRepository = commentSearchRepository;
     }
 
     /**
@@ -264,7 +283,11 @@ public class ArticleResource {
     // }
 
     /**
-     * GET  /articles/:slug : get the "slug" article.
+     * GET  /articles/:slug : get the "slug" or "id" article. This app is just a demo. It follows the Real World
+     *      API spec that has this parameter be a string. I also want the regular JHipster UI to work for Article
+     *      and that has the parameter be an integer. So while the article could theoretically have a title that's
+     *      an integer and this would try to return the article with that as the id, that's unlikely and this is
+     *      just a demo.
      *
      * @param slug the slug of the article to retrieve
      * @return the ResponseEntity with status 200 (OK) and with body the article, or with status 404 (Not Found)
@@ -273,8 +296,25 @@ public class ArticleResource {
     @Timed
     public ResponseEntity<Article> getArticle(@PathVariable String slug) {
         log.debug("REST request to get Article : {}", slug);
-        Article article = articleRepository.findOneBySlugWithEagerRelationships(slug);
+        Article article;
+        Long id = longValue(slug);
+        if(id > 0) {
+            article = articleRepository.findOneByIdWithEagerRelationships(id);
+        } else {
+            article = articleRepository.findOneBySlugWithEagerRelationships(slug);
+        }
         return ResponseUtil.wrapOrNotFound(Optional.ofNullable(article));
+    }
+
+    private Long longValue( String input ) {
+        Long value = 0L;
+        try {
+            value = Long.parseLong(input, 10);
+            return value;
+        }
+        catch( NumberFormatException e ) {
+            return 0L;
+        }
     }
 
     /**
@@ -307,6 +347,54 @@ public class ArticleResource {
         Page<Article> page = articleSearchRepository.search(queryStringQuery(query), pageable);
         HttpHeaders headers = PaginationUtil.generateSearchPaginationHttpHeaders(query, page, "/api/_search/articles");
         return new ResponseEntity<>(page.getContent(), headers, HttpStatus.OK);
+    }
+
+    /**
+     * POST  /articles/:slug/comments : Add a comment to an Article
+     *
+     * @param article the article to create
+     * @return the ResponseEntity with status 201 (Created) and with body the new article, or with status 400 (Bad Request)
+     * @throws URISyntaxException if the Location URI syntax is incorrect
+     */
+
+    @PostMapping("/articles/{slug}/comments")
+    @Timed
+    public ResponseEntity<Article> addComment(@RequestBody CommentDTO commentDTO, @PathVariable String slug) throws URISyntaxException {
+        log.debug("REST request to add Comment : {}", commentDTO);
+        // if (article.getId() != null) {
+        //     return ResponseEntity.badRequest().headers(HeaderUtil.createFailureAlert(ENTITY_NAME, "idexists", "A new article cannot already have an ID")).body(null);
+        // }
+
+        Optional<User> currentUser = userRepository.findOneByLogin(SecurityUtils.getCurrentUserLogin());
+        if (currentUser.isPresent()) {
+            Author author = authorRepository.findById(currentUser.get().getId());
+            if (author == null) {
+                author = new Author();
+                author.setId(currentUser.get().getId());
+                authorRepository.save(author);
+                authorSearchRepository.save(author);
+            }
+
+            Comment comment = new Comment();
+            comment.setBody(commentDTO.getBody());
+            comment.setAuthor(author);
+            comment.setCreatedAt(ZonedDateTime.now());
+            comment.setUpdatedAt(ZonedDateTime.now());
+            Comment savedComment = commentRepository.save(comment);
+            commentSearchRepository.save(savedComment);
+
+            Article article = articleRepository.findOneBySlug(slug);
+            article.addComment(savedComment);
+            Article savedArticle = articleRepository.save(article);
+            articleSearchRepository.save(savedArticle);
+
+            return ResponseEntity.created(new URI("/articles/{slug}/comments"))
+            .headers(HeaderUtil.createEntityCreationAlert(ENTITY_NAME, result.getId().toString()))
+            .body(savedArticle);
+        } else {
+            return ResponseEntity.badRequest().headers(HeaderUtil.createFailureAlert(ENTITY_NAME, "nocurrentuser", "No current user")).body(null);
+        }
+
     }
 
 }

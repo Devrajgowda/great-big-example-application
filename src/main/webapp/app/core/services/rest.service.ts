@@ -23,8 +23,10 @@ import { AppConfig } from '../../app.config';
  */
 const endpoints = {
     article: 'articles',
+    author: 'authors',
     claim: 'claims',
     claimRebuttal: 'claim-rebuttals',
+    comment: 'comments',
     contact: 'contacts',
     crisis: 'crises',
     hero: 'heroes',
@@ -64,6 +66,12 @@ export class RESTService {
 
     add(entity: any, table): Observable<any> {
         return this.http.post(`${this.config.apiUrl}/${endpoints[table]}`, this.prepareRecord(entity))
+            .map(this.extractData)
+            .catch(this.handleError);
+    }
+
+    post(route: string, object: any): Observable<any> {
+        return this.http.post(`${this.config.apiUrl}/${route}`, this.prepareRecord(object))
             .map(this.extractData)
             .catch(this.handleError);
     }
