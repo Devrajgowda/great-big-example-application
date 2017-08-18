@@ -14,6 +14,7 @@ import { User } from '../../../core/store/user/user.model';
 import { slices } from '../../../core/store/util';
 import * as EntityActions from '../../../core/store/entity/entity.actions';
 import * as ArticleActions from '../../../core/store/article/article.actions';
+import * as ProfileActions from '../../../core/store/profile/profile.actions';
 import { Account, Principal } from '../../../shared';
 
 @Component({
@@ -33,7 +34,7 @@ export class ArticleComponent implements OnInit, OnDestroy {
     commentFormErrors = {};
     isSubmitting = false;
     isDeleting = false;
-    identity$: Promise<Account>;
+    identity: Promise<Account>;
     identitySub: Subscription;
 
     constructor(
@@ -46,14 +47,14 @@ export class ArticleComponent implements OnInit, OnDestroy {
     ) { }
 
     ngOnInit() {
-        this.identity$ = this.principal.identity();
+        this.identity = this.principal.identity();
         this.article$ = this.store.select(fromRoot.getSelectedArticle);
         this.articleSub = this.article$.subscribe((article) => this.article = article);
         this.comments$ = this.store.select(fromRoot.getCommentsForSelectedArticle);
         this.commentsSub = this.comments$.subscribe((comments) => this.comments = comments);
 
         // Load the current user's data
-        this.identitySub = Observable.combineLatest(this.identity$, this.article$).subscribe(
+        this.identitySub = Observable.combineLatest(this.identity, this.article$).subscribe(
             ([identityData, article]) => {
                 this.currentUser = identityData;
 
@@ -62,19 +63,27 @@ export class ArticleComponent implements OnInit, OnDestroy {
         );
     }
 
-    // onToggleFavorite(favorited: boolean) {
-    //     this.article.favorited = favorited;
+    onToggleFavorite(favorited: boolean) {
 
-    //     if (favorited) {
-    //         this.article.favoritesCount++;
-    //     } else {
-    //         this.article.favoritesCount--;
-    //     }
-    // }
+        //     this.article.favorited = favorited;
 
-    // onToggleFollowing(following: boolean) {
-    //     this.article.author.following = following;
-    // }
+        if (favorited) {
+            this.store.dispatch(new ArticleActions.Favorite(this.article.slug));
+            // this.article.favoritesCount++;
+        } else {
+            this.store.dispatch(new ArticleActions.Unfavorite(this.article.slug));
+            // this.article.favoritesCount--;
+        }
+    }
+
+    onToggleFollowing(following: boolean) {
+        if (following) {
+            this.store.dispatch(new ProfileActions.Follow(this.article.author.username));
+        } else {
+            this.store.dispatch(new ProfileActions.Unfollow(this.article.author.username));
+        }
+        // this.article.author.following = following;
+    }
 
     deleteArticle() {
         this.isDeleting = true;

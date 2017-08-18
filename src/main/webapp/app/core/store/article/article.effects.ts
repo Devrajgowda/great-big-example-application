@@ -2,7 +2,8 @@ import { Injectable } from '@angular/core';
 import { Store } from '@ngrx/store';
 import { Actions, Effect } from '@ngrx/effects';
 import { Observable } from 'rxjs/Observable';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute, Router, ActivatedRouteSnapshot } from '@angular/router';
+import { of } from 'rxjs/observable/of';
 
 import { Article } from './article.model';
 import { slices } from '../util';
@@ -17,7 +18,8 @@ import * as ArticleActions from './article.actions';
 import { initialBlogPageLayout } from '../../../features/blog/blog.layout';
 import * as SliceActions from '../slice/slice.actions';
 import * as fromRoot from '../../../core/store';
-import { PayloadAction } from '../util';
+import { PayloadAction, handleNavigation, secondSegment } from '../util';
+import { RootState } from '../';
 
 @Injectable()
 export class ArticleEffects {
@@ -44,23 +46,15 @@ export class ArticleEffects {
             return Observable.empty();
         });
 
-    // @Effect()
-    // // export function loadFromRemote$(actions$: Actions, slice: string, dataService): Observable<Action> {
-    // private loadForQueryFromRemote = this.actions$
-    //     .ofType(typeFor(slices.LAYOUT, SliceActions.actions.UPDATE))
-    //     .filter((action: SliceAction) => action.payload.filters)   // TODO: make this a better test for this being the blog page layout
-    //     .withLatestFrom(this.store.select(fromRoot.getBlogPageLayout), (action, blogPageLayout) => {
-
-    //         const route = '/articles' + (blogPageLayout.type === 'feed') ? '/feed' : '';
-    //         return this.dataService.getEntities(route, action.payload.filters)
-    //             .mergeMap((fetchedEntities) => Observable.from(fetchedEntities))
-    //             .map((fetchedEntity) => new EntityActions.LoadSuccess(slices.ARTICLE, fetchedEntity))  // one action per entity
-    //             .catch((err) => {
-    //                 console.log(err);
-    //                 return Observable.of(new EntityActions.AddUpdateFail(slices.ARTICLE, null));
-    //             })
-    //     }
-    //     );
+    /*
+     * Select the article whose slug is contained in the route
+     */
+    @Effect()
+    navigateToArticle$ = handleNavigation(this.store, this.actions$, secondSegment, 'features/blog/article/:slug', (r: ActivatedRouteSnapshot, state: RootState) => {
+        const slug = r.paramMap.get('slug');
+        const articleId = state.article.ids.filter((id) => state.article.entities[id].slug === slug)[0];
+        return of(new EntityActions.Select(slices.ARTICLE, state.article[articleId]));
+    });
 
     @Effect()
     private favorite$ = sliceFunctions.postToRemote$(this.actions$, slices.ARTICLE, this.dataService, actions.FAVORITE, new ArticleActions.FavoriteSuccess(), new ArticleActions.FavoriteFail());
@@ -72,7 +66,7 @@ export class ArticleEffects {
     private addComment$ = sliceFunctions.postToRemote$(this.actions$, slices.ARTICLE, this.dataService, actions.ADD_COMMENT, new ArticleActions.AddCommentSuccess(), new ArticleActions.AddCommentFail());
 
     constructor(
-        private store: Store<Article>,
+        private store: Store<RootState>,
         private actions$: Actions<PayloadAction>,
         private router: Router,
         private dataService: RESTService

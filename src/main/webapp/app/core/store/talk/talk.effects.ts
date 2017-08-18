@@ -5,13 +5,14 @@ import { Injectable } from '@angular/core';
 import { of } from 'rxjs/observable/of';
 import { Store } from '@ngrx/store';
 import { Observable } from 'rxjs/Observable';
+import { Action } from '@ngrx/store';
 
 import { WatchService } from '../../../features/talks/services/watch.service';
 import { Filters } from '../../../features/talks/talks.layout';
 import { RESTService } from '../../services/rest.service';
 import { Talk } from './talk.model';
 import { RootState } from '../';
-import { slices, PayloadAction } from '../util';
+import { slices, PayloadAction, handleNavigation, secondSegment } from '../util';
 import * as EntityActions from '../entity/entity.actions';
 import { typeFor } from '../util';
 import { actions } from '../entity/entity.actions';
@@ -19,14 +20,14 @@ import { actions } from '../entity/entity.actions';
 @Injectable()
 export class TalkEffects {
     @Effect()
-    navigateToTalks$ = this.handleNavigation('talks', (r: ActivatedRouteSnapshot) => {
+    navigateToTalks$ = handleNavigation(this.store, this.actions$, secondSegment, 'talks', (r: ActivatedRouteSnapshot) => {
         const filters = createFilters(r.params);
         return this.dataService.getEntities(slices.TALK, { speaker: filters.speaker, title: filters.title, minRating: '' + filters.minRating })
             .map((fetchedEntities) => new EntityActions.LoadAllSuccess(slices.TALK, fetchedEntities));
     });
 
     @Effect()
-    navigateToTalk$ = this.handleNavigation('talks/talk/:id', (r: ActivatedRouteSnapshot, state: RootState) => {
+    navigateToTalk$ = handleNavigation(this.store, this.actions$, secondSegment, 'talks/talk/:id', (r: ActivatedRouteSnapshot, state: RootState) => {
         const id = +r.paramMap.get('id');
         if (!state.talk[id]) {
             return this.dataService.getEntity(+r.paramMap.get('id'), slices.TALK).map((responseEntity) => new EntityActions.UpdateSuccess(slices.TALK, responseEntity));
@@ -52,32 +53,6 @@ export class TalkEffects {
         private dataService: RESTService,
         private watch: WatchService
     ) { }
-
-    /**
-     * @whatItDoes Use this function to do something in response to routing to a specific route
-     *
-     * @param segment The url part to watch for
-     * @param callback The function to execute when routing to segment
-     */
-    private handleNavigation(segment: string, callback: (a: ActivatedRouteSnapshot, state: RootState) => Observable<any>) {
-        const nav = this.actions$.ofType(ROUTER_NAVIGATION)
-            .map(secondSegment)
-            .filter((s) => s.routeConfig.path === segment);
-
-        return nav.withLatestFrom(this.store).switchMap((a) => callback(a[0], a[1])).catch((e) => {
-            console.log('Network error', e);
-            return of();
-        });
-    }
-}
-/**
- * This returns a route configuration of the second part of the route.
- * /features/talks       => talks
- * /features/talks/:id   => talks/:id
- * @param r
- */
-function secondSegment(r: RouterNavigationAction) {
-    return r.payload.routerState.root.firstChild.firstChild;
 }
 
 function createFilters(p: Params): Filters {

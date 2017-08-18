@@ -66,7 +66,7 @@ export class EditorPage implements OnInit, OnDestroy {
         this.isSubmitting = true;
 
         this.store.dispatch(new EntityActions.Add(slices.ARTICLE, this.articleForm.value));
-        // (article) => this.router.navigateByUrl('/article/' + article.slug),  TODO: handle routing on success
+        // (article) => this.router.navigateByUrl('/article/' + article.slug)
     }
 
     ngOnDestroy() {

@@ -76,7 +76,8 @@ export class AddPage implements OnInit, OnDestroy {
     }
 
     updateArticle(values: Object) {
-        (<any>Object).assign(this.article, values);
+        this.store.dispatch(new EntityActions.Patch(slices.ARTICLE, { id: this.article.id, ...values }));
+        // (<any>Object).assign(this.article, values);
     }
 
     ngOnDestroy() {

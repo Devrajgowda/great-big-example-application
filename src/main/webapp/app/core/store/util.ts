@@ -1,5 +1,12 @@
 import { Action } from '@ngrx/store';
 import { Actions } from '@ngrx/effects';
+import { Params, ActivatedRouteSnapshot } from '@angular/router';
+import { ROUTER_NAVIGATION, RouterNavigationAction } from '@ngrx/router-store';
+import { of } from 'rxjs/observable/of';
+import { Observable } from 'rxjs/Observable';
+import { Store } from '@ngrx/store';
+
+import { RootState } from './';
 
 /**
  * This function coerces a string into a string literal type.
@@ -67,3 +74,30 @@ export class PayloadAction implements Action {
 }
 
 export type PayloadActions = Actions<PayloadAction>;
+
+/**
+ * @whatItDoes Use this function to do something in response to routing to a specific route
+ *
+ * @param segment The url part to watch for
+ * @param callback The function to execute after routing to segment
+ */
+export function handleNavigation(store: Store<RootState>, actions$: Actions, segment: (Action) => ActivatedRouteSnapshot, segmentValue: string, callback: (a: ActivatedRouteSnapshot, state: RootState) => Observable<any>) {
+    const nav = actions$.ofType(ROUTER_NAVIGATION)
+        .map(segment)
+        .filter((s) => s.routeConfig.path === segmentValue);
+
+    return nav.withLatestFrom(store).switchMap((a) => callback(a[0], a[1])).catch((e) => {
+        console.log('Network error', e);
+        return of();
+    });
+}
+
+/**
+ * This returns a route configuration of the second part of the route.
+ * /features/talks       => talks
+ * /features/talks/:id   => talks/:id
+ * @param r
+ */
+export function secondSegment(r: RouterNavigationAction<{}>): ActivatedRouteSnapshot {    // TODO: figure out what type should go here
+    return (<any>r.payload.routerState).root.firstChild.firstChild;
+}

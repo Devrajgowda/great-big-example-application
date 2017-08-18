@@ -36,6 +36,7 @@ import org.springframework.util.MultiValueMap;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -357,6 +358,7 @@ public class ArticleResource {
      * @throws URISyntaxException if the Location URI syntax is incorrect
      */
 
+    @Transactional
     @PostMapping("/articles/{slug}/comments")
     @Timed
     public ResponseEntity<Article> addComment(@RequestBody CommentDTO commentDTO, @PathVariable String slug) throws URISyntaxException {
@@ -388,8 +390,8 @@ public class ArticleResource {
             Article savedArticle = articleRepository.save(article);
             articleSearchRepository.save(savedArticle);
 
-            return ResponseEntity.created(new URI("/articles/{slug}/comments"))
-            .headers(HeaderUtil.createEntityCreationAlert(ENTITY_NAME, result.getId().toString()))
+            return ResponseEntity.created(new URI("/articles/:slug/comments"))
+            .headers(HeaderUtil.createEntityCreationAlert(ENTITY_NAME, savedArticle.getId().toString()))
             .body(savedArticle);
         } else {
             return ResponseEntity.badRequest().headers(HeaderUtil.createFailureAlert(ENTITY_NAME, "nocurrentuser", "No current user")).body(null);

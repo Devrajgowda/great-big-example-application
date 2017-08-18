@@ -14,6 +14,7 @@ import java.util.Objects;
  * A Comment.
  */
 @Entity
+@Embeddable
 @Table(name = "comment")
 @Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)
 @Document(indexName = "comment")

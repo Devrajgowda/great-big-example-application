@@ -14,7 +14,10 @@ import { GreatBigExampleApplicationHomeModule } from './features/home/home.modul
 // import { StoreLogMonitorModule } from '@ngrx/store-log-monitor';
 import { TranslateModule } from '@ngx-translate/core';
 import { EffectsModule } from '@ngrx/effects';
-import { StoreRouterConnectingModule } from '@ngrx/router-store';
+import {
+    StoreRouterConnectingModule,
+    RouterStateSerializer,
+} from '@ngrx/router-store';
 import { StoreDevtoolsModule } from '@ngrx/store-devtools';
 import { StoreModule } from '@ngrx/store';
 
@@ -86,7 +89,8 @@ const imports = [
      */
     // There is a fix in the works for a performanc problem when
     // using devtools and router-store together
-    // process.env.NODE_ENV ? StoreDevtoolsModule.instrument() : [],
+    process.env.NODE_ENV === 'dev' ? StoreDevtoolsModule.instrument() : [],
+    // StoreDevtoolsModule.instrument(),
 
     /**
      * EffectsModule.forRoot() is imported once in the root module and

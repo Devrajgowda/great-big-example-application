@@ -108,7 +108,7 @@ public class AuthorResource {
     @Timed
     public ResponseEntity<Author> getAuthor(@PathVariable Long id) {
         log.debug("REST request to get Author : {}", id);
-        Author author = authorRepository.findOneWithEagerRelationships(id);
+        Author author = authorRepository.findById(id);
         return ResponseUtil.wrapOrNotFound(Optional.ofNullable(author));
     }
 
