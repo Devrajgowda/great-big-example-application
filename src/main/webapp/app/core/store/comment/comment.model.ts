@@ -1,7 +1,7 @@
 import { Profile } from '../profile/profile.model';
 
 export interface Comment {
-    id: number;
+    id: string;
     articleId: string;
     body: string;
     createdAt: string;

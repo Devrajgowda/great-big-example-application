@@ -16,7 +16,7 @@ import { Counter } from './counter/counter.model';
 import { Hero } from './hero/hero.model';
 import { Layout } from './layout/layout.model';
 import { Note } from './note/note.model';
-import { Rebuttal, initialRebuttal } from './rebuttal/rebuttal.model';
+import { Rebuttal } from './rebuttal/rebuttal.model';
 import { Session } from './session/session.model';
 import { User } from './user/user.model';
 import { TagList } from './tag-list/tag-list.model';

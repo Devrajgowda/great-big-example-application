@@ -9,7 +9,7 @@ import { actions, EntityAction } from '../entity/entity.actions';
 import * as EntityActions from '../entity/entity.actions';
 import * as ArticleActions from '../article/article.actions';
 
-export function reducer(state: Entities<Article> = initialEntities<Article>({}, slices.ARTICLE, actions, initialArticle),
+export function reducer(state: Entities<Article> = initialEntities<Article>(slices.ARTICLE, actions, initialArticle),
     action: EntityAction<Article>): Entities<Article> {
 
     switch (action.type) {

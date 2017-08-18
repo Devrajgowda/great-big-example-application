@@ -1,4 +1,5 @@
 import { PayloadAction } from '../util';
+import { Entity } from './entity.model';
 import { SliceAction } from '../slice/slice.actions';
 import { typeFor } from '../util';
 
@@ -30,7 +31,7 @@ export const actions = {
 
 export const TEMP = 'TEMP_ID_VALUE';
 
-export class EntityAction<T> extends SliceAction implements PayloadAction {
+class DynamicTypeAction<T> extends SliceAction implements PayloadAction {
     protected actionName = '';
     constructor(public slice: string, public payload: any) {
         super(slice, payload);
@@ -38,10 +39,15 @@ export class EntityAction<T> extends SliceAction implements PayloadAction {
     get type() {
         return typeFor(this.slice, this.actionName);
     }
-
 }
 
-export class Add<T> extends EntityAction<T> {
+export class EntityAction<T extends Entity> extends DynamicTypeAction<T> implements PayloadAction {
+    constructor(public slice: string, public payload: T) {
+        super(slice, payload);
+    }
+}
+
+export class Add<T extends Entity> extends EntityAction<T> {
     protected actionName: string = actions.ADD;
     constructor(public slice: string, public payload: any = {}) {
         super(slice, Object.assign({}, { dirty: true }, payload));
@@ -63,7 +69,7 @@ export class Add<T> extends EntityAction<T> {
  * validated. If the id of the payload is missing or null
  * then use the TEMP value. Otherwise use the payload.id value
  */
-export class AddTemp<T> extends EntityAction<T> {
+export class AddTemp<T extends Entity> extends EntityAction<T> {
     protected actionName: string = actions.ADD_TEMP;
     constructor(public slice: string, payload: any = {}) {
         super(slice, Object.assign({}, payload, (payload.id ? {} : { id: TEMP })));
@@ -74,95 +80,95 @@ export class AddTemp<T> extends EntityAction<T> {
  * Use this action to first put in the store and then
  * submit to the server
  */
-export class AddOptimistically<T> extends Add<T> {
+export class AddOptimistically<T extends Entity> extends Add<T> {
     protected actionName: string = actions.ADD_OPTIMISTICALLY;
     constructor(public slice: string, payload: any = {}) {
         super(slice, Object.assign({}, { id: TEMP }, payload));
     }
 }
 
-export class AddSuccess<T> extends EntityAction<T> {
+export class AddSuccess<T extends Entity> extends EntityAction<T> {
     protected actionName: string = actions.ADD_SUCCESS;
 }
 
-export class AddUpdateFail<T> extends EntityAction<T> {
+export class AddUpdateFail<T extends Entity> extends EntityAction<T> {
     protected actionName: string = actions.ADD_UPDATE_FAIL;
 }
 
-export class Delete<T> extends EntityAction<T> {
+export class Delete<T extends Entity> extends EntityAction<T> {
     protected actionName: string = actions.DELETE;
 }
 
-export class DeleteFail<T> extends EntityAction<T> {
+export class DeleteFail<T extends Entity> extends EntityAction<T> {
     protected actionName: string = actions.DELETE_FAIL;
 }
 
-export class DeleteSuccess<T> extends EntityAction<T> {
+export class DeleteSuccess<T extends Entity> extends EntityAction<T> {
     protected actionName: string = actions.DELETE_SUCCESS;
 }
 
-export class DeleteTemp<T> extends EntityAction<T> {
+export class DeleteTemp<T extends Entity> extends EntityAction<T> {
     protected actionName: string = actions.DELETE_TEMP;
     constructor(public slice: string) {
-        super(slice, { id: TEMP })
+        super(slice, <T>{ id: TEMP })
     }
 }
 
-export class Load<T> extends EntityAction<T> {
+export class Load<T extends Entity> extends EntityAction<T> {
     protected actionName: string = actions.LOAD;
 }
 
-export class LoadFail<T> extends EntityAction<T> {
+export class LoadFail<T extends Entity> extends EntityAction<T> {
     protected actionName: string = actions.LOAD_FAIL;
 }
 
-export class LoadSuccess<T> extends EntityAction<T> {
+export class LoadSuccess<T extends Entity> extends EntityAction<T> {
     protected actionName: string = actions.LOAD_SUCCESS;
 }
 
-export class LoadAll<T> extends EntityAction<T> {
+export class LoadAll<T extends Entity> extends EntityAction<T> {
     protected actionName: string = actions.LOAD_ALL;
 }
 
-export class LoadAllFail<T> extends EntityAction<T> {
+export class LoadAllFail<T extends Entity> extends EntityAction<T> {
     protected actionName: string = actions.LOAD_ALL_FAIL;
 }
 
-export class LoadAllSuccess<T> extends EntityAction<T> {
+export class LoadAllSuccess<T extends Entity> extends DynamicTypeAction<T> {
     protected actionName: string = actions.LOAD_ALL_SUCCESS;
 }
 
-export class Patch<T> extends EntityAction<T> {
+export class Patch<T> extends DynamicTypeAction<T> {
     protected actionName: string = actions.PATCH;
 }
 
-export class PatchSuccess<T> extends EntityAction<T> {
+export class PatchSuccess<T extends Entity> extends EntityAction<T> {
     protected actionName: string = actions.PATCH_SUCCESS;
 }
 
-export class PatchFail<T> extends EntityAction<T> {
+export class PatchFail<T extends Entity> extends EntityAction<T> {
     protected actionName: string = actions.PATCH_FAIL;
 }
 
-export class Update<T> extends EntityAction<T> {
+export class Update<T extends Entity> extends EntityAction<T> {
     protected actionName: string = actions.UPDATE;
 }
 
-export class PatchEach<T> extends EntityAction<T> {
+export class PatchEach<T extends Entity> extends DynamicTypeAction<T> {
     protected actionName: string = actions.PATCH_EACH;
 }
 
-export class UpdateSuccess<T> extends EntityAction<T> {
+export class UpdateSuccess<T extends Entity> extends EntityAction<T> {
     protected actionName: string = actions.UPDATE_SUCCESS;
 }
 
-export class Select<T> extends EntityAction<T> {
+export class Select<T extends Entity> extends EntityAction<T> {
     protected actionName: string = actions.SELECT;
 }
 
-export class SelectNext<T> extends EntityAction<T> {
+export class SelectNext<T extends Entity> extends EntityAction<T> {
     protected actionName: string = actions.SELECT_NEXT;
     constructor(public slice: string) {
-        super(null, slice);
+        super(slice, null);
     }
 }

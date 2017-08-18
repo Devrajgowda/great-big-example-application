@@ -11,8 +11,8 @@ import { Router, ActivatedRoute } from '@angular/router';
 
 import * as fromRoot from '../../core/store';
 import { BerniePageLayout } from './bernie.layout';
-import { Claim, initialClaim } from '../../core/store/claim/claim.model';
-import { Rebuttal, initialRebuttal } from '../../core/store/rebuttal/rebuttal.model';
+import { Claim, ClaimFields, initialClaim } from '../../core/store/claim/claim.model';
+import { Rebuttal, RebuttalFields, initialRebuttal } from '../../core/store/rebuttal/rebuttal.model';
 import { ClaimRebuttal, initialClaimRebuttal } from '../../core/store/claim-rebuttal/claim-rebuttal.model';
 import { Entities } from '../../core/store/entity/entity.model';
 import * as EntityActions from '../../core/store/entity/entity.actions';
@@ -105,14 +105,12 @@ export class BerniePage implements OnInit, OnDestroy, AfterViewChecked {
         // to create a new, blank rebuttal for this claim
         // create an instance of rebuttal and an instance of the join record claimRebuttal
         // and dispatch actions to each respective reducer
-        const newRebuttal = initialRebuttal({ editing: true });
-        const newClaimRebuttal = initialClaimRebuttal({ claimId: claim.id, rebuttalId: EntityActions.TEMP });
-        this.store.dispatch(new EntityActions.AddTemp(slices.REBUTTAL, newRebuttal));
-        this.store.dispatch(new EntityActions.AddTemp(slices.CLAIM_REBUTTAL, newClaimRebuttal));
+        this.store.dispatch(new EntityActions.AddTemp(slices.REBUTTAL, { editing: true }));
+        this.store.dispatch(new EntityActions.AddTemp(slices.CLAIM_REBUTTAL, { claimId: claim.id, rebuttalId: EntityActions.TEMP }));
     }
 
     toggleRebuttals(claim: Claim) {
-        this.store.dispatch(new EntityActions.Patch(slices.CLAIM, { id: claim.id, expanded: !claim.expanded }));
+        this.store.dispatch(new EntityActions.Patch<ClaimFields>(slices.CLAIM, { id: claim.id, expanded: !claim.expanded }));
     }
 
     cancelRebuttal({ claimRebuttalId, rebuttal }) {
@@ -120,7 +118,7 @@ export class BerniePage implements OnInit, OnDestroy, AfterViewChecked {
             this.store.dispatch(new EntityActions.DeleteTemp(slices.CLAIM_REBUTTAL));
             this.store.dispatch(new EntityActions.DeleteTemp(slices.REBUTTAL));
         } else {
-            this.store.dispatch(new EntityActions.Patch<Rebuttal>(slices.REBUTTAL, { id: rebuttal.id, editing: false }));
+            this.store.dispatch(new EntityActions.Patch<RebuttalFields>(slices.REBUTTAL, { id: rebuttal.id, editing: false }));
         }
     }
 
@@ -129,7 +127,7 @@ export class BerniePage implements OnInit, OnDestroy, AfterViewChecked {
     }
 
     makeRebuttalEditable(rebuttal: Rebuttal) {
-        this.store.dispatch(new EntityActions.Patch<Rebuttal>(slices.REBUTTAL, { id: rebuttal.id, editing: true }));
+        this.store.dispatch(new EntityActions.Patch<RebuttalFields>(slices.REBUTTAL, { id: rebuttal.id, editing: true }));
     }
 
     reorderRebuttals(claim, event) {

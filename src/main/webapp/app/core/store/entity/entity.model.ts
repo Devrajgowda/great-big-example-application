@@ -1,6 +1,11 @@
 import { EntityAction } from './entity.actions';
 
-export interface Entities<T> {
+export interface Entity {
+    id: string,
+    [field: string]: any
+}
+
+export interface Entities<T extends Entity> {
     ids: string[];
     entities: { [id: string]: T };
     loaded?: boolean;
@@ -8,10 +13,9 @@ export interface Entities<T> {
     selectedEntityId?: string;
     slice: string;
     initialEntity: T;
-    getData: Function;
 };
 
-export function initialEntities<T>(vals: any = {}, slice: string, actionNames: any, initialEntity): Entities<T> {
+export function initialEntities<T extends Entity>(slice: string, actionNames: any, initialEntity: T, vals?: T): Entities<T> {
 
     return Object.assign({
         ids: [],

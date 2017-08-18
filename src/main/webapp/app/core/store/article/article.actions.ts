@@ -1,4 +1,6 @@
-import { EntityAction, actions as entityActions } from '../entity/entity.actions';
+import { actions as entityActions } from '../entity/entity.actions';
+import { Entity } from '../entity/entity.model';
+import { SliceAction } from '../slice/slice.actions';
 import { Article } from './article.model';
 import { slices } from '../util';
 
@@ -15,16 +17,16 @@ export const actions = {
     ADD_COMMENT_FAIL: 'ADD_COMMENT_FAIL'
 }
 
-class ArticleAction extends EntityAction<Article> {
-    constructor(obj = {}) {
+class ArticleAction extends SliceAction {
+    constructor(obj?: Entity | string) {
         super(slices.ARTICLE, obj);
     }
 }
 
-export class Favorite extends ArticleAction {
+export class Favorite extends SliceAction {
     protected actionName: string = actions.FAVORITE;
     constructor(slug: string) {
-        super({ route: '/articles/' + slug + '/favorite' });
+        super(slices.ARTICLE, { route: '/articles/' + slug + '/favorite' });
     }
 }
 
@@ -48,10 +50,10 @@ export class UnfavoriteFail extends ArticleAction {
     protected actionName: string = actions.UNFAVORITE_FAIL;
 }
 
-export class AddComment extends ArticleAction {
+export class AddComment extends SliceAction {
     protected actionName: string = actions.ADD_COMMENT;
     constructor(slug: string, requestObject: any) {
-        super({ route: 'articles/' + slug + '/comments', requestObject });
+        super(slices.ARTICLE, { route: 'articles/' + slug + '/comments', requestObject });
     }
 }
 

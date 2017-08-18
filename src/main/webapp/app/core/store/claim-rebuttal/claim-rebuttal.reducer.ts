@@ -9,7 +9,7 @@ import * as sliceFunctions from '../slice/slice.functions';
 import { slices, typeFor } from '../util';
 import { actions, EntityAction } from '../entity/entity.actions';
 
-export function reducer(state: Entities<ClaimRebuttal> = initialEntities<ClaimRebuttal>({},
+export function reducer(state: Entities<ClaimRebuttal> = initialEntities<ClaimRebuttal>(
     slices.CLAIM_REBUTTAL, actions, initialClaimRebuttal),
     action: EntityAction<ClaimRebuttal>): Entities<ClaimRebuttal> {
     const entities = {};

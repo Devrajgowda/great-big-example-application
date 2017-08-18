@@ -11,12 +11,12 @@ import 'rxjs/add/operator/withLatestFrom';
 import { toPayload, Actions } from '@ngrx/effects';
 import { Action } from '@ngrx/store';
 
-import { Entities } from './entity.model';
+import { Entities, Entity } from './entity.model';
 import { typeFor, PayloadAction, PayloadActions } from '../util';
 import { actions, EntityAction } from './entity.actions';
 import * as EntityActions from './entity.actions';
 
-export function addToStore<T>(state: Entities<T>, action: EntityActions.Add<T> | EntityActions.Load<T>): Entities<T> {
+export function addToStore<T extends Entity>(state: Entities<T>, action: EntityActions.Add<T> | EntityActions.Load<T>): Entities<T> {
     const entities = Object.assign({}, state.entities);
     entities[action.payload.id] = reduceOne(state, null, action);
     return Object.assign({}, state, {
@@ -31,7 +31,7 @@ export function addToStore<T>(state: Entities<T>, action: EntityActions.Add<T> |
 /**
  * Called after response from an add request returns from the server
  */
-export function addSuccess<T>(state: Entities<T>, action: EntityActions.AddTemp<T>): Entities<T> {
+export function addSuccess<T extends Entity>(state: Entities<T>, action: EntityActions.AddTemp<T>): Entities<T> {
     const entities = Object.assign({}, state.entities);
     const optimisticObject = entities[EntityActions.TEMP] || null;
     entities[action.payload.id] = reduceOne(state, optimisticObject, action);
@@ -50,7 +50,7 @@ export function addSuccess<T>(state: Entities<T>, action: EntityActions.AddTemp<
  *
  * Only delete pessimistically
  */
-export function deleteEntity<T>(state: Entities<T>, action: EntityActions.Delete<T> | EntityActions.DeleteTemp<T>): Entities<T> {
+export function deleteEntity<T extends Entity>(state: Entities<T>, action: EntityActions.Delete<T> | EntityActions.DeleteTemp<T>): Entities<T> {
     const entities = Object.assign({}, state.entities);
 
     const id = action.payload.id;
@@ -68,20 +68,20 @@ export function deleteEntity<T>(state: Entities<T>, action: EntityActions.Delete
 /**
  * Called from OnDestroy hooks to remove unsaved records with TEMP ID
  */
-export function deleteTemp<T>(state: Entities<T>, action: EntityActions.DeleteTemp<T>): Entities<T> {
+export function deleteTemp<T extends Entity>(state: Entities<T>, action: EntityActions.DeleteTemp<T>): Entities<T> {
     const entities = Object.assign({}, state.entities);
     if (entities[action.payload.id]) {
         return deleteEntity<T>(state, action);
     }
 }
 
-export function select<T>(state: Entities<T>, action: EntityActions.Select<T>): Entities<T> {
+export function select<T extends Entity>(state: Entities<T>, action: EntityActions.Select<T>): Entities<T> {
     return Object.assign({}, state, {
         selectedEntityId: action.payload.id || action.payload
     });
 };
 
-export function selectNext<T>(state: Entities<T>, action: EntityActions.SelectNext<T>): Entities<T> {
+export function selectNext<T extends Entity>(state: Entities<T>, action: EntityActions.SelectNext<T>): Entities<T> {
     let ix = 1 + state.ids.indexOf(state.selectedEntityId);
     if (ix >= state.ids.length) { ix = 0; }
     return Object.assign({}, state, { selectedEntityId: state.ids[ix] });
@@ -93,7 +93,7 @@ export function selectNext<T>(state: Entities<T>, action: EntityActions.SelectNe
  * @param state
  * @param action
  */
-export function union<T>(state: Entities<T>, action: EntityActions.LoadSuccess<T>) {
+export function union<T extends Entity>(state: Entities<T>, action: EntityActions.LoadSuccess<T>) {
     const entities = action.payload;
     let newEntities = entities.filter((entity) => !state.entities[entity.id]);
 
@@ -117,7 +117,7 @@ export function union<T>(state: Entities<T>, action: EntityActions.LoadSuccess<T
  * @param state  the set of entities
  * @param action needs a payload that has an id
  */
-export function update<T>(state: Entities<T>, action: EntityActions.Update<T>): Entities<T> {
+export function update<T extends Entity>(state: Entities<T>, action: EntityActions.Update<T>): Entities<T> {
     const entities = Object.assign({}, state.entities);
     const id = action.payload.id;
     entities[id] = reduceOne(state, entities[id], action);
@@ -133,8 +133,8 @@ export function update<T>(state: Entities<T>, action: EntityActions.Update<T>): 
  * @param state  the set of entities
  * @param action needs a payload that is an array of entities
  */
-export function newEntities<T>(state: Entities<T>, action: EntityActions.Update<T>): Entities<T> {
-    const entities = action.payload.reduce(function(map, obj) {
+export function newEntities<T extends Entity>(state: Entities<T>, action: EntityActions.Update<T>): Entities<T> {
+    const entities = action.payload.reduce(function (map, obj) {
         map[obj.id] = obj;
         return map;
     }, {});
@@ -144,7 +144,7 @@ export function newEntities<T>(state: Entities<T>, action: EntityActions.Update<
     });
 };
 
-export function patchEach<T>(state: Entities<T>, action: any): Entities<T> {
+export function patchEach<T extends Entity>(state: Entities<T>, action: any): Entities<T> {
     const entities = Object.assign({}, state.entities);
     for (const id of Object.keys(entities)) {
         entities[id] = Object.assign(entities[id], action.payload);
@@ -154,7 +154,7 @@ export function patchEach<T>(state: Entities<T>, action: any): Entities<T> {
     });
 };
 
-function reduceOne<T>(state: Entities<T>, entity: T = null, action: EntityAction<T>): T {
+function reduceOne<T extends Entity>(state: Entities<T>, entity: T = null, action: EntityAction<T>): T {
     // console.log('reduceOne entity:' + JSON.stringify(entity) + ' ' + action.type)
     switch (action.type) {
 
@@ -227,7 +227,7 @@ export function addToRemote$(actions$: Actions, slice: string, dataService, stor
     return actions$
         .ofType(typeFor(slice, actions.ADD), typeFor(slice, actions.ADD_OPTIMISTICALLY))
         .switchMap((action) => dataService.add((<any>action).payloadForPost(), slice))  // TODO: find better way
-        .map((responseEntity) => new EntityActions.AddSuccess(slice, responseEntity));
+        .map((responseEntity: Entity) => new EntityActions.AddSuccess(slice, responseEntity));
 }
 
 export function updateToRemote$(actions$: Actions, slice: string, dataService, store): Observable<Action> {
@@ -239,7 +239,7 @@ export function updateToRemote$(actions$: Actions, slice: string, dataService, s
                 .from((<any>entities).ids)
                 .filter((id: string) => (<any>entities).entities[id].dirty)
                 .switchMap((id: string) => dataService.update((<any>entities).entities[id], slice))
-                .map((responseEntity) => new EntityActions.UpdateSuccess(slice, responseEntity))
+                .map((responseEntity: Entity) => new EntityActions.UpdateSuccess(slice, responseEntity))
         );
 }
 
@@ -247,7 +247,7 @@ export function deleteFromRemote$(actions$: Actions, slice: string, dataService,
     return actions$
         .ofType(typeFor(slice, actions.DELETE))
         .switchMap((action) => dataService.remove((<EntityAction<any>>action).payload, slice))
-        .map((responseEntity) => new EntityActions.DeleteSuccess(slice, responseEntity))
+        .map((responseEntity: Entity) => new EntityActions.DeleteSuccess(slice, responseEntity))
         .catch((err) => {
             console.log(err);
             return Observable.of(new EntityActions.DeleteFail(slice, err));

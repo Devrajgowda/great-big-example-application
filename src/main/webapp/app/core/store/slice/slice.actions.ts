@@ -15,7 +15,7 @@ export class SliceAction implements Action {
         return typeFor(this.slice, this.actionName);
     }
 
-    constructor(public slice: string, public payload: any) { }
+    constructor(public slice: string, public payload?: any) { }
 }
 
 export class Load extends SliceAction {

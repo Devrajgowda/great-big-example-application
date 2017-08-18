@@ -15,7 +15,7 @@ import { actions, EntityAction } from '../entity/entity.actions';
 
 // type Action = RouterAction<fromRoot.RootState> | TalksUpdated | TalkUpdated | Watch | TalkWatched | Rate | Unrate;
 
-export function reducer(state: Entities<Talk> = initialEntities<Talk>({}, slices.TALK, actions, initialTalk), action: EntityAction<Talk>): Entities<Talk> {
+export function reducer(state: Entities<Talk> = initialEntities<Talk>(slices.TALK, actions, initialTalk), action: EntityAction<Talk>): Entities<Talk> {
 
     switch (action.type) {
         case typeFor(slices.TALK, actions.LOAD_ALL_SUCCESS):

@@ -7,7 +7,7 @@ import * as functions from '../entity/entity.functions';
 import { typeFor } from '../util';
 import { actions, EntityAction } from '../entity/entity.actions';
 
-export function reducer(state: Entities<Note> = initialEntities<Note>({}, slices.NOTE, actions, initialNote),
+export function reducer(state: Entities<Note> = initialEntities<Note>(slices.NOTE, actions, initialNote),
     action: EntityAction<Note>): Entities<Note> {
 
     switch (action.type) {
