@@ -213,7 +213,7 @@ function isLoadingAction(verb: string) {
     switch (verb) {
         case actions.ADD:
         case actions.LOAD:
-        case 'ADD_COMMENT':
+        case 'ADD_COMMENT':  // TODO: create an ADD_CHILD action verb to handle this
             return true;
         default:
             return false;
