@@ -65,21 +65,21 @@ public class ArticleResource {
 
     private final ArticleRepository articleRepository;
 
+    private final ArticleSearchRepository articleSearchRepository;
+
     private final AuthorRepository authorRepository;
+
+    private final AuthorSearchRepository authorSearchRepository;
 
     private final UserRepository userRepository;
 
     private final TagRepository tagRepository;
 
-    private final CommentRepository commentRepository;
-
     private final TagSearchRepository tagSearchRepository;
 
+    private final CommentRepository commentRepository;
+
     private final CommentSearchRepository commentSearchRepository;
-
-    private final ArticleSearchRepository articleSearchRepository;
-
-    private final AuthorSearchRepository authorSearchRepository;
 
     public ArticleResource(ArticleRepository articleRepository,
                            ArticleSearchRepository articleSearchRepository,
@@ -238,8 +238,6 @@ public class ArticleResource {
         // }
         if(parameters.containsKey("tag")) {
             page = articleRepository.findByTag(parameters.getFirst("tag"), pageable);
-
-            //
         } else if(parameters.containsKey("author")) {
             page = articleRepository.findByAuthor(parameters.getFirst("author"), pageable);
         } else if(parameters.containsKey("favorited")) {
@@ -315,6 +313,58 @@ public class ArticleResource {
         }
         catch( NumberFormatException e ) {
             return 0L;
+        }
+    }
+
+    @Transactional
+    @PostMapping("/articles/{slug}/favorite")
+    @Timed
+    public ResponseEntity<Article> favoriteArticle(@PathVariable String slug) {
+        log.debug("REST request to favorite Article : {}", slug);
+        Article article = articleRepository.findOneBySlugWithEagerRelationships(slug);
+        Optional<User> currentUser = userRepository.findOneByLogin(SecurityUtils.getCurrentUserLogin());
+        if (currentUser.isPresent()) {
+            Author author = authorRepository.findById(currentUser.get().getId());
+            if (author == null) {
+                author = new Author();
+                author.setId(currentUser.get().getId());
+                authorRepository.save(author);
+            }
+
+            article.addFavoriter(author);
+            Article result = articleRepository.save(article);
+            articleSearchRepository.save(result);
+            return ResponseEntity.ok()
+            .headers(HeaderUtil.createEntityUpdateAlert(ENTITY_NAME, article.getId().toString()))
+            .body(result);
+        } else {
+            return ResponseEntity.badRequest().headers(HeaderUtil.createFailureAlert(ENTITY_NAME, "nocurrentuser", "No current user")).body(null);
+        }
+    }
+
+    @Transactional
+    @DeleteMapping("/articles/{slug}/favorite")
+    @Timed
+    public ResponseEntity<Article> unfavoriteArticle(@PathVariable String slug) {
+        log.debug("REST request to unfavorite Article : {}", slug);
+        Article article = articleRepository.findOneBySlugWithEagerRelationships(slug);
+        Optional<User> currentUser = userRepository.findOneByLogin(SecurityUtils.getCurrentUserLogin());
+        if (currentUser.isPresent()) {
+            Author author = authorRepository.findById(currentUser.get().getId());
+            if (author == null) {
+                author = new Author();
+                author.setId(currentUser.get().getId());
+                authorRepository.save(author);
+            }
+
+            article.removeFavoriter(author);
+            Article result = articleRepository.save(article);
+            articleSearchRepository.save(result);
+            return ResponseEntity.ok()
+            .headers(HeaderUtil.createEntityUpdateAlert(ENTITY_NAME, article.getId().toString()))
+            .body(result);
+        } else {
+            return ResponseEntity.badRequest().headers(HeaderUtil.createFailureAlert(ENTITY_NAME, "nocurrentuser", "No current user")).body(null);
         }
     }
 

@@ -7,12 +7,12 @@ import { SelectivePreloadingStrategy } from '../../../../shared/selective-preloa
 import 'rxjs/add/operator/map';
 
 @Component({
-  template: `
+    template: `
     <p>Dashboard</p>
 
-    <p>Session ID: {{ sessionId | async }}</p>
-    <a id="anchor"></a>
-    <p>Token: {{ token | async }}</p>
+    <p>Session ID: {{ sessionId | async }} TODO:</p>
+    <a id="anchor"> TODO:</a>
+    <p>Token: {{ token | async }} TODO:</p>
 
     Preloaded Modules
     <ul>
@@ -21,28 +21,33 @@ import 'rxjs/add/operator/map';
   `
 })
 export class AdminDashboardComponent implements OnInit {
-  sessionId: Observable<string>;
-  token: Observable<string>;
-  modules: string[];
+    sessionId: Observable<string>;
+    token: Observable<string>;
+    modules: string[];
 
-  constructor(
-    private route: ActivatedRoute,
-    private preloadStrategy: SelectivePreloadingStrategy
-  ) {
-    this.modules = preloadStrategy.preloadedModules;
-  }
+    constructor(
+        private route: ActivatedRoute,
+        private preloadStrategy: SelectivePreloadingStrategy
+    ) {
+        this.modules = preloadStrategy.preloadedModules;
+    }
 
-  ngOnInit() {
-    // Capture the session ID if available
-    this.sessionId = this.route
-      .queryParams
-      .map((params) => params['session_id'] || 'None');
+    ngOnInit() {
 
-    // Capture the fragment if available
-    this.token = this.route
-      .fragment
-      .map((fragment) => fragment || 'None');
-  }
+        // TODO: Think about demonstrating these concepts as they may actually be employed in a real app
+        // NavigationExtras
+        // Save url for rerouting after login
+        //
+        // // Capture the session ID if available
+        // this.sessionId = this.route
+        //   .queryParams
+        //   .map((params) => params['session_id'] || 'None');
+
+        // // Capture the fragment if available
+        // this.token = this.route
+        //   .fragment
+        //   .map((fragment) => fragment || 'None');
+    }
 }
 
 /*

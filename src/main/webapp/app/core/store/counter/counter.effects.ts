@@ -4,12 +4,14 @@ import { Actions, Effect } from '@ngrx/effects';
 import { empty } from 'rxjs/observable/empty';
 
 import { Counter, initialCounter } from './counter.model';
-import { RESTService } from '../../services/rest.service';
 import * as functions from '../entity/entity.functions';
 import { typeFor, slices } from '../util';
 import { actions, SliceAction } from '../slice/slice.actions';
 import * as SliceActions from '../slice/slice.actions';
 
+/*
+ * @whatItDoes This just resets the counter whenever someone logs in or logs out
+*/
 @Injectable()
 export class CounterEffects {
     @Effect({ dispatch: false })
@@ -25,7 +27,6 @@ export class CounterEffects {
 
     constructor(
         private store: Store<Counter>,
-        private actions$: Actions,
-        private dataService: RESTService
+        private actions$: Actions
     ) { }
 }

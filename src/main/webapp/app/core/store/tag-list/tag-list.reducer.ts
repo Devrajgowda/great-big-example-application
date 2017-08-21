@@ -3,7 +3,6 @@ import { createSelector } from 'reselect';
 import { actions } from '../entity/entity.actions';
 import { SliceAction } from '../slice/slice.actions';
 import { initialTagList } from './tag-list.model';
-import { Entities, initialEntities } from '../entity/entity.model';
 import { slices } from '../util';
 import * as functions from '../slice/slice.functions';
 import { typeFor } from '../util';

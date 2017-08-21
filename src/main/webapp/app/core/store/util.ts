@@ -98,6 +98,6 @@ export function handleNavigation(store: Store<RootState>, actions$: Actions, seg
  * /features/talks/:id   => talks/:id
  * @param r
  */
-export function secondSegment(r: RouterNavigationAction<{}>): ActivatedRouteSnapshot {    // TODO: figure out what type should go here
+export function secondSegment(r: RouterNavigationAction): ActivatedRouteSnapshot {    // TODO: figure out what type should go here
     return (<any>r.payload.routerState).root.firstChild.firstChild;
 }

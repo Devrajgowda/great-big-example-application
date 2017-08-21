@@ -8,23 +8,23 @@
 
 # Background and Motivation
 
-The main goal of this project is to make available source code for a state-of-the-art web application
-the likes of which only exist as intellectual property visible exclusively to employed experts who have
-signed non-disclosure agreements and can't let you see it or learn how they made everything work together.
+The main goal of this project is to make available source code for a state-of-the-art starter/model web
+application the likes of which only exist as intellectual property visible exclusively to employed experts who
+have signed non-disclosure agreements and can't let you see it or learn how they made everything work together.
 
     You should not have to get hired before learning how professionals do a thing
 
 The other goal is to assemble enough functionality into one excellent, free example application that people
-think twice before starting another one-feature, no edge-case, example and exacerbating the already
+think twice before starting another one-feature, no edge-case, blog post example and exacerbating the already
 overwhelming starting point option overload. Hopefully this will persuade a few people to direct
-that energy instead into improving what already exists. To this end I have made, over the course of the past 4 years,
-[the world's biggest, most detailed database of web technology selling points](https://goo.gl/yp2YgJ)
-so things could be compared easily in broad daylight without the hype and selective disclosure of
-a typical product/project sales page. Use it to determine what's best. Then help make that thing better. See
-[below](https://github.com/dancancro/great-big-example-application#demonstrations-features-and-selling-points)
-for a sample slice of it.
+that energy instead into improving what already exists. **Don't stop making blog posts**. Just demonstrate the
+concept with added features to this project rather than entirely separate projects with entirely hard to incorporate,
+strictly aesthetic variations in architecture.
 
-See the project's [to do list](https://github.com/dancancro/great-big-example-application/projects/1) for opportunities to contribute.
+I'd love your help with improving this application. See the project's
+[to do list](https://github.com/dancancro/great-big-example-application/projects/1) for opportunities to contribute.
+I'm also looking for people who would like to go through the code and ask me questions. I'll then enter answers
+as comments in the code.
 
 # But why one great big app?
 
@@ -189,7 +189,10 @@ removing that part of the file name, `src/app/features/counter.page.ts` -> `src/
 that makes it too confusing when you are working on multiple files with the same names and different directories.
 
 3. I noticed a lot of duplication and boilerplate of identical CRUD code for each of my types of entities. So I made utility functions and
-the related actions and models for each of three types of store slice - [entities](https://github.com/dancancro/great-big-example-application/tree/master/src/main/webapp/app/core/store/entity), [id lists](https://github.com/dancancro/great-big-example-application/tree/master/src/main/webapp/app/core/store/id), and [slices](https://github.com/dancancro/great-big-example-application/tree/master/src/main/webapp/app/core/store/slice) (everything else).
+the related actions and models for each of three types of store slice - [entities](https://github.com/dancancro/great-big-example-application/tree/master/src/main/webapp/app/core/store/entity), [id lists](https://github.com/dancancro/great-big-example-application/tree/master/src/main/webapp/app/core/store/id), and [slices](https://github.com/dancancro/great-big-example-application/tree/master/src/main/webapp/app/core/store/slice) (everything else). This is
+the biggest deal in this list. It standardizes how things are treated so you don't have to solve common problems that have already
+been solved. It's all optional too so you can pick and choose which parts of your state use the structure, type safety and utilities of each
+standard kind of state or not use any of them.
 
 4. I came up with a mini lexicon of file types to keep file names shorter and more expressive. A "page" is understood to be a smart `@Component`
 class that fills the page and might have a router-outlet and route configurations. A "guard" is understood to be an `@Injectable` "service" class that
@@ -468,7 +471,8 @@ api code. The way this works is that the UI lets you display things before they 
 attributes because the api is ignorant of the user interface. When the response comes back you can find the original object by its previously established ID and handle it accordingly.
 If successful, you'd likely do nothing that the user sees. However, if you hadn't given it an ID, it would be discarded and recreated from the object in the response. This response
 object would not have all the transient attributes of the object in the request. So, for example, if its location on the screen were a transient attribute, then the user would see it
-jump to a default location since the former location would be lost.
+jump to a default location since the former location would be lost. [Here](https://youtu.be/LEgpsROSfWM?t=1778) is another argument for using UUIDs: It allows you to create hashcodes 
+of entities that don't change after the entity is saved and given an ID by the database. You create hashcodes of entities in order to have an equals() method.
 
 ## 4) Why is it necessary to copy objects before posting to the server?
 

@@ -32,6 +32,7 @@ import {
     combineReducers,
     Action,
     ActionReducerFactory,
+    MetaReducer
 } from '@ngrx/store';
 
 /**
@@ -140,7 +141,11 @@ export const reducers: ActionReducerMap<RootState> = {
  * the root meta-reducer. To add more meta-reducers, provide an array of meta-reducers
  * that will be composed to form the root meta-reducer.
  */
-export const metaReducers: ActionReducer<any, any>[] = process.env.NODE_ENV === 'dev'
+// export const metaReducers: ActionReducer<any, any>[] = process.env.NODE_ENV === 'dev'
+//     ? [logger]
+//     : [];
+
+export const metaReducers: MetaReducer<RootState>[] = process.env.NODE_ENV === 'dev'
     ? [logger]
     : [];
 
@@ -488,7 +493,12 @@ export const getAuthorsState = (state: RootState): Entities<Author> => state.aut
 export const getAuthorEntities = createSelector(getAuthorsState, fromAuthors.getEntities);
 export const getAuthorIds = createSelector(getAuthorsState, fromAuthors.getIds);
 export const getAuthors = createSelector(getAuthorEntities, getAuthorIds, (entities, ids) => {
-    return ids.map((id) => entities[id]);
+    return ids.map((id) => {
+        return entities[id];
+        // const following = false;
+        // entities[id].followers.some((follower) => follower.login === currentUser.login)
+        // return { ...entities[id], following };
+    });
 });
 
 /**

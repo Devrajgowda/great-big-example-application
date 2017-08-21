@@ -12,6 +12,9 @@ export class AuthInterceptor extends JhiHttpInterceptor {
         super();
     }
 
+    /*
+     * @whatItDoes Adds the authentication token to every http request
+     */
     requestIntercept(options?: RequestOptionsArgs): RequestOptionsArgs {
         const token = this.localStorage.retrieve('authenticationToken') || this.sessionStorage.retrieve('authenticationToken');
         if (!!token) {

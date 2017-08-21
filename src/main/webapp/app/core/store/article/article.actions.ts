@@ -26,8 +26,12 @@ class ArticleAction extends SliceAction {
 export class Favorite extends SliceAction {
     protected actionName: string = actions.FAVORITE;
     constructor(slug: string) {
-        super(slices.ARTICLE, { route: '/articles/' + slug + '/favorite' });
+        super(slices.ARTICLE, { route: 'articles/' + slug + '/favorite' });
     }
+}
+
+export class Unfavorite extends Favorite {
+    protected actionName: string = actions.UNFAVORITE;
 }
 
 export class FavoriteSuccess extends ArticleAction {
@@ -36,10 +40,6 @@ export class FavoriteSuccess extends ArticleAction {
 
 export class FavoriteFail extends ArticleAction {
     protected actionName: string = actions.FAVORITE_FAIL;
-}
-
-export class Unfavorite extends ArticleAction {
-    protected actionName: string = actions.UNFAVORITE;
 }
 
 export class UnfavoriteSuccess extends ArticleAction {
