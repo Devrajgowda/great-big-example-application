@@ -15,17 +15,17 @@ import { Entities, Entity } from './entity.model';
 import { typeFor, PayloadAction, PayloadActions } from '../util';
 import { actions, EntityAction } from './entity.actions';
 import * as EntityActions from './entity.actions';
+import * as sliceFunctions from '../slice/slice.functions';
 
 export function addToStore<T extends Entity>(state: Entities<T>, action: EntityActions.Add<T> | EntityActions.Load<T>): Entities<T> {
     const entities = Object.assign({}, state.entities);
     entities[action.payload.id] = reduceOne(state, null, action);
-    return Object.assign({}, state, {
+    let newState = Object.assign({}, state, {
         ids: Object.keys(entities),
         entities,
-        selectedEntityId: action.payload.id,
-        loaded: true,
-        loading: false,
+        selectedEntityId: action.payload.id
     });
+    return sliceFunctions.setSliceLoading(newState, action);
 };
 
 /**
@@ -36,13 +36,12 @@ export function addSuccess<T extends Entity>(state: Entities<T>, action: EntityA
     const optimisticObject = entities[EntityActions.TEMP] || null;
     entities[action.payload.id] = reduceOne(state, optimisticObject, action);
     entities[EntityActions.TEMP] && delete entities[EntityActions.TEMP];
-    return Object.assign({}, state, {
+    let newState = Object.assign({}, state, {
         ids: Object.keys(entities),
         entities,
-        selectedEntityId: action.payload.id,
-        loaded: true,
-        loading: false,
+        selectedEntityId: action.payload.id
     });
+    return sliceFunctions.setSliceLoading(newState, action);
 };
 /*
  * Delete the property from state.entities, the element from state.ids and
@@ -62,17 +61,20 @@ export function deleteEntity<T extends Entity>(state: Entities<T>, action: Entit
     const selectedEntityId = idx === -1 ? state.selectedEntityId : state.ids[newIdx];
     const i = state.ids.findIndex((findId) => findId === id);
     const ids = [...state.ids.slice(0, i), ...state.ids.slice(i + 1)];
-    return Object.assign({}, state, { entities, ids, selectedEntityId });
+    let newState = Object.assign({}, state, { entities, ids, selectedEntityId });
+    return sliceFunctions.setSliceLoading(newState, action);
 };
 
 /**
  * Called from OnDestroy hooks to remove unsaved records with TEMP ID
  */
 export function deleteTemp<T extends Entity>(state: Entities<T>, action: EntityActions.DeleteTemp<T>): Entities<T> {
+    let newState = state;
     const entities = Object.assign({}, state.entities);
     if (entities[action.payload.id]) {
-        return deleteEntity<T>(state, action);
+        newState = deleteEntity<T>(state, action);
     }
+    return newState;
 }
 
 export function select<T extends Entity>(state: Entities<T>, action: EntityActions.Select<T>): Entities<T> {
@@ -112,7 +114,7 @@ export function union<T extends Entity>(state: Entities<T>, action: EntityAction
 }
 
 /**
- * @whatItDoes updates, patches or sets deleteMe of a single entity
+ * @whatItDoes updates, patches, sets loading or sets deleteMe of a single entity
  *
  * @param state  the set of entities
  * @param action needs a payload that has an id
@@ -128,7 +130,7 @@ export function update<T extends Entity>(state: Entities<T>, action: EntityActio
 };
 
 /**
- * @whatItDoes updates a given slice with a new set of entities in one fell swoop
+ * @whatItDoes updates a given slice with a whole new set of entities in one fell swoop
  *
  * @param state  the set of entities
  * @param action needs a payload that is an array of entities
@@ -156,36 +158,79 @@ export function patchEach<T extends Entity>(state: Entities<T>, action: any): En
 
 function reduceOne<T extends Entity>(state: Entities<T>, entity: T = null, action: EntityAction<T>): T {
     // console.log('reduceOne entity:' + JSON.stringify(entity) + ' ' + action.type)
+    let newState;
     switch (action.type) {
 
         case typeFor(state.slice, actions.ADD_TEMP):
         case typeFor(state.slice, actions.ADD_OPTIMISTICALLY):
-            return Object.assign({}, state.initialEntity, action.payload, { dirty: true });
+            newState = Object.assign({}, state.initialEntity, action.payload, { dirty: true });
+            break;
         case typeFor(state.slice, actions.DELETE):
-            return Object.assign({}, entity, action.payload, { deleteMe: true });
+            newState = Object.assign({}, entity, action.payload, { deleteMe: true });
+            break;
         case typeFor(state.slice, actions.DELETE_FAIL):
-            return Object.assign({}, entity, action.payload, { deleteMe: false });
+            newState = Object.assign({}, entity, action.payload, { deleteMe: false });
+            break;
         case typeFor(state.slice, actions.UPDATE):
-            return Object.assign({}, action.payload, { dirty: true });
+            newState = Object.assign({}, action.payload, { dirty: true });
+            break;
         case typeFor(state.slice, actions.PATCH):
-            return Object.assign({}, entity, action.payload, { dirty: true });
+            newState = Object.assign({}, entity, action.payload, { dirty: true });
+            break;
         case typeFor(state.slice, actions.ADD_SUCCESS):
             // entity could be a client-side-created object with client-side state not returned by
             // the server. If so, preserve this state by having entity as part of this
-            return Object.assign({}, state.initialEntity, entity, action.payload, { dirty: false });
+            newState = Object.assign({}, state.initialEntity, entity, action.payload, { dirty: false });
+            break;
         case typeFor(state.slice, actions.LOAD_SUCCESS):
-            return Object.assign({}, state.initialEntity, action.payload, { dirty: false });
+            newState = Object.assign({}, state.initialEntity, action.payload, { dirty: false });
+            break;
         case typeFor(state.slice, actions.UPDATE_SUCCESS):
             if (entity['id'] === action.payload.id) {
-                return Object.assign({}, entity, { dirty: false });
+                newState = Object.assign({}, entity, { dirty: false });
             } else {
-                return entity;
+                newState = entity;
             }
+            break;
         default:
-            return entity;
+            newState = entity;
     }
+    return setEntityLoading(newState, action);
 };
 
+function setEntityLoading(state, action) {
+    let newState = state;
+    if (isLoadingAction(action.verb)) {
+        newState = { ...state, loading: true };
+    } else if (isPostLoadingAction(action.verb)) {
+        newState = { ...state, loading: false };
+    }
+    return newState;
+
+}
+
+function isLoadingAction(verb: string) {
+    switch (verb) {
+        case actions.ADD:
+        case actions.LOAD:
+        case 'ADD_COMMENT':
+            return true;
+        default:
+            return false;
+    }
+}
+
+function isPostLoadingAction(verb: string) {
+    switch (verb) {
+        case actions.ADD_SUCCESS:
+        case actions.ADD_UPDATE_FAIL:
+        case actions.DELETE_FAIL:
+        case actions.DELETE_SUCCESS:
+            return true;
+        default:
+            return false;
+    }
+}
 /**
  *
  * Effects

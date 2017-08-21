@@ -87,7 +87,7 @@
                 <div *showAuthed="true">
                     <jhi-alert-error></jhi-alert-error>
                     <form class="card comment-form" (ngSubmit)="addComment()">
-                        <fieldset [disabled]="isSubmitting">
+                        <fieldset [disabled]="article.loading">
                             <div class="card-block">
                                 <textarea class="form-control" placeholder="Write a comment..." rows="3" [formControl]="commentControl"></textarea>
                             </div>

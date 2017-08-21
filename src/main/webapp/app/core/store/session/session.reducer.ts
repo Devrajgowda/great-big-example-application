@@ -12,7 +12,7 @@ export function reducer(state: Session = initialSession(), action: SliceAction):
         case typeFor(slices.SESSION, actions.LOAD_SUCCESS):
             return functions.loadSuccess(state, action);
         case typeFor(slices.SESSION, actions.LOAD_FAIL):
-            return functions.loadFail(state);
+            return functions.loadFail(state, action);
         case typeFor(slices.SESSION, actions.UPDATE):
             return functions.update(state, action);
         default:

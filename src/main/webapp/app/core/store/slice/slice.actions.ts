@@ -6,7 +6,8 @@ export const actions = {
     LOAD: 'LOAD',
     LOAD_FAIL: 'LOAD_FAIL',
     LOAD_SUCCESS: 'LOAD_SUCCESS',
-    UPDATE: 'UPDATE'
+    UPDATE: 'UPDATE',
+    UPDATE_SUCCESS: 'UPDATE_SUCCESS'
 };
 
 export class SliceAction implements Action {
@@ -16,6 +17,9 @@ export class SliceAction implements Action {
     }
 
     constructor(public slice: string, public payload?: any) { }
+    get verb() {
+        return this.actionName;
+    }
 }
 
 export class Load extends SliceAction {

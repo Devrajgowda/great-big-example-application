@@ -12,27 +12,24 @@ import { PayloadAction } from '../util';
 const merge = require('lodash/merge');
 
 export function load(state: {}, action: SliceAction): any {
-    return merge({}, state, {
-        hasError: false,
-        loaded: false,
-        loading: true,
+    let newState = merge({}, state, {
+        hasError: false
     });
+    return setSliceLoading(newState, action);
 };
 
-export function loadFail(state): any {
-    return merge({}, state, {
+export function loadFail(state, action: SliceAction): any {
+    let newState = merge({}, state, {
         hasError: true,
-        loaded: false,
-        loading: false,
     });
+    return setSliceLoading(newState, action);
 }
 
 export function loadSuccess(state, action): any {
-    return merge({}, state, action.payload, {
+    let newState = merge({}, state, action.payload, {
         hasError: false,
-        loaded: true,
-        loading: false,
     });
+    return setSliceLoading(newState, action);
 }
 
 export function update(state: any, action: SliceAction): any {
@@ -76,6 +73,36 @@ function evaluate(val, state) {
     }
 
     return val;
+}
+
+export function setSliceLoading(state, action) {
+    let newState = state;
+    if (isLoadingAction(action.verb)) {
+        newState = { ...state, loading: true };
+    } else if (isPostLoadingAction(action.verb)) {
+        newState = { ...state, loading: false, loaded: (action.verb === actions.LOAD_SUCCESS) };
+    }
+    return newState;
+
+}
+
+function isLoadingAction(verb: string) {
+    switch (verb) {
+        case actions.LOAD:
+            return true;
+        default:
+            return false;
+    }
+}
+
+function isPostLoadingAction(verb: string) {
+    switch (verb) {
+        case actions.LOAD_FAIL:
+        case actions.LOAD_SUCCESS:
+            return true;
+        default:
+            return false;
+    }
 }
 
 /**

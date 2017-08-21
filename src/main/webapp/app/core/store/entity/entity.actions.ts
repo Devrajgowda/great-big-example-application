@@ -1,9 +1,11 @@
 import { PayloadAction } from '../util';
 import { Entity } from './entity.model';
 import { SliceAction } from '../slice/slice.actions';
+import { actions as sliceActions } from '../slice/slice.actions';
 import { typeFor } from '../util';
 
 export const actions = {
+    ...sliceActions,
     ADD: 'ADD',
     ADD_OPTIMISTICALLY: 'ADD_OPTIMISTICALLY',
     ADD_SUCCESS: 'ADD_SUCCESS',
@@ -13,17 +15,12 @@ export const actions = {
     DELETE_FAIL: 'DELETE_FAIL',
     DELETE_SUCCESS: 'DELETE_SUCCESS',
     DELETE_TEMP: 'DELETE_TEMP',
-    LOAD: 'LOAD',
-    LOAD_FAIL: 'LOAD_FAIL',
-    LOAD_SUCCESS: 'LOAD_SUCCESS',
     LOAD_ALL: 'LOAD_ALL',
     LOAD_ALL_FAIL: 'LOAD_ALL_FAIL',
     LOAD_ALL_SUCCESS: 'LOAD_ALL_SUCCESS',
     SELECT: 'SELECT',
     SELECT_NEXT: 'SELECT_NEXT',
-    UPDATE: 'UPDATE',
     PATCH_EACH: 'PATCH_EACH',
-    UPDATE_SUCCESS: 'UPDATE_SUCCESS',
     PATCH: 'PATCH',
     PATCH_SUCCESS: 'PATCH_SUCCESS',
     PATCH_FAIL: 'PATCH_FAIL'
@@ -31,17 +28,7 @@ export const actions = {
 
 export const TEMP = 'TEMP_ID_VALUE';
 
-class DynamicTypeAction<T> extends SliceAction implements PayloadAction {
-    protected actionName = '';
-    constructor(public slice: string, public payload: any) {
-        super(slice, payload);
-    }
-    get type() {
-        return typeFor(this.slice, this.actionName);
-    }
-}
-
-export class EntityAction<T extends Entity> extends DynamicTypeAction<T> implements PayloadAction {
+export class EntityAction<T extends Entity> extends SliceAction implements PayloadAction {
     constructor(public slice: string, public payload: T) {
         super(slice, payload);
     }
@@ -134,11 +121,11 @@ export class LoadAllFail<T extends Entity> extends EntityAction<T> {
     protected actionName: string = actions.LOAD_ALL_FAIL;
 }
 
-export class LoadAllSuccess<T extends Entity> extends DynamicTypeAction<T> {
+export class LoadAllSuccess<T extends Entity> extends SliceAction {
     protected actionName: string = actions.LOAD_ALL_SUCCESS;
 }
 
-export class Patch<T> extends DynamicTypeAction<T> {
+export class Patch<T> extends SliceAction {
     protected actionName: string = actions.PATCH;
 }
 
@@ -154,7 +141,7 @@ export class Update<T extends Entity> extends EntityAction<T> {
     protected actionName: string = actions.UPDATE;
 }
 
-export class PatchEach<T extends Entity> extends DynamicTypeAction<T> {
+export class PatchEach<T extends Entity> extends SliceAction {
     protected actionName: string = actions.PATCH_EACH;
 }
 

@@ -7,6 +7,11 @@ export interface Entity {
     [field: string]: any
 }
 
+const initialBaseEntity = {
+    id: null,
+    loading: false
+};
+
 export interface Entities<T extends Entity> extends Slice {
     ids: string[];
     entities: { [id: string]: T };
@@ -20,6 +25,6 @@ export function initialEntities<T extends Entity>(slice: string, initialEntity: 
         ids: [],
         entities: {},
         selectedEntityId: null,
-        initialEntity,
+        initialEntity: Object.assign({}, initialBaseEntity, initialEntity),
     }, vals);
 };

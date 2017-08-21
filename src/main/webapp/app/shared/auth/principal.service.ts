@@ -71,13 +71,13 @@ export class Principal {
         return this.account.get().toPromise().then((account) => {
             if (account) {
                 // Added: This next line integrates the JHipster state with the ngrx store
-                this.store.dispatch(new SliceActionClasses.LoadSuccess(slices.SESSION, account));
+                this.store.dispatch(new SliceActionClasses.LoadSuccess(slices.SESSION, { account }));
                 this.userIdentity = account;
                 this.authenticated = true;
                 this.trackerService.connect();
             } else {
                 // Added: This next line integrates the JHipster state with the ngrx store
-                this.store.dispatch(new SliceActionClasses.LoadFail(slices.SESSION, account));
+                this.store.dispatch(new SliceActionClasses.LoadFail(slices.SESSION, { account }));
                 this.userIdentity = null;
                 this.authenticated = false;
             }

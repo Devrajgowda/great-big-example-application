@@ -15,30 +15,28 @@ import 'rxjs/add/operator/toArray';
 
 import { IDs } from './id.model';
 import { typeFor } from '../util';
-import { actions, IDAction } from './id.actions';
+import { actions } from './id.actions';
 import * as IDActions from './id.actions';
+import { SliceAction } from '../slice/slice.actions';
 import { PayloadAction } from '../util';
+import * as sliceFunctions from '../slice/slice.functions';
 
 /**
  * Reducers
  */
 
-export function addLoadID(state: IDs, action: IDAction): IDs {
-    return Object.assign({}, state, {
-        loading: true,
-    });
+export function addLoadID(state: IDs, action: SliceAction): IDs {
+    return sliceFunctions.setSliceLoading(state, action);
 };
 
-export function updateIDs(state: IDs, action: IDAction): IDs {
+export function updateIDs(state: IDs, action: SliceAction): IDs {
     const entities = action.payload;
     return Object.assign({}, state, {
-        loaded: true,
-        loading: false,
         ids: entities.map((entity) => entity.id)
     });
 };
 
-export function addID(state: IDs, action: IDAction): IDs {
+export function addID(state: IDs, action: SliceAction): IDs {
     const id = action.payload.id;
     if (state.ids.indexOf(id.id) > -1) {
         return state;
@@ -49,7 +47,7 @@ export function addID(state: IDs, action: IDAction): IDs {
     });
 };
 
-export function deleteID(state: IDs, action: IDAction): IDs {
+export function deleteID(state: IDs, action: SliceAction): IDs {
     const entity = action.payload;
 
     return Object.assign({}, state, {
