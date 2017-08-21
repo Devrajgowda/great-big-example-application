@@ -9,7 +9,7 @@ import { actions } from '../entity/entity.actions';
 import { EntityAction } from '../entity/entity.actions';
 import { IDAction } from '../id/id.actions';
 
-export function reducer(state: Entities<Book> = initialEntities<Book>(slices.BOOK, actions, initialBook),
+export function reducer(state: Entities<Book> = initialEntities<Book>(slices.BOOK, initialBook),
     action: EntityAction<Book> | IDAction): Entities<Book> {
     // console.log(`${action.type}`);
     switch (action.type) {

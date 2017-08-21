@@ -9,25 +9,13 @@ import { actions, EntityAction } from '../entity/entity.actions';
 import * as EntityActions from '../entity/entity.actions';
 import * as ArticleActions from '../article/article.actions';
 
-export function reducer(state: Entities<Article> = initialEntities<Article>(slices.ARTICLE, actions, initialArticle),
+export function reducer(state: Entities<Article> = initialEntities<Article>(slices.ARTICLE, initialArticle),
     action: EntityAction<Article>): Entities<Article> {
 
     switch (action.type) {
         case typeFor(slices.ARTICLE, actions.ADD_TEMP):
         case typeFor(slices.ARTICLE, actions.LOAD_SUCCESS):
             return functions.addToStore<Article>(state, <any>action);
-        // case typeFor(slices.ARTICLE, ArticleActions.actions.FAVORITE_SUCCESS):
-        // case typeFor(slices.ARTICLE, ArticleActions.actions.FAVORITE_FAIL):
-
-        // if (favorited) {
-        //     this.article.favoritesCount++;
-        // } else {
-        //     this.article.favoritesCount--;
-        // }
-        // case typeFor(slices.ARTICLE, ArticleActions.actions.FOLLOW_SUCCESS):
-
-        // this.article.author.following = following;
-        // case typeFor(slices.ARTICLE, ArticleActions.actions.FOLLOW_FAIL):
         default:
             return state;
     }

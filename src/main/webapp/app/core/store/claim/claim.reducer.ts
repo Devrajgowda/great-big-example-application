@@ -7,7 +7,7 @@ import * as sliceFunctions from '../slice/slice.functions';
 import { slices } from '../util';
 import { typeFor } from '../util';
 
-export function reducer(state = initialEntities<Claim>(slices.CLAIM, actions, initialClaim),
+export function reducer(state = initialEntities<Claim>(slices.CLAIM, initialClaim),
     action: EntityAction<Claim>): Entities<Claim> {
     switch (action.type) {
         case typeFor(slices.CLAIM, actions.ADD_SUCCESS):

@@ -8,7 +8,7 @@ import { typeFor } from '../util';
 import { actions, EntityAction } from '../entity/entity.actions';
 
 export function reducer(state: Entities<Crisis> =
-    initialEntities<Crisis>(slices.CRISIS, actions, initialCrisis),
+    initialEntities<Crisis>(slices.CRISIS, initialCrisis),
     action: EntityAction<Crisis>): Entities<Crisis> {
     switch (action.type) {
         case typeFor(slices.CRISIS, actions.ADD_SUCCESS):

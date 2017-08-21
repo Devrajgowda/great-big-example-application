@@ -7,7 +7,7 @@ import * as sliceFunctions from '../slice/slice.functions';
 import { slices } from '../util';
 import { typeFor } from '../util';
 
-export function reducer(state = initialEntities<Author>(slices.AUTHOR, actions, initialAuthor),
+export function reducer(state = initialEntities<Author>(slices.AUTHOR, initialAuthor),
     action: EntityAction<Author>): Entities<Author> {
     switch (action.type) {
         case typeFor(slices.AUTHOR, actions.ADD_SUCCESS):

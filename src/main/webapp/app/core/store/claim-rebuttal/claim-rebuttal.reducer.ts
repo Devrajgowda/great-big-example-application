@@ -10,7 +10,7 @@ import { slices, typeFor } from '../util';
 import { actions, EntityAction } from '../entity/entity.actions';
 
 export function reducer(state: Entities<ClaimRebuttal> = initialEntities<ClaimRebuttal>(
-    slices.CLAIM_REBUTTAL, actions, initialClaimRebuttal),
+    slices.CLAIM_REBUTTAL, initialClaimRebuttal),
     action: EntityAction<ClaimRebuttal>): Entities<ClaimRebuttal> {
     const entities = {};
 

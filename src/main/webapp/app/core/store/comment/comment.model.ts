@@ -1,7 +1,7 @@
 import { Profile } from '../profile/profile.model';
+import { Entity } from '../entity/entity.model';
 
-export interface Comment {
-    id: string;
+export interface Comment extends Entity {
     articleId: string;
     body: string;
     createdAt: string;
