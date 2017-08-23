@@ -34,11 +34,10 @@ export class ArticleComponent implements OnInit, OnDestroy {
     commentFormErrors = {};
     isSubmitting = false;
     isDeleting = false;
-    identity: Promise<Account>;
-    identitySub: Subscription;
+    currentUser$: Observable<User>;
+    currentUserSub: Subscription;
 
     constructor(
-        private principal: Principal,
         private eventManager: JhiEventManager,
         private store: Store<fromRoot.RootState>,
         private alertService: JhiAlertService,
@@ -47,14 +46,15 @@ export class ArticleComponent implements OnInit, OnDestroy {
     ) { }
 
     ngOnInit() {
-        this.identity = this.principal.identity();
+        // this.identity = this.principal.identity();
+        this.currentUser$ = this.store.select(fromRoot.getUserState);
         this.article$ = this.store.select(fromRoot.getSelectedArticle);
         this.articleSub = this.article$.subscribe((article) => this.article = article);
         this.comments$ = this.store.select(fromRoot.getCommentsForSelectedArticle);
         this.commentsSub = this.comments$.subscribe((comments) => this.comments = comments);
 
         // Load the current user's data
-        this.identitySub = Observable.combineLatest(this.identity, this.article$).subscribe(
+        this.currentUserSub = Observable.combineLatest(this.currentUser$, this.article$).subscribe(
             ([identityData, article]) => {
                 this.currentUser = identityData;
 
@@ -119,7 +119,7 @@ export class ArticleComponent implements OnInit, OnDestroy {
 
     ngOnDestroy() {
         this.commentsSub && this.commentsSub.unsubscribe();
-        this.identitySub && this.identitySub.unsubscribe();
+        this.currentUserSub && this.currentUserSub.unsubscribe();
         this.articleSub && this.articleSub.unsubscribe();
     }
 }
