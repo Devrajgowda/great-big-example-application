@@ -39,8 +39,8 @@ as comments in the code.
 other line of work under the sun?).
 
 "Approaches are a matter of personal preference and shouldn't be imposed" (on beginners who just want
-to make something that totally works, don't want to waste time learning an approach that the pros
-[don't actually use](https://gitter.im/angular/angular?at=596d4193f5b3458e3057ea73), and don't have
+to make something that totally works, don't want to waste time and get confused learning an approach that
+the pros [don't actually use](https://gitter.im/angular/angular?at=596d4193f5b3458e3057ea73), and don't have
 any preferences yet).
 
 "If _all_ you want to do is be a code monkey then sure, study real examples, but _real_ computer
@@ -61,15 +61,15 @@ using just windows? I don't understand the resistance, not even a little. As one
 in this field is uniquely easily transferrable, yet for some reason it isn't. The case seems pretty plain to me
 but to settle the matter, here are some reasons why web development should be taught using big examples:
 
-    1. Production-ready code answers every question, not just what the authors of tutorials choose to
-    answer through their choices of simplifications.
+    1. Production-grade code answers every production-grade code question, not just what the authors of
+    tutorials choose to answer through their choices of simplifications.
 
     2. To make something new as an expert would do it, it's much easier to copy and modify, or study and
     emulate, an exact thing made by experts, no matter how complex, than to synthesize the missing details
     removed for the sake of simplicity, out of nothing, no matter how simple. To do the latter requires
     full comprehension of a menagerie of inconsistent learning materials in inconsistent contexts, all but
     one of which approaches you will ultimately reject and count as wasted learn time. I did that to make
-    this; it's not fun. To do the former you copy, find/replace, modify, and compare what you're making
+    this; it's not fun. To do the former you copy, find/replace, modify, and compare/revise what you're making
     with what works until what you're making also works. It's just what you'll do on the job to make
     something new *after* you have signed the NDA and get keys to the castle of doing things like
     professionals do and the vault of expertly made things to copy/modify, or study/emulate if you prefer.
@@ -471,7 +471,7 @@ api code. The way this works is that the UI lets you display things before they 
 attributes because the api is ignorant of the user interface. When the response comes back you can find the original object by its previously established ID and handle it accordingly.
 If successful, you'd likely do nothing that the user sees. However, if you hadn't given it an ID, it would be discarded and recreated from the object in the response. This response
 object would not have all the transient attributes of the object in the request. So, for example, if its location on the screen were a transient attribute, then the user would see it
-jump to a default location since the former location would be lost. [Here](https://youtu.be/LEgpsROSfWM?t=1778) is another argument for using UUIDs: It allows you to create hashcodes 
+jump to a default location since the former location would be lost. [Here](https://youtu.be/LEgpsROSfWM?t=1778) is another argument for using UUIDs: It allows you to create hashcodes
 of entities that don't change after the entity is saved and given an ID by the database. You create hashcodes of entities in order to have an equals() method.
 
 ## 4) Why is it necessary to copy objects before posting to the server?
