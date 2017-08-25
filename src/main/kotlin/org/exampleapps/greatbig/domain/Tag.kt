@@ -8,8 +8,6 @@ import javax.persistence.*
 
 @Entity
 data class Tag(val name: String = "",
-               @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "sequenceGenerator")
-    @SequenceGenerator(name = "sequenceGenerator")
+               @Id @GeneratedValue(strategy = GenerationType.AUTO)
                @JsonIgnore
                var id: Long = 0)

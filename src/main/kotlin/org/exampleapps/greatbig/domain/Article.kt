@@ -16,9 +16,7 @@ data class Article(var slug: String = "",
                    var favorited: MutableList<Author> = mutableListOf(),
                    @ManyToOne
                    var author: Author = Author(),
-                   @Id
-                @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "sequenceGenerator")
-                @SequenceGenerator(name = "sequenceGenerator")
+                   @Id @GeneratedValue(strategy = GenerationType.AUTO)
                    var id: Long = 0) {
     fun favoritesCount() = favorited.size
 }
