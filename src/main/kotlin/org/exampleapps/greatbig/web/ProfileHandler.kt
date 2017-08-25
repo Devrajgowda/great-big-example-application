@@ -34,8 +34,8 @@ class ProfileHandler(val userRepository: UserRepository,
         authorRepository.findById(user.get().getId())?.let {
             var currentUser = userService.getUserWithAuthorities()
             val currentAuthor = authorRepository.findById(currentUser.getId())
-            if (!currentAuthor.follows.contains(it)) {
-                currentAuthor.follows.add(it)
+            if (!currentAuthor.followers.contains(it)) {
+                currentAuthor.followers.add(it)
                 // currentAuthor = userService.setCurrentUser(userRepository.save(currentUser))
             }
             return view(it, currentAuthor)
@@ -50,8 +50,8 @@ class ProfileHandler(val userRepository: UserRepository,
         authorRepository.findById(user.get().getId())?.let {
             var currentUser = userService.getUserWithAuthorities()
             val currentAuthor = authorRepository.findById(currentUser.getId())
-            if (currentAuthor.follows.contains(it)) {
-                currentAuthor.follows.remove(it)
+            if (currentAuthor.followers.contains(it)) {
+                currentAuthor.followers.remove(it)
                 // currentAuthor = userService.setCurrentUser(userRepository.save(currentUser))
             }
             return view(it, currentAuthor)

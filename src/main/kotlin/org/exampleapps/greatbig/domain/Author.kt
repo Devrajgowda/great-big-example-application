@@ -16,7 +16,7 @@ data class Author(@Id
 	            var user: User = User(),
                 @ManyToMany
                 @JsonIgnore
-                var follows: MutableList<Author> = mutableListOf()
+                var followers: MutableList<Author> = mutableListOf()
                 ) {
     override fun toString(): String = "Author($id, $bio)"
 }

@@ -13,7 +13,7 @@ data class Profile(var username: String,
     companion object {
         fun fromUser(author: Author, currentAuthor: Author): Profile {
             return Profile(username = author.user.login, bio = author.bio, image = author.user.imageUrl,
-                    following = currentAuthor.follows.contains(author))
+                    following = currentAuthor.followers.contains(author))
         }
     }
 }

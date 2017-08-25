@@ -66,7 +66,7 @@ class ArticleHandler(val repository: ArticleRepository,
              @RequestParam(defaultValue = "0") offset: Int): Any {
         val currentUser = userService.getUserWithAuthorities()
         val currentAuthor = authorRepository.findById(currentUser.getId())
-        val articles = repository.findByAuthorIdInOrderByCreatedAtDesc(currentAuthor.follows.map { it.id },
+        val articles = repository.findByAuthorIdInOrderByCreatedAtDesc(currentAuthor.followers.map { it.id },
                 PageRequest(offset, limit))
         return articlesView(articles, currentAuthor)
     }
