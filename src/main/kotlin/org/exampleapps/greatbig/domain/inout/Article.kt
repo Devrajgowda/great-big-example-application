@@ -1,7 +1,7 @@
-package org.exampleapps.greatbig.model.inout
+package org.exampleapps.greatbig.domain.inout
 
 import com.fasterxml.jackson.annotation.JsonRootName
-import org.exampleapps.greatbig.model.User
+import org.exampleapps.greatbig.domain.Author
 import java.time.OffsetDateTime
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
@@ -22,7 +22,7 @@ data class Article(var title: String? = null,
             return date.toZonedDateTime().withZoneSameInstant(ZoneId.of("Z")).format(DateTimeFormatter.ISO_ZONED_DATE_TIME)
         }
 
-        fun fromModel(model: org.exampleapps.greatbig.model.Article, currentUser: User): Article {
+        fun fromModel(model: org.exampleapps.greatbig.domain.Article, currentAuthor: Author): Article {
             return Article(
                     slug = model.slug,
                     title = model.title,
@@ -31,8 +31,8 @@ data class Article(var title: String? = null,
                     tagList = model.tagList.map { it.name },
                     createdAt = dateFormat(model.createdAt),
                     updatedAt = dateFormat(model.updatedAt),
-                    author = Profile.fromUser(model.author, currentUser),
-                    favorited = model.favorited.contains(currentUser),
+                    author = Profile.fromUser(model.author, currentAuthor),
+                    favorited = model.favorited.contains(currentAuthor),
                     favoritesCount = model.favorited.size)
         }
     }

@@ -2,21 +2,27 @@ package org.exampleapps.greatbig.web
 
 import org.exampleapps.greatbig.exception.NotFoundException
 import org.exampleapps.greatbig.jwt.ApiKeySecured
-import org.exampleapps.greatbig.model.User
-import org.exampleapps.greatbig.model.inout.Profile
+import org.exampleapps.greatbig.domain.User
+import org.exampleapps.greatbig.domain.Author
+import org.exampleapps.greatbig.domain.inout.Profile
 import org.exampleapps.greatbig.repository.UserRepository
+import org.exampleapps.greatbig.repository.AuthorRepository
 import org.exampleapps.greatbig.service.UserService
 import org.springframework.web.bind.annotation.*
 
 @RestController
 class ProfileHandler(val userRepository: UserRepository,
+                     val authorRepository: AuthorRepository,
                      val userService: UserService) {
 
     @ApiKeySecured(mandatory = false)
     @GetMapping("/api/profiles/{username}")
     fun profile(@PathVariable username: String): Any {
-        userRepository.findByUsername(username)?.let {
-            return view(it, userService.currentUser())
+        val user = userRepository.findOneByLogin(username);
+        authorRepository.findById(user.get().getId())?.let {
+            val currentUser = userService.getUserWithAuthorities()
+            val currentAuthor = authorRepository.findById(currentUser.getId())
+            return view(it, currentAuthor)
         }
         throw NotFoundException()
     }
@@ -24,13 +30,15 @@ class ProfileHandler(val userRepository: UserRepository,
     @ApiKeySecured
     @PostMapping("/api/profiles/{username}/follow")
     fun follow(@PathVariable username: String): Any {
-        userRepository.findByUsername(username)?.let {
-            var currentUser = userService.currentUser()
-            if (!currentUser.follows.contains(it)) {
-                currentUser.follows.add(it)
-                currentUser = userService.setCurrentUser(userRepository.save(currentUser))
+        val user = userRepository.findOneByLogin(username);
+        authorRepository.findById(user.get().getId())?.let {
+            var currentUser = userService.getUserWithAuthorities()
+            val currentAuthor = authorRepository.findById(currentUser.getId())
+            if (!currentAuthor.follows.contains(it)) {
+                currentAuthor.follows.add(it)
+                // currentAuthor = userService.setCurrentUser(userRepository.save(currentUser))
             }
-            return view(it, currentUser)
+            return view(it, currentAuthor)
         }
         throw NotFoundException()
     }
@@ -38,17 +46,19 @@ class ProfileHandler(val userRepository: UserRepository,
     @ApiKeySecured
     @DeleteMapping("/api/profiles/{username}/follow")
     fun unfollow(@PathVariable username: String): Any {
-        userRepository.findByUsername(username)?.let {
-            var currentUser = userService.currentUser()
-            if (currentUser.follows.contains(it)) {
-                currentUser.follows.remove(it)
-                currentUser = userService.setCurrentUser(userRepository.save(currentUser))
+        val user = userRepository.findOneByLogin(username);
+        authorRepository.findById(user.get().getId())?.let {
+            var currentUser = userService.getUserWithAuthorities()
+            val currentAuthor = authorRepository.findById(currentUser.getId())
+            if (currentAuthor.follows.contains(it)) {
+                currentAuthor.follows.remove(it)
+                // currentAuthor = userService.setCurrentUser(userRepository.save(currentUser))
             }
-            return view(it, currentUser)
+            return view(it, currentAuthor)
         }
         throw NotFoundException()
     }
 
-    fun view(user: User, currentUser: User) = mapOf("profile" to Profile.fromUser(user, currentUser))
+    fun view(author: Author, currentAuthor: Author) = mapOf("profile" to Profile.fromUser(author, currentAuthor))
 
 }

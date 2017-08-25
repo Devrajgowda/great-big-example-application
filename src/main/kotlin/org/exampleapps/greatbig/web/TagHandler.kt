@@ -1,6 +1,6 @@
 package org.exampleapps.greatbig.web
 
-import org.exampleapps.greatbig.model.Tag
+import org.exampleapps.greatbig.domain.Tag
 import org.exampleapps.greatbig.repository.TagRepository
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.RestController

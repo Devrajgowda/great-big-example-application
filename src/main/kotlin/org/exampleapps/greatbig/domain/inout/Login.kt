@@ -1,4 +1,4 @@
-package org.exampleapps.greatbig.model.inout
+package org.exampleapps.greatbig.domain.inout
 
 import com.fasterxml.jackson.annotation.JsonRootName
 import javax.validation.constraints.NotNull

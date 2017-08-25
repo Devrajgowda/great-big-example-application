@@ -5,15 +5,17 @@ import org.exampleapps.greatbig.exception.ForbiddenRequestException
 import org.exampleapps.greatbig.exception.InvalidRequest
 import org.exampleapps.greatbig.exception.NotFoundException
 import org.exampleapps.greatbig.jwt.ApiKeySecured
-import org.exampleapps.greatbig.model.Article
-import org.exampleapps.greatbig.model.Comment
-import org.exampleapps.greatbig.model.Tag
-import org.exampleapps.greatbig.model.User
-import org.exampleapps.greatbig.model.inout.NewArticle
-import org.exampleapps.greatbig.model.inout.NewComment
-import org.exampleapps.greatbig.model.inout.UpdateArticle
+import org.exampleapps.greatbig.domain.Article
+import org.exampleapps.greatbig.domain.Author
+import org.exampleapps.greatbig.domain.Comment
+import org.exampleapps.greatbig.domain.Tag
+import org.exampleapps.greatbig.domain.User
+import org.exampleapps.greatbig.domain.inout.NewArticle
+import org.exampleapps.greatbig.domain.inout.NewComment
+import org.exampleapps.greatbig.domain.inout.UpdateArticle
 import org.exampleapps.greatbig.repository.ArticleRepository
 import org.exampleapps.greatbig.repository.CommentRepository
+import org.exampleapps.greatbig.repository.AuthorRepository
 import org.exampleapps.greatbig.repository.TagRepository
 import org.exampleapps.greatbig.repository.UserRepository
 import org.exampleapps.greatbig.repository.specification.ArticlesSpecifications
@@ -27,12 +29,13 @@ import org.springframework.web.bind.annotation.*
 import java.time.OffsetDateTime
 import java.util.*
 import javax.validation.Valid
-import org.exampleapps.greatbig.model.inout.Article as ArticleIO
-import org.exampleapps.greatbig.model.inout.Comment as CommentOut
+import org.exampleapps.greatbig.domain.inout.Article as ArticleIO
+import org.exampleapps.greatbig.domain.inout.Comment as CommentOut
 
 @RestController
 class ArticleHandler(val repository: ArticleRepository,
                      val userService: UserService,
+                     val authorRepository: AuthorRepository,
                      val userRepository: UserRepository,
                      val commentRepository: CommentRepository,
                      val tagRepository: TagRepository) {
@@ -48,28 +51,33 @@ class ArticleHandler(val repository: ArticleRepository,
 
         val articles = repository.findAll(ArticlesSpecifications.lastArticles(
                 if (tag != "") tagRepository.findByName(tag) else null,
-                if (author != "") userRepository.findByUsername(author) else null,
-                if (favorited != "") userRepository.findByUsername(favorited) else null
+                if (author != "") userRepository.findOneByLogin(author).get() else null,
+                if (favorited != "") userRepository.findOneByLogin(favorited).get() else null
         ), p).toList()
+        val currentUser = userService.getUserWithAuthorities()
+        val currentAuthor = authorRepository.findById(currentUser.getId())
 
-        return articlesView(articles, userService.currentUser())
+        return articlesView(articles, currentAuthor)
     }
 
     @ApiKeySecured
     @GetMapping("/api/articles/feed")
     fun feed(@RequestParam(defaultValue = "20") limit: Int,
              @RequestParam(defaultValue = "0") offset: Int): Any {
-        val currentUser = userService.currentUser()
-        val articles = repository.findByAuthorIdInOrderByCreatedAtDesc(currentUser.follows.map { it.id },
+        val currentUser = userService.getUserWithAuthorities()
+        val currentAuthor = authorRepository.findById(currentUser.getId())
+        val articles = repository.findByAuthorIdInOrderByCreatedAtDesc(currentAuthor.follows.map { it.id },
                 PageRequest(offset, limit))
-        return articlesView(articles, currentUser)
+        return articlesView(articles, currentAuthor)
     }
 
     @ApiKeySecured(mandatory = false)
     @GetMapping("/api/articles/{slug}")
     fun article(@PathVariable slug: String): Any {
+        val currentUser = userService.getUserWithAuthorities()
+        val currentAuthor = authorRepository.findById(currentUser.getId())
         repository.findBySlug(slug)?.let {
-            return articleView(it, userService.currentUser())
+            return articleView(it, currentAuthor)
         }
         throw NotFoundException()
     }
@@ -85,7 +93,8 @@ class ArticleHandler(val repository: ArticleRepository,
             slug += "-" + UUID.randomUUID().toString().substring(0, 8)
         }
 
-        val currentUser = userService.currentUser()
+        val currentUser = userService.getUserWithAuthorities()
+        val currentAuthor = authorRepository.findById(currentUser.getId())
 
         // search for tags
         val tagList = newArticle.tagList.map {
@@ -93,17 +102,18 @@ class ArticleHandler(val repository: ArticleRepository,
         }
 
         val article = Article(slug = slug,
-                author = currentUser, title = newArticle.title!!, description = newArticle.description!!,
+                author = currentAuthor, title = newArticle.title!!, description = newArticle.description!!,
                 body = newArticle.body!!, tagList = tagList.toMutableList())
 
-        return articleView(repository.save(article), currentUser)
+        return articleView(repository.save(article), currentAuthor)
     }
 
     @ApiKeySecured
     @PutMapping("/api/articles/{slug}")
     fun updateArticle(@PathVariable slug: String, @RequestBody article: UpdateArticle): Any {
         repository.findBySlug(slug)?.let {
-            val currentUser = userService.currentUser()
+            val currentUser = userService.getUserWithAuthorities()
+            val currentAuthor = authorRepository.findById(currentUser.getId())
             if (it.author.id != currentUser.id)
                 throw ForbiddenRequestException()
 
@@ -141,7 +151,7 @@ class ArticleHandler(val repository: ArticleRepository,
                     tagList = if (tagList == null || tagList.isEmpty()) it.tagList
                     else tagList.toMutableList())
 
-            return articleView(repository.save(updated), currentUser)
+            return articleView(repository.save(updated), currentAuthor)
         }
 
         throw NotFoundException()
@@ -152,10 +162,10 @@ class ArticleHandler(val repository: ArticleRepository,
     @DeleteMapping("/api/articles/{slug}")
     fun deleteArticle(@PathVariable slug: String) {
         repository.findBySlug(slug)?.let {
-            if (it.author.id != userService.currentUser().id)
+            if (it.author.id != userService.getUserWithAuthorities().id)
                 throw ForbiddenRequestException()
 
-            commentRepository.deleteAll(commentRepository.findByArticle(it))
+            // commentRepository.deleteAll(commentRepository.findByArticle(it))
             return repository.delete(it)
         }
         throw NotFoundException()
@@ -165,8 +175,9 @@ class ArticleHandler(val repository: ArticleRepository,
     @GetMapping("/api/articles/{slug}/comments")
     fun articleComments(@PathVariable slug: String): Any {
         repository.findBySlug(slug)?.let {
-            val currentUser = userService.currentUser()
-            return commentsView(commentRepository.findByArticleOrderByCreatedAtDesc(it), currentUser)
+            val currentUser = userService.getUserWithAuthorities()
+            val currentAuthor = authorRepository.findById(currentUser.getId())
+            return commentsView(commentRepository.findByArticleOrderByCreatedAtDesc(it), currentAuthor)
         }
         throw NotFoundException()
     }
@@ -177,9 +188,10 @@ class ArticleHandler(val repository: ArticleRepository,
         InvalidRequest.check(errors)
 
         repository.findBySlug(slug)?.let {
-            val currentUser = userService.currentUser()
-            val newComment = Comment(body = comment.body!!, article = it, author = currentUser)
-            return commentView(commentRepository.save(newComment), currentUser)
+            val currentUser = userService.getUserWithAuthorities()
+            val currentAuthor = authorRepository.findById(currentUser.getId())
+            val newComment = Comment(body = comment.body!!, article = it, author = currentAuthor)
+            return commentView(commentRepository.save(newComment), currentAuthor)
         }
         throw NotFoundException()
     }
@@ -189,8 +201,11 @@ class ArticleHandler(val repository: ArticleRepository,
     @DeleteMapping("/api/articles/{slug}/comments/{id}")
     fun deleteComment(@PathVariable slug: String, @PathVariable id: Long) {
         repository.findBySlug(slug)?.let {
-            val currentUser = userService.currentUser()
-            val comment = commentRepository.findById(id).orElseThrow({ NotFoundException() })
+            val currentUser = userService.getUserWithAuthorities()
+            val comment = commentRepository.findOne(id)
+            if (comment == null) {
+                throw NotFoundException()
+            }
             if (comment.article.id != it.id)
                 throw ForbiddenRequestException()
             if (comment.author.id != currentUser.id)
@@ -205,12 +220,13 @@ class ArticleHandler(val repository: ArticleRepository,
     @PostMapping("/api/articles/{slug}/favorite")
     fun favoriteArticle(@PathVariable slug: String): Any {
         repository.findBySlug(slug)?.let {
-            val currentUser = userService.currentUser()
-            if (!it.favorited.contains(currentUser)) {
-                it.favorited.add(currentUser)
-                return articleView(repository.save(it), currentUser)
+            val currentUser = userService.getUserWithAuthorities()
+            val currentAuthor = authorRepository.findById(currentUser.getId())
+            if (!it.favorited.contains(currentAuthor)) {
+                it.favorited.add(currentAuthor)
+                return articleView(repository.save(it), currentAuthor)
             }
-            return articleView(it, currentUser)
+            return articleView(it, currentAuthor)
         }
         throw NotFoundException()
     }
@@ -219,28 +235,29 @@ class ArticleHandler(val repository: ArticleRepository,
     @DeleteMapping("/api/articles/{slug}/favorite")
     fun unfavoriteArticle(@PathVariable slug: String): Any {
         repository.findBySlug(slug)?.let {
-            val currentUser = userService.currentUser()
-            if (it.favorited.contains(currentUser)) {
-                it.favorited.remove(currentUser)
-                return articleView(repository.save(it), currentUser)
+            val currentUser = userService.getUserWithAuthorities()
+            val currentAuthor = authorRepository.findById(currentUser.getId())
+            if (it.favorited.contains(currentAuthor)) {
+                it.favorited.remove(currentAuthor)
+                return articleView(repository.save(it), currentAuthor)
             }
-            return articleView(it, currentUser)
+            return articleView(it, currentAuthor)
         }
         throw NotFoundException()
     }
 
     // helpers
 
-    fun articleView(article: Article, currentUser: User)
-            = mapOf("article" to ArticleIO.fromModel(article, currentUser))
+    fun articleView(article: Article, currentAuthor: Author)
+        = mapOf("article" to ArticleIO.fromModel(article, currentAuthor))
 
-    fun articlesView(articles: List<Article>, currentUser: User)
-            = mapOf("articles" to articles.map { ArticleIO.fromModel(it, userService.currentUser()) },
-            "articlesCount" to articles.size)
+    fun articlesView(articles: List<Article>, currentAuthor: Author)
+        = mapOf("articles" to articles.map { ArticleIO.fromModel(it, currentAuthor) },
+        "articlesCount" to articles.size)
 
-    fun commentView(comment: Comment, currentUser: User)
-            = mapOf("comment" to CommentOut.fromModel(comment, currentUser))
+    fun commentView(comment: Comment, currentAuthor: Author)
+        = mapOf("comment" to CommentOut.fromModel(comment, currentAuthor))
 
-    fun commentsView(comments: List<Comment>, currentUser: User)
-            = mapOf("comments" to comments.map { CommentOut.fromModel(it, currentUser) })
+    fun commentsView(comments: List<Comment>, currentAuthor: Author)
+        = mapOf("comments" to comments.map { CommentOut.fromModel(it, currentAuthor) })
 }

@@ -1,6 +1,6 @@
 package org.exampleapps.greatbig.repository
 
-import org.exampleapps.greatbig.model.Article
+import org.exampleapps.greatbig.domain.Article
 import org.springframework.data.domain.Pageable
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor
 import org.springframework.data.repository.PagingAndSortingRepository

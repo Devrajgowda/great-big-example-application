@@ -1,6 +1,6 @@
 package org.exampleapps.greatbig.repository
 
-import org.exampleapps.greatbig.model.Tag
+import org.exampleapps.greatbig.domain.Tag
 import org.springframework.data.repository.CrudRepository
 import org.springframework.stereotype.Repository
 

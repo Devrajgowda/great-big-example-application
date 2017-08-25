@@ -1,8 +1,8 @@
 package org.exampleapps.greatbig.repository.specification
 
-import org.exampleapps.greatbig.model.Article
-import org.exampleapps.greatbig.model.Tag
-import org.exampleapps.greatbig.model.User
+import org.exampleapps.greatbig.domain.Article
+import org.exampleapps.greatbig.domain.Tag
+import org.exampleapps.greatbig.domain.User
 import org.springframework.data.jpa.domain.Specification
 import javax.persistence.criteria.Predicate
 

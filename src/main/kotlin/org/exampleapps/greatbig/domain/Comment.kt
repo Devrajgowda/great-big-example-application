@@ -1,4 +1,4 @@
-package org.exampleapps.greatbig.model
+package org.exampleapps.greatbig.domain
 
 import java.time.OffsetDateTime
 import javax.persistence.*
@@ -10,6 +10,8 @@ data class Comment(var createdAt: OffsetDateTime = OffsetDateTime.now(),
                    @ManyToOne
                    var article: Article = Article(),
                    @ManyToOne
-                   var author: User = User(),
-                   @Id @GeneratedValue(strategy = GenerationType.AUTO)
+                   var author: Author = Author(),
+                   @Id
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "sequenceGenerator")
+    @SequenceGenerator(name = "sequenceGenerator")
                    var id: Long = 0)

@@ -1,7 +1,7 @@
-package org.exampleapps.greatbig.model.inout
+package org.exampleapps.greatbig.domain.inout
 
 import com.fasterxml.jackson.annotation.JsonRootName
-import org.exampleapps.greatbig.model.User
+import org.exampleapps.greatbig.domain.Author
 import java.time.OffsetDateTime
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
@@ -17,13 +17,13 @@ data class Comment(val createdAt: String,
             return date.toZonedDateTime().withZoneSameInstant(ZoneId.of("Z")).format(DateTimeFormatter.ISO_ZONED_DATE_TIME)
         }
 
-        fun fromModel(model: org.exampleapps.greatbig.model.Comment, currentUser: User): Comment {
+        fun fromModel(model: org.exampleapps.greatbig.domain.Comment, currentAuthor: Author): Comment {
             return Comment(
                     id = model.id,
                     body = model.body,
                     createdAt = dateFormat(model.createdAt),
                     updatedAt = dateFormat(model.updatedAt),
-                    author = Profile.fromUser(model.author, currentUser)
+                    author = Profile.fromUser(model.author, currentAuthor)
             )
         }
     }
