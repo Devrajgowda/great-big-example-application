@@ -1,4 +1,4 @@
-package org.exampleapps.greatbig.web
+package org.exampleapps.greatbig.web.rest
 
 import org.exampleapps.greatbig.exception.NotFoundException
 import org.exampleapps.greatbig.jwt.ApiKeySecured
@@ -59,6 +59,6 @@ class ProfileHandler(val userRepository: UserRepository,
         throw NotFoundException()
     }
 
-    fun view(author: Author, currentAuthor: Author) = mapOf("profile" to Profile.fromUser(author, currentAuthor))
+    fun view(author: Author, currentAuthor: Author) = mapOf("profile" to Profile.fromAuthor(author, currentAuthor))
 
 }

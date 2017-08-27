@@ -1,4 +1,4 @@
-package org.exampleapps.greatbig.web
+package org.exampleapps.greatbig.web.rest
 
 import com.github.slugify.Slugify
 import org.exampleapps.greatbig.exception.ForbiddenRequestException
@@ -40,7 +40,7 @@ class ArticleHandler(val repository: ArticleRepository,
                      val commentRepository: CommentRepository,
                      val tagRepository: TagRepository) {
 
-    @ApiKeySecured(mandatory = false)
+    // @ApiKeySecured(mandatory = false)
     @GetMapping("/api/articles")
     fun articles(@RequestParam(defaultValue = "20") limit: Int,
                  @RequestParam(defaultValue = "0") offset: Int,
@@ -60,7 +60,7 @@ class ArticleHandler(val repository: ArticleRepository,
         return articlesView(articles, currentAuthor)
     }
 
-    @ApiKeySecured
+    // @ApiKeySecured
     @GetMapping("/api/articles/feed")
     fun feed(@RequestParam(defaultValue = "20") limit: Int,
              @RequestParam(defaultValue = "0") offset: Int): Any {
@@ -71,7 +71,7 @@ class ArticleHandler(val repository: ArticleRepository,
         return articlesView(articles, currentAuthor)
     }
 
-    @ApiKeySecured(mandatory = false)
+    // @ApiKeySecured(mandatory = false)
     @GetMapping("/api/articles/{slug}")
     fun article(@PathVariable slug: String): Any {
         val currentUser = userService.getUserWithAuthorities()
@@ -82,7 +82,7 @@ class ArticleHandler(val repository: ArticleRepository,
         throw NotFoundException()
     }
 
-    @ApiKeySecured
+    // @ApiKeySecured
     @PostMapping("/api/articles")
     fun newArticle(@Valid @RequestBody newArticle: NewArticle, errors: Errors): Any {
         InvalidRequest.check(errors)
@@ -108,7 +108,7 @@ class ArticleHandler(val repository: ArticleRepository,
         return articleView(repository.save(article), currentAuthor)
     }
 
-    @ApiKeySecured
+    // @ApiKeySecured
     @PutMapping("/api/articles/{slug}")
     fun updateArticle(@PathVariable slug: String, @RequestBody article: UpdateArticle): Any {
         repository.findBySlug(slug)?.let {
@@ -157,7 +157,7 @@ class ArticleHandler(val repository: ArticleRepository,
         throw NotFoundException()
     }
 
-    @ApiKeySecured
+    // @ApiKeySecured
     @ResponseStatus(HttpStatus.OK)
     @DeleteMapping("/api/articles/{slug}")
     fun deleteArticle(@PathVariable slug: String) {
@@ -171,7 +171,7 @@ class ArticleHandler(val repository: ArticleRepository,
         throw NotFoundException()
     }
 
-    @ApiKeySecured(mandatory = false)
+    // @ApiKeySecured(mandatory = false)
     @GetMapping("/api/articles/{slug}/comments")
     fun articleComments(@PathVariable slug: String): Any {
         repository.findBySlug(slug)?.let {
@@ -182,7 +182,7 @@ class ArticleHandler(val repository: ArticleRepository,
         throw NotFoundException()
     }
 
-    @ApiKeySecured
+    // @ApiKeySecured
     @PostMapping("/api/articles/{slug}/comments")
     fun addComment(@PathVariable slug: String, @Valid @RequestBody comment: NewComment, errors: Errors): Any {
         InvalidRequest.check(errors)
@@ -196,7 +196,7 @@ class ArticleHandler(val repository: ArticleRepository,
         throw NotFoundException()
     }
 
-    @ApiKeySecured
+    // @ApiKeySecured
     @ResponseStatus(HttpStatus.OK)
     @DeleteMapping("/api/articles/{slug}/comments/{id}")
     fun deleteComment(@PathVariable slug: String, @PathVariable id: Long) {
@@ -216,7 +216,7 @@ class ArticleHandler(val repository: ArticleRepository,
         throw NotFoundException()
     }
 
-    @ApiKeySecured
+    // @ApiKeySecured
     @PostMapping("/api/articles/{slug}/favorite")
     fun favoriteArticle(@PathVariable slug: String): Any {
         repository.findBySlug(slug)?.let {
@@ -231,7 +231,7 @@ class ArticleHandler(val repository: ArticleRepository,
         throw NotFoundException()
     }
 
-    @ApiKeySecured
+    // @ApiKeySecured
     @DeleteMapping("/api/articles/{slug}/favorite")
     fun unfavoriteArticle(@PathVariable slug: String): Any {
         repository.findBySlug(slug)?.let {

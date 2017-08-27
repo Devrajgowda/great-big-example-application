@@ -23,7 +23,7 @@ data class Comment(val createdAt: String,
                     body = model.body,
                     createdAt = dateFormat(model.createdAt),
                     updatedAt = dateFormat(model.updatedAt),
-                    author = Profile.fromUser(model.author, currentAuthor)
+                    author = Profile.fromAuthor(model.author, currentAuthor)
             )
         }
     }

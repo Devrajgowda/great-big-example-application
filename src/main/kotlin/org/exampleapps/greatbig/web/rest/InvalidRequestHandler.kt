@@ -1,4 +1,4 @@
-package org.exampleapps.greatbig.web
+package org.exampleapps.greatbig.web.rest
 
 import org.exampleapps.greatbig.exception.InvalidException
 import org.springframework.http.HttpStatus

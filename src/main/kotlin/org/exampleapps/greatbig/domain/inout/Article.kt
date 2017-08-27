@@ -31,7 +31,7 @@ data class Article(var title: String? = null,
                     tagList = model.tagList.map { it.name },
                     createdAt = dateFormat(model.createdAt),
                     updatedAt = dateFormat(model.updatedAt),
-                    author = Profile.fromUser(model.author, currentAuthor),
+                    author = Profile.fromAuthor(model.author, currentAuthor),
                     favorited = model.favorited.contains(currentAuthor),
                     favoritesCount = model.favorited.size)
         }

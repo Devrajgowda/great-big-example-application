@@ -11,7 +11,7 @@ data class Profile(var username: String,
                    var image: String?,
                    var following: Boolean) {
     companion object {
-        fun fromUser(author: Author, currentAuthor: Author): Profile {
+        fun fromAuthor(author: Author, currentAuthor: Author): Profile {
             return Profile(username = author.user.login, bio = author.bio, image = author.user.imageUrl,
                     following = currentAuthor.followers.contains(author))
         }
