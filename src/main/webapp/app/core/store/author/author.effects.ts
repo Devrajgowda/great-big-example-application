@@ -9,8 +9,8 @@ import * as functions from '../entity/entity.functions';
 
 @Injectable()
 export class AuthorEffects {
-    @Effect()
-    private loadFromRemote$ = functions.loadFromRemote$(this.actions$, slices.AUTHOR, this.dataService);
+    // @Effect()
+    // private loadFromRemote$ = functions.loadFromRemote$(this.actions$, slices.AUTHOR, this.dataService);
 
     constructor(
         private store: Store<Author>,

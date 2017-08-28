@@ -15,12 +15,13 @@ import * as EntityActions from '../../../core/store/entity/entity.actions';
     templateUrl: './add.page.html'
 })
 export class AddPage implements OnInit, OnDestroy {
+    loadingSub: Subscription;
     articleSub: Subscription;
     article: Article;
     articleForm: FormGroup;
     tagField = new FormControl();
     errors: Object = {};
-    isSubmitting = false;
+    loading = false;
 
     constructor(
         private store: Store<fromRoot.RootState>,
@@ -45,6 +46,11 @@ export class AddPage implements OnInit, OnDestroy {
                 this.articleForm.patchValue(article);
             }
         });
+        this.loadingSub = this.store.select(fromRoot.getArticlesState).subscribe((articlesState) => {
+            if (articlesState) {
+                this.loading = articlesState.loading;
+            }
+        });
         if (this.route.snapshot.url.length == 1) {
             this.store.dispatch(new EntityActions.AddTemp(slices.ARTICLE));
         }
@@ -66,18 +72,10 @@ export class AddPage implements OnInit, OnDestroy {
     }
 
     submitForm() {
-        this.isSubmitting = true;
-
-        // update the model
-        this.updateArticle(this.articleForm.value);
-
-        const submission = this.article;
-        this.store.dispatch(new EntityActions.Add(slices.ARTICLE, submission));
-    }
-
-    updateArticle(values: Object) {
-        this.store.dispatch(new EntityActions.Patch(slices.ARTICLE, { id: this.article.id, ...values }));
-        // (<any>Object).assign(this.article, values);
+        debugger;
+        this.loading = true;
+        this.store.dispatch(new EntityActions.Add(slices.ARTICLE,
+            { ...this.article, ...this.articleForm.value }));
     }
 
     ngOnDestroy() {

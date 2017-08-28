@@ -9,8 +9,8 @@ import * as functions from '../entity/entity.functions';
 
 @Injectable()
 export class CommentEffects {
-    @Effect()
-    private loadFromRemote$ = functions.loadFromRemote$(this.actions$, slices.COMMENT, this.dataService);
+    // @Effect()
+    // private loadFromRemote$ = functions.loadFromRemote$(this.actions$, slices.COMMENT, this.dataService);
     @Effect()
     private updateToRemote$ = functions.updateToRemote$(this.actions$, slices.COMMENT, this.dataService, this.store);
     @Effect()

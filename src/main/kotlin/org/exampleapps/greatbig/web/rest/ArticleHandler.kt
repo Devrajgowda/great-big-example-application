@@ -20,9 +20,12 @@ import org.exampleapps.greatbig.repository.TagRepository
 import org.exampleapps.greatbig.repository.UserRepository
 import org.exampleapps.greatbig.repository.specification.ArticlesSpecifications
 import org.exampleapps.greatbig.service.UserService
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.PageRequest
 import org.springframework.data.domain.Sort
 import org.springframework.http.HttpStatus
+import org.springframework.transaction.annotation.Transactional
 import org.springframework.validation.Errors
 import org.springframework.validation.FieldError
 import org.springframework.web.bind.annotation.*
@@ -40,13 +43,19 @@ class ArticleHandler(val repository: ArticleRepository,
                      val commentRepository: CommentRepository,
                      val tagRepository: TagRepository) {
 
+    val log: Logger = LoggerFactory.getLogger(ArticleHandler::class.java)
+
     // @ApiKeySecured(mandatory = false)
+    @Transactional
     @GetMapping("/api/articles")
     fun articles(@RequestParam(defaultValue = "20") limit: Int,
                  @RequestParam(defaultValue = "0") offset: Int,
                  @RequestParam(defaultValue = "") tag: String,
                  @RequestParam(defaultValue = "") author: String,
                  @RequestParam(defaultValue = "") favorited: String): Any {
+
+        log.debug("\n\nREST request to get all Articles")
+
         val p = PageRequest(offset, limit, Sort.Direction.DESC, "createdAt")
 
         val articles = repository.findAll(ArticlesSpecifications.lastArticles(
@@ -64,6 +73,9 @@ class ArticleHandler(val repository: ArticleRepository,
     @GetMapping("/api/articles/feed")
     fun feed(@RequestParam(defaultValue = "20") limit: Int,
              @RequestParam(defaultValue = "0") offset: Int): Any {
+
+        log.debug("\n\nREST request to get article feed")
+
         val currentUser = userService.getUserWithAuthorities()
         val currentAuthor = authorRepository.findById(currentUser.getId())
         val articles = repository.findByAuthorIdInOrderByCreatedAtDesc(currentAuthor.followers.map { it.id },
@@ -74,6 +86,9 @@ class ArticleHandler(val repository: ArticleRepository,
     // @ApiKeySecured(mandatory = false)
     @GetMapping("/api/articles/{slug}")
     fun article(@PathVariable slug: String): Any {
+
+        log.debug("\n\nREST request to get Article for : ", slug)
+
         val currentUser = userService.getUserWithAuthorities()
         val currentAuthor = authorRepository.findById(currentUser.getId())
         repository.findBySlug(slug)?.let {
@@ -85,6 +100,9 @@ class ArticleHandler(val repository: ArticleRepository,
     // @ApiKeySecured
     @PostMapping("/api/articles")
     fun newArticle(@Valid @RequestBody newArticle: NewArticle, errors: Errors): Any {
+
+        log.debug("\n\nREST request to add Article : {}", newArticle)
+
         InvalidRequest.check(errors)
 
         var slug = Slugify().slugify(newArticle.title!!)
@@ -111,6 +129,9 @@ class ArticleHandler(val repository: ArticleRepository,
     // @ApiKeySecured
     @PutMapping("/api/articles/{slug}")
     fun updateArticle(@PathVariable slug: String, @RequestBody article: UpdateArticle): Any {
+
+        log.debug("\n\nREST request to put Article : {}", article)
+
         repository.findBySlug(slug)?.let {
             val currentUser = userService.getUserWithAuthorities()
             val currentAuthor = authorRepository.findById(currentUser.getId())
@@ -161,6 +182,9 @@ class ArticleHandler(val repository: ArticleRepository,
     @ResponseStatus(HttpStatus.OK)
     @DeleteMapping("/api/articles/{slug}")
     fun deleteArticle(@PathVariable slug: String) {
+
+        log.debug("\n\nREST request to delete Article for: ", slug)
+
         repository.findBySlug(slug)?.let {
             if (it.author.id != userService.getUserWithAuthorities().id)
                 throw ForbiddenRequestException()
@@ -174,6 +198,9 @@ class ArticleHandler(val repository: ArticleRepository,
     // @ApiKeySecured(mandatory = false)
     @GetMapping("/api/articles/{slug}/comments")
     fun articleComments(@PathVariable slug: String): Any {
+
+        log.debug("\n\nREST request to get comments for : ", slug)
+
         repository.findBySlug(slug)?.let {
             val currentUser = userService.getUserWithAuthorities()
             val currentAuthor = authorRepository.findById(currentUser.getId())
@@ -185,6 +212,9 @@ class ArticleHandler(val repository: ArticleRepository,
     // @ApiKeySecured
     @PostMapping("/api/articles/{slug}/comments")
     fun addComment(@PathVariable slug: String, @Valid @RequestBody comment: NewComment, errors: Errors): Any {
+
+        log.debug("\n\nREST request to add comment : {}", comment)
+
         InvalidRequest.check(errors)
 
         repository.findBySlug(slug)?.let {
@@ -200,6 +230,9 @@ class ArticleHandler(val repository: ArticleRepository,
     @ResponseStatus(HttpStatus.OK)
     @DeleteMapping("/api/articles/{slug}/comments/{id}")
     fun deleteComment(@PathVariable slug: String, @PathVariable id: Long) {
+
+        log.debug("\n\nREST request to get comments for : ", slug)
+
         repository.findBySlug(slug)?.let {
             val currentUser = userService.getUserWithAuthorities()
             val comment = commentRepository.findOne(id)
@@ -219,6 +252,9 @@ class ArticleHandler(val repository: ArticleRepository,
     // @ApiKeySecured
     @PostMapping("/api/articles/{slug}/favorite")
     fun favoriteArticle(@PathVariable slug: String): Any {
+
+        log.debug("\n\nREST request to favorite Article : ", slug)
+
         repository.findBySlug(slug)?.let {
             val currentUser = userService.getUserWithAuthorities()
             val currentAuthor = authorRepository.findById(currentUser.getId())
@@ -234,6 +270,9 @@ class ArticleHandler(val repository: ArticleRepository,
     // @ApiKeySecured
     @DeleteMapping("/api/articles/{slug}/favorite")
     fun unfavoriteArticle(@PathVariable slug: String): Any {
+
+        log.debug("\n\nREST request to unfavorite Article : ", slug)
+
         repository.findBySlug(slug)?.let {
             val currentUser = userService.getUserWithAuthorities()
             val currentAuthor = authorRepository.findById(currentUser.getId())
