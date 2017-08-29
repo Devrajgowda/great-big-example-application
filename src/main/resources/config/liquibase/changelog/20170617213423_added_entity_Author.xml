@@ -29,28 +29,17 @@
             </column>
             <!-- jhipster-needle-liquibase-add-column - JHipster will add columns here, do not remove-->
         </createTable>
-        
+
         <createTable tableName="author_follower">
             <column name="followers_id" type="bigint">
                 <constraints nullable="false"/>
             </column>
-            <column name="authors_id" type="bigint">
+            <column name="author_id" type="bigint">
                 <constraints nullable="false"/>
             </column>
         </createTable>
 
-        <addPrimaryKey columnNames="authors_id, followers_id" tableName="author_follower"/>
-        
-        <createTable tableName="author_favorite">
-            <column name="favorites_id" type="bigint">
-                <constraints nullable="false"/>
-            </column>
-            <column name="authors_id" type="bigint">
-                <constraints nullable="false"/>
-            </column>
-        </createTable>
+        <addPrimaryKey columnNames="author_id, followers_id" tableName="author_follower"/>
 
-        <addPrimaryKey columnNames="authors_id, favorites_id" tableName="author_favorite"/>
-        
     </changeSet>
 </databaseChangeLog>

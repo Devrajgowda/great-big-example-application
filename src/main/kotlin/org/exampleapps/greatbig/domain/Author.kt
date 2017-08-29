@@ -15,6 +15,7 @@ data class Author(@Id
                 @JoinColumn(name = "id")
 	            var user: User = User(),
                 @ManyToMany
+                @JoinTable(name="author_follower")
                 @JsonIgnore
                 var followers: MutableList<Author> = mutableListOf()
                 ) {

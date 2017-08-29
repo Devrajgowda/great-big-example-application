@@ -26,7 +26,8 @@ data class Article(
     var body: String = "",
 
     @ManyToMany
-    val tagList: MutableList<Tag> = mutableListOf(),
+    @JoinTable(name="article_tag")
+    val tags: MutableList<Tag> = mutableListOf(),
 
     @Column(name = "created_at", nullable = false)
     var createdAt: OffsetDateTime = OffsetDateTime.now(),
@@ -35,6 +36,7 @@ data class Article(
     var updatedAt: OffsetDateTime = OffsetDateTime.now(),
 
     @ManyToMany
+    @JoinTable(name="article_favorited")
     var favorited: MutableList<Author> = mutableListOf(),
 
     @ManyToOne

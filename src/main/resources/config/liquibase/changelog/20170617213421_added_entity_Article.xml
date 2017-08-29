@@ -53,17 +53,28 @@
         </createTable>
         <dropDefaultValue tableName="article" columnName="created_at" columnDataType="datetime"/>
         <dropDefaultValue tableName="article" columnName="updated_at" columnDataType="datetime"/>
-        
+
         <createTable tableName="article_tag">
             <column name="tags_id" type="bigint">
                 <constraints nullable="false"/>
             </column>
-            <column name="articles_id" type="bigint">
+            <column name="article_id" type="bigint">
                 <constraints nullable="false"/>
             </column>
         </createTable>
 
-        <addPrimaryKey columnNames="articles_id, tags_id" tableName="article_tag"/>
-        
+        <addPrimaryKey columnNames="article_id, tags_id" tableName="article_tag"/>
+
+        <createTable tableName="article_favorited">
+            <column name="favorited_id" type="bigint">
+                <constraints nullable="false"/>
+            </column>
+            <column name="article_id" type="bigint">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <addPrimaryKey columnNames="article_id, favorited_id" tableName="article_favorited"/>
+
     </changeSet>
 </databaseChangeLog>

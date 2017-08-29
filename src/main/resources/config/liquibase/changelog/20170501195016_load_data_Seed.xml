@@ -79,9 +79,9 @@
                   tableName="author_follower">
         </loadData>
         <loadData encoding="UTF-8"
-                  file="config/liquibase/author_favorite.csv"
+                  file="config/liquibase/article_favorited.csv"
                   separator=","
-                  tableName="author_favorite">
+                  tableName="article_favorited">
         </loadData>
         <loadData encoding="UTF-8"
                   file="config/liquibase/comment.csv"

@@ -121,7 +121,7 @@ class ArticleHandler(val repository: ArticleRepository,
 
         val article = Article(slug = slug,
                 author = currentAuthor, title = newArticle.title!!, description = newArticle.description!!,
-                body = newArticle.body!!, tagList = tagList.toMutableList())
+                body = newArticle.body!!, tags = tagList.toMutableList())
 
         return articleView(repository.save(article), currentAuthor)
     }
@@ -169,7 +169,7 @@ class ArticleHandler(val repository: ArticleRepository,
                     body = article.body ?: it.body,
                     slug = slug,
                     updatedAt = OffsetDateTime.now(),
-                    tagList = if (tagList == null || tagList.isEmpty()) it.tagList
+                    tags = if (tagList == null || tagList.isEmpty()) it.tags
                     else tagList.toMutableList())
 
             return articleView(repository.save(updated), currentAuthor)
