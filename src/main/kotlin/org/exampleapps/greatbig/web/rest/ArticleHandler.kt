@@ -134,7 +134,7 @@ class ArticleHandler(val repository: ArticleRepository,
     @PutMapping("/api/articles/{slug}")
     fun updateArticle(@PathVariable slug: String, @RequestBody article: UpdateArticle): Any {
 
-        log.debug("\n\nREST request to put Article : {}", article)
+        log.debug("\n\nREST request to put Article : {}", slug)
 
         repository.findBySlug(slug)?.let {
             val currentUser = userService.getUserWithAuthorities()

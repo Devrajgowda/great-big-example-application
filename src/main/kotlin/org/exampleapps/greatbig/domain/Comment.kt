@@ -11,15 +11,25 @@ import javax.persistence.*
 @Table(name = "comment")
 @Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)
 @Document(indexName = "comment")
-data class Comment(var createdAt: OffsetDateTime = OffsetDateTime.now(),
-                   var updatedAt: OffsetDateTime = OffsetDateTime.now(),
-                   var body: String = "",
-                   @ManyToOne
-                   var article: Article = Article(),
-                   @ManyToOne
-                   var author: Author = Author(),
-                //    @Id @GeneratedValue(strategy = GenerationType.AUTO)
-                   @Id
-                   @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "sequenceGenerator")
-                   @SequenceGenerator(name = "sequenceGenerator")
-                   var id: Long = 0)
+data class Comment(
+
+    @Column(name = "created_at")
+    var createdAt: OffsetDateTime = OffsetDateTime.now(),
+
+    @Column(name = "updated_at")
+    var updatedAt: OffsetDateTime = OffsetDateTime.now(),
+
+    @Column(name = "jhi_body", nullable = false)
+    var body: String = "",
+
+    @ManyToOne
+    var article: Article = Article(),
+
+    @ManyToOne
+    var author: Author = Author(),
+
+//    @Id @GeneratedValue(strategy = GenerationType.AUTO)
+    @Id
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "sequenceGenerator")
+    @SequenceGenerator(name = "sequenceGenerator")
+    var id: Long = 0)

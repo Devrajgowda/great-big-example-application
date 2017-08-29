@@ -9,13 +9,15 @@ import org.exampleapps.greatbig.repository.UserRepository
 import org.exampleapps.greatbig.repository.AuthorRepository
 import org.exampleapps.greatbig.service.UserService
 import org.springframework.web.bind.annotation.*
+import org.springframework.transaction.annotation.Transactional
 
 @RestController
 class ProfileHandler(val userRepository: UserRepository,
                      val authorRepository: AuthorRepository,
                      val userService: UserService) {
 
-    @ApiKeySecured(mandatory = false)
+    // @ApiKeySecured(mandatory = false)
+    @Transactional
     @GetMapping("/api/profiles/{username}")
     fun profile(@PathVariable username: String): Any {
         val user = userRepository.findOneByLogin(username);
@@ -27,7 +29,8 @@ class ProfileHandler(val userRepository: UserRepository,
         throw NotFoundException()
     }
 
-    @ApiKeySecured
+    // @ApiKeySecured
+    @Transactional
     @PostMapping("/api/profiles/{username}/follow")
     fun follow(@PathVariable username: String): Any {
         val user = userRepository.findOneByLogin(username);
@@ -43,7 +46,8 @@ class ProfileHandler(val userRepository: UserRepository,
         throw NotFoundException()
     }
 
-    @ApiKeySecured
+    // @ApiKeySecured
+    @Transactional
     @DeleteMapping("/api/profiles/{username}/follow")
     fun unfollow(@PathVariable username: String): Any {
         val user = userRepository.findOneByLogin(username);
