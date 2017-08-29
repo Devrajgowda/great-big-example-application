@@ -70,6 +70,7 @@ class ArticleHandler(val repository: ArticleRepository,
     }
 
     // @ApiKeySecured
+    @Transactional
     @GetMapping("/api/articles/feed")
     fun feed(@RequestParam(defaultValue = "20") limit: Int,
              @RequestParam(defaultValue = "0") offset: Int): Any {
@@ -84,6 +85,7 @@ class ArticleHandler(val repository: ArticleRepository,
     }
 
     // @ApiKeySecured(mandatory = false)
+    @Transactional
     @GetMapping("/api/articles/{slug}")
     fun article(@PathVariable slug: String): Any {
 
@@ -98,6 +100,7 @@ class ArticleHandler(val repository: ArticleRepository,
     }
 
     // @ApiKeySecured
+    @Transactional
     @PostMapping("/api/articles")
     fun newArticle(@Valid @RequestBody newArticle: NewArticle, errors: Errors): Any {
 
@@ -127,6 +130,7 @@ class ArticleHandler(val repository: ArticleRepository,
     }
 
     // @ApiKeySecured
+    @Transactional
     @PutMapping("/api/articles/{slug}")
     fun updateArticle(@PathVariable slug: String, @RequestBody article: UpdateArticle): Any {
 
@@ -179,6 +183,7 @@ class ArticleHandler(val repository: ArticleRepository,
     }
 
     // @ApiKeySecured
+    @Transactional
     @ResponseStatus(HttpStatus.OK)
     @DeleteMapping("/api/articles/{slug}")
     fun deleteArticle(@PathVariable slug: String) {
@@ -196,6 +201,7 @@ class ArticleHandler(val repository: ArticleRepository,
     }
 
     // @ApiKeySecured(mandatory = false)
+    @Transactional
     @GetMapping("/api/articles/{slug}/comments")
     fun articleComments(@PathVariable slug: String): Any {
 
@@ -210,6 +216,7 @@ class ArticleHandler(val repository: ArticleRepository,
     }
 
     // @ApiKeySecured
+    @Transactional
     @PostMapping("/api/articles/{slug}/comments")
     fun addComment(@PathVariable slug: String, @Valid @RequestBody comment: NewComment, errors: Errors): Any {
 
@@ -227,6 +234,7 @@ class ArticleHandler(val repository: ArticleRepository,
     }
 
     // @ApiKeySecured
+    @Transactional
     @ResponseStatus(HttpStatus.OK)
     @DeleteMapping("/api/articles/{slug}/comments/{id}")
     fun deleteComment(@PathVariable slug: String, @PathVariable id: Long) {
@@ -250,6 +258,7 @@ class ArticleHandler(val repository: ArticleRepository,
     }
 
     // @ApiKeySecured
+    @Transactional
     @PostMapping("/api/articles/{slug}/favorite")
     fun favoriteArticle(@PathVariable slug: String): Any {
 
@@ -268,6 +277,7 @@ class ArticleHandler(val repository: ArticleRepository,
     }
 
     // @ApiKeySecured
+    @Transactional
     @DeleteMapping("/api/articles/{slug}/favorite")
     fun unfavoriteArticle(@PathVariable slug: String): Any {
 
