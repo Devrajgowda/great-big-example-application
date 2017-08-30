@@ -12,7 +12,7 @@ import { Filters } from '../../../features/talks/talks.layout';
 import { RESTService } from '../../services/rest.service';
 import { Talk } from './talk.model';
 import { RootState } from '../';
-import { slices, PayloadAction, handleNavigation, secondSegment } from '../util';
+import { slices, PayloadAction, handleNavigation } from '../util';
 import * as EntityActions from '../entity/entity.actions';
 import { typeFor } from '../util';
 import { actions } from '../entity/entity.actions';
@@ -20,14 +20,14 @@ import { actions } from '../entity/entity.actions';
 @Injectable()
 export class TalkEffects {
     @Effect()
-    navigateToTalks$ = handleNavigation(this.store, this.actions$, secondSegment, 'talks', (r: ActivatedRouteSnapshot) => {
+    navigateToTalks$ = handleNavigation(this.store, this.actions$, '/features/talks', (r: ActivatedRouteSnapshot) => {
         const filters = createFilters(r.params);
         return this.dataService.getEntities(slices.TALK, { speaker: filters.speaker, title: filters.title, minRating: '' + filters.minRating })
             .map((fetchedEntities) => new EntityActions.LoadAllSuccess(slices.TALK, fetchedEntities));
     });
 
     @Effect()
-    navigateToTalk$ = handleNavigation(this.store, this.actions$, secondSegment, 'talks/talk/:id', (r: ActivatedRouteSnapshot, state: RootState) => {
+    navigateToTalk$ = handleNavigation(this.store, this.actions$, '/features/talks/talk/:id', (r: ActivatedRouteSnapshot, state: RootState) => {
         const id = +r.paramMap.get('id');
         if (!state.talk[id]) {
             return this.dataService.getEntity(+r.paramMap.get('id'), slices.TALK).map((responseEntity) => new EntityActions.UpdateSuccess(slices.TALK, responseEntity));

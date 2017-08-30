@@ -81,23 +81,27 @@ export type PayloadActions = Actions<PayloadAction>;
  * @param segment The url part to watch for
  * @param callback The function to execute after routing to segment
  */
-export function handleNavigation(store: Store<RootState>, actions$: Actions, segment: (Action) => ActivatedRouteSnapshot, segmentValue: string, callback: (a: ActivatedRouteSnapshot, state: RootState) => Observable<any>) {
-    const nav = actions$.ofType(ROUTER_NAVIGATION)
-        .map(segment)
-        .filter((s) => s.routeConfig.path === segmentValue);
-
-    return nav.withLatestFrom(store).switchMap((a) => callback(a[0], a[1])).catch((e) => {
-        console.log('Network error', e);
-        return of();
-    });
+export function handleNavigation(store: Store<RootState>, actions$: Actions, pathOfInterest: string, callback: (a: ActivatedRouteSnapshot, state: RootState) => Observable<any>) {
+    return actions$.ofType(ROUTER_NAVIGATION)
+        .map(actionToSnapshot)
+        .filter((s) => getFullRouteConfigPath('', s) === pathOfInterest)
+        .withLatestFrom(store).switchMap((a) => {
+            return callback(a[0], a[1])
+        })
+        .catch((e) => {
+            console.log('Network error', e);
+            return of();
+        });
 }
 
-/**
- * This returns a route configuration of the second part of the route.
- * /features/talks       => talks
- * /features/talks/:id   => talks/:id
- * @param r
- */
-export function secondSegment(r: RouterNavigationAction): ActivatedRouteSnapshot {    // TODO: figure out what type should go here
-    return (<any>r.payload.routerState).root.firstChild.firstChild;
+export function actionToSnapshot(r: RouterNavigationAction): ActivatedRouteSnapshot {    // TODO: figure out what type should go here
+    return (<any>r.payload.routerState).root.firstChild;
+}
+
+function getFullRouteConfigPath(path, firstChild) {
+    if (!firstChild) {
+        return path;
+    }
+
+    return getFullRouteConfigPath(path + (firstChild.routeConfig.path ? '/' + firstChild.routeConfig.path : ''), firstChild.firstChild);
 }

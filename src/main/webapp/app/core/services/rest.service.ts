@@ -65,6 +65,12 @@ export class RESTService {
             .catch(this.handleError);
     }
 
+    get(route: string): Observable<any> {
+        return this.http.get(`${this.config.apiUrl}/${route}`)
+            .map(this.extractData)
+            .catch(this.handleError);
+    }
+
     post(route: string, object: any): Observable<any> {
         return this.http.post(`${this.config.apiUrl}/${route}`, this.prepareRecord(object))
             .map(this.extractData)

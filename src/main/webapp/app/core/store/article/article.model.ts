@@ -1,7 +1,7 @@
 import { Profile } from '../profile/profile.model';
+import { Entity } from '../entity/entity.model';
 
-export interface Article {
-    id: string;
+export interface Article extends Entity {
     slug: string;
     title: string;
     description: string;
@@ -15,7 +15,6 @@ export interface Article {
 }
 
 export const initialArticle = {
-    id: null,
     slug: '',
     title: '',
     description: '',
@@ -25,5 +24,11 @@ export const initialArticle = {
     updatedAt: '',
     favorited: false,
     favoritesCount: 0,
-    author: null
+    author: null,
+    get id() {
+        return this.slug;
+    },
+    set id(slug: string) {
+        this.slug = slug;
+    }
 };

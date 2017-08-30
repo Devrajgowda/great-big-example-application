@@ -25,6 +25,6 @@ export function initialEntities<T extends Entity>(slice: string, initialEntity: 
         ids: [],
         entities: {},
         selectedEntityId: null,
-        initialEntity: Object.assign({}, initialBaseEntity, initialEntity),
+        initialEntity: Object.assign({}, initialBaseEntity, initialEntity)
     }, vals);
 };

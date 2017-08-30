@@ -58,7 +58,7 @@ export class ArticleComponent implements OnInit, OnDestroy {
             ([identityData, article]) => {
                 this.currentUser = identityData;
 
-                this.canModify = (this.currentUser.login === article.author.username);
+                this.canModify = article && (this.currentUser.login === article.author.username);
             }
         );
     }

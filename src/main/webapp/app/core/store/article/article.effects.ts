@@ -18,7 +18,7 @@ import * as ArticleActions from './article.actions';
 import { initialBlogPageLayout } from '../../../features/blog/blog.layout';
 import * as SliceActions from '../slice/slice.actions';
 import * as fromRoot from '../../../core/store';
-import { PayloadAction, handleNavigation, secondSegment } from '../util';
+import { PayloadAction, handleNavigation } from '../util';
 import { RootState } from '../';
 
 @Injectable()
@@ -50,10 +50,18 @@ export class ArticleEffects {
      * Select the article whose slug is contained in the route
      */
     @Effect()
-    navigateToArticle$ = handleNavigation(this.store, this.actions$, secondSegment, 'features/blog/article/:slug', (r: ActivatedRouteSnapshot, state: RootState) => {
+    navigateToArticle$ = handleNavigation(this.store, this.actions$, '/features/blog/article/:slug', (r: ActivatedRouteSnapshot, state: RootState) => {
         const slug = r.paramMap.get('slug');
-        const articleId = state.article.ids.filter((id) => state.article.entities[id].slug === slug)[0];
-        return of(new EntityActions.Select(slices.ARTICLE, state.article[articleId]));
+        // const articleId = state.article.ids.filter((id) => {
+        //     return state.article.entities[id].slug === slug
+        // }
+        // )[0];
+
+        if (state.article.entities[slug]) {
+            return of(new EntityActions.Select(slices.ARTICLE, state.article[slug]));
+        } else {
+            return this.dataService.get('articles/' + slug).map((responseEntity) => new EntityActions.LoadSuccess(slices.ARTICLE, responseEntity));
+        }
     });
 
     @Effect()
