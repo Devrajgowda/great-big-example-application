@@ -44,26 +44,26 @@ export function typeFor(slice: string, action: string) {
 }
 
 export const slices = {
-    ARTICLE: 'article',
-    AUTHOR: 'author',
-    BOOK: 'book',
-    CRISIS: 'crisis',
-    CLAIM: 'claim',
-    CLAIM_REBUTTAL: 'claimRebuttal',
-    COLLECTION: 'collection',
-    COMMENT: 'comment',
-    CONTACT: 'contact',
-    COUNTER: 'counter',
-    HERO: 'hero',
-    LAYOUT: 'layout',
-    MESSAGE: 'message',
-    NOTE: 'note',
-    PROFILE: 'profile',
-    REBUTTAL: 'rebuttal',
-    SEARCH: 'search',
-    SESSION: 'session',
-    TAG_LIST: 'tagList',
-    TALK: 'talk'
+    ARTICLE: 'article' as 'article',
+    AUTHOR: 'author' as 'author',
+    BOOK: 'book' as 'book',
+    CRISIS: 'crisis' as 'crisis',
+    CLAIM: 'claim' as 'claim',
+    CLAIM_REBUTTAL: 'claimRebuttal' as 'claimRebuttal',
+    COLLECTION: 'collection' as 'collection',
+    COMMENT: 'comment' as 'comment',
+    CONTACT: 'contact' as 'contact',
+    COUNTER: 'counter' as 'counter',
+    HERO: 'hero' as 'hero',
+    LAYOUT: 'layout' as 'layout',
+    MESSAGE: 'message' as 'message',
+    NOTE: 'note' as 'note',
+    PROFILE: 'profile' as 'profile',
+    REBUTTAL: 'rebuttal' as 'rebuttal',
+    SEARCH: 'search' as 'search',
+    SESSION: 'session' as 'session',
+    TAG_LIST: 'tagList' as 'tagList',
+    TALK: 'talk' as 'talk'
 };
 
 export class PayloadAction implements Action {

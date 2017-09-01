@@ -99,8 +99,9 @@ export class ArticleComponent implements OnInit, OnDestroy {
         // this.isSubmitting = true;
         this.commentFormErrors = {};
 
-        const requestObject = { comment: { body: this.commentControl.value } };
-        this.store.dispatch(new ArticleActions.AddComment(this.article.slug, requestObject));
+        // const requestObject = { comment: { body: this.commentControl.value } };  // It must be like this per spec
+        // this.store.dispatch(new ArticleActions.AddComment(this.article.slug, requestObject));
+        this.store.dispatch(new EntityActions.Add(slices.COMMENT, { articleId: this.article.id, body: this.commentControl.value }));
     }
 
     onDeleteComment(comment) {

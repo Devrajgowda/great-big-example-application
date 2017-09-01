@@ -11,22 +11,22 @@ export function reducer(state: Entities<Comment> = initialEntities<Comment>(slic
     action: EntityAction<Comment>): Entities<Comment> {
 
     switch (action.type) {
-        case typeFor(slices.COMMENT, actions.ADD_SUCCESS):
-            return functions.addSuccess<Comment>(state, <any>action);
-        case typeFor(slices.COMMENT, actions.ADD_TEMP):
-        case typeFor(slices.COMMENT, actions.LOAD_SUCCESS):
-            return functions.addToStore<Comment>(state, <any>action);
-        case typeFor(slices.COMMENT, actions.UPDATE):
-        case typeFor(slices.COMMENT, actions.UPDATE_SUCCESS):
-            return functions.update<Comment>(state, <any>action);
-        case typeFor(slices.COMMENT, actions.DELETE):
-            return functions.deleteEntity<Comment>(state, <any>action);
-        case typeFor(slices.COMMENT, actions.DELETE_TEMP):
-            return functions.deleteTemp<Comment>(state, <any>action);
-        case typeFor(slices.COMMENT, actions.SELECT):
-            return functions.select<Comment>(state, <any>action);
-        case typeFor(slices.COMMENT, actions.SELECT_NEXT):
-            return functions.selectNext<Comment>(state, <any>action);
+        // case typeFor(slices.COMMENT, actions.ADD_SUCCESS):
+        //     return functions.addSuccess<Comment>(state, <any>action);
+        // case typeFor(slices.COMMENT, actions.ADD_TEMP):
+        // case typeFor(slices.COMMENT, actions.LOAD_SUCCESS):
+        //     return functions.addToStore<Comment>(state, <any>action);
+        // case typeFor(slices.COMMENT, actions.UPDATE):
+        // case typeFor(slices.COMMENT, actions.UPDATE_SUCCESS):
+        //     return functions.update<Comment>(state, <any>action);
+        // case typeFor(slices.COMMENT, actions.DELETE):
+        //     return functions.deleteEntity<Comment>(state, <any>action);
+        // case typeFor(slices.COMMENT, actions.DELETE_TEMP):
+        //     return functions.deleteTemp<Comment>(state, <any>action);
+        // case typeFor(slices.COMMENT, actions.SELECT):
+        //     return functions.select<Comment>(state, <any>action);
+        // case typeFor(slices.COMMENT, actions.SELECT_NEXT):
+        //     return functions.selectNext<Comment>(state, <any>action);
         default:
             return state;
     }

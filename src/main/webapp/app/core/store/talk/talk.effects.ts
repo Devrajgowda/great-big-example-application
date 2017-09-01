@@ -21,24 +21,25 @@ import { actions } from '../entity/entity.actions';
 export class TalkEffects {
     @Effect()
     navigateToTalks$ = handleNavigation(this.store, this.actions$, '/features/talks', (r: ActivatedRouteSnapshot) => {
-        const filters = createFilters(r.params);
+        const filters = createFilters(r.firstChild.firstChild.params);
         return this.dataService.getEntities(slices.TALK, { speaker: filters.speaker, title: filters.title, minRating: '' + filters.minRating })
             .map((fetchedEntities) => new EntityActions.LoadAllSuccess(slices.TALK, fetchedEntities));
     });
 
     @Effect()
     navigateToTalk$ = handleNavigation(this.store, this.actions$, '/features/talks/talk/:id', (r: ActivatedRouteSnapshot, state: RootState) => {
-        const id = +r.paramMap.get('id');
-        if (!state.talk[id]) {
+        const id = +r.firstChild.firstChild.firstChild.paramMap.get('id');
+        if (!state.talk.entities[id]) {
             return this.dataService.getEntity(+r.paramMap.get('id'), slices.TALK).map((responseEntity) => new EntityActions.UpdateSuccess(slices.TALK, responseEntity));
         } else {
             return of();
         }
     });
 
-    @Effect() rateTalk$ = this.actions$.ofType(typeFor(slices.TALK, actions.PATCH)).
-        switchMap((a: PayloadAction) => {
-            return this.dataService.update({ id: a.payload.id, yourRating: a.payload.rating }, slices.TALK)
+    @Effect() rateTalk$ = this.actions$.ofType(typeFor(slices.TALK, actions.PATCH))
+        .withLatestFrom(this.store)
+        .switchMap(([a, state]) => {
+            return this.dataService.update({ id: a.payload.id, yourRating: a.payload.rating }, slices.TALK, state, this.store)
                 .switchMap(() => of())
                 .catch((e) => {
                     console.log('Error', e);
@@ -49,7 +50,7 @@ export class TalkEffects {
 
     constructor(
         private store: Store<RootState>,  // Other effects are Store<Thing>
-        private actions$: Actions,
+        private actions$: Actions<PayloadAction>,
         private dataService: RESTService,
         private watch: WatchService
     ) { }

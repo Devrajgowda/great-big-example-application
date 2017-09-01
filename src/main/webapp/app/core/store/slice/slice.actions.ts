@@ -6,6 +6,7 @@ export const actions = {
     LOAD: 'LOAD',
     LOAD_FAIL: 'LOAD_FAIL',
     LOAD_SUCCESS: 'LOAD_SUCCESS',
+    PATCH: 'PATCH',
     UPDATE: 'UPDATE',
     UPDATE_SUCCESS: 'UPDATE_SUCCESS'
 };
@@ -32,6 +33,10 @@ export class LoadFail extends SliceAction {
 
 export class LoadSuccess extends SliceAction {
     protected actionName: string = actions.LOAD_SUCCESS;
+}
+
+export class Patch extends SliceAction {
+    protected actionName: string = actions.PATCH;
 }
 
 export class Update extends SliceAction {

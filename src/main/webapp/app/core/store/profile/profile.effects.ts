@@ -17,7 +17,6 @@ export class ProfileEffects {
     private follow$ = sliceFunctions.postToRemote$(this.actions$, slices.ARTICLE, this.dataService, actions.FOLLOW, new ProfileActions.FollowSuccess(), new ProfileActions.FollowFail());
 
     constructor(
-        private store: Store<Profile>,
         private actions$: Actions,
         private dataService: RESTService
     ) { }

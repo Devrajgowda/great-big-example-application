@@ -10,6 +10,7 @@ import { RESTService } from '../../services/rest.service';
 import * as SliceActions from '../slice/slice.actions';
 import * as EntityActions from '../entity/entity.actions';
 import { WatchService } from '../../../features/talks/services/watch.service';
+import { RootState } from '../';
 
 /**
  * @whatItDoes Calls the WatchService with the provided talk id and then dispatches
@@ -27,10 +28,10 @@ export class LayoutEffects {
     private loadForQueryFromRemote = this.actions$
         .ofType(typeFor(slices.LAYOUT, SliceActions.actions.UPDATE))
         .filter((action: SliceAction) => action.payload.filters)   // TODO: make this a better test for this being the blog page layout
-        .withLatestFrom(this.store.select('blogPage'))
-        .switchMap(([action, blogPageLayout]) => {
-            const route = '/articles' + (blogPageLayout.type === 'feed') ? '/feed' : '';
-            return this.dataService.getEntities(route, blogPageLayout.filters)
+        .withLatestFrom(this.store.select('layout'))
+        .switchMap(([action, layout]) => {
+            const route = '/articles' + (layout.blogPage.type === 'feed') ? '/feed' : '';
+            return this.dataService.getEntities(route, layout.blogPage.filters)
                 .mergeMap((fetchedEntities) => Observable.from(fetchedEntities))
                 .map((fetchedEntity) => new EntityActions.LoadSuccess(slices.ARTICLE, fetchedEntity))  // one action per entity
                 .catch((err) => {
@@ -60,7 +61,7 @@ export class LayoutEffects {
     constructor(
         private watchService: WatchService,
         private actions$: Actions,
-        private store: Store<Layout>,
+        private store: Store<RootState>,
         private dataService: RESTService
     ) { }
 }

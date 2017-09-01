@@ -6,6 +6,7 @@ import { Message } from './message.model';
 import { slices } from '../util';
 import { SocketService } from '../../services/socket.service';
 import * as functions from '../entity/entity.functions';
+import { RootState } from '../';
 
 @Injectable()
 export class MessageEffects {
@@ -16,7 +17,7 @@ export class MessageEffects {
     private addToRemote$ = functions.addToRemote$(this.actions$, slices.MESSAGE, this.dataService, this.store);
 
     constructor(
-        private store: Store<Message>,
+        private store: Store<RootState>,
         private actions$: Actions,
         private dataService: SocketService
     ) { }

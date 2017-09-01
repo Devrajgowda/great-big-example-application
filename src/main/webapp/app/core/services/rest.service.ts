@@ -2,16 +2,24 @@ import { Injectable, OnInit } from '@angular/core';
 import { Http, URLSearchParams, Response, Headers } from '@angular/http';
 import { Observable } from 'rxjs/Observable';
 import { Subject } from 'rxjs/Subject';
+import { Store } from '@ngrx/store';
+// import { normalize } from 'normalizr';
 
 import { Claim } from '../store/claim/claim.model';
 import { ClaimRebuttal } from '../store/claim-rebuttal/claim-rebuttal.model';
+import { Comment } from '../store/comment/comment.model';
 import { Contact } from '../store/contact/contact.model';
 import { Crisis } from '../store/crisis/crisis.model';
 import { Hero } from '../store/hero/hero.model';
 import { Note } from '../store/note/note.model';
 import { Rebuttal } from '../store/rebuttal/rebuttal.model';
 import { AppConfig } from '../../app.config';
-
+// import { articleSchema } from '../store/article/article.model';
+import { DataService } from './data.service';
+import { RootState } from '../store';
+import { Entity } from '../store/entity/entity.model';
+import * as SliceActions from '../store/slice/slice.actions';
+import * as EntityActions from '../store/slice/slice.actions';
 /**
  * This mapping exists because I don't like pluralization of entity names. The JHipster
  * approach uses plurals so this takes care of that.
@@ -30,11 +38,36 @@ const endpoints = {
     talk: 'talks'
 };
 
+// const schemas = {
+//     article: articleSchema
+// }
+
+const requestTransforms = {
+    add: {
+        comment(comment: Comment, state: RootState) {
+            return { comment: { body: comment.body } };
+        }
+    }
+}
+
+const endpointTransforms = {
+    add: {
+        comment(comment: Comment, state: RootState) {
+            let slug = state.article.entities[comment.articleId].slug;
+            return `articles/${slug}/comments`;
+        }
+    }
+}
+
 @Injectable()
-export class RESTService {
+export class RESTService implements DataService {
     constructor(private http: Http, private config: AppConfig) { }
 
-    getEntities(table: string, query: { [key: string]: string | number } = {}): Observable<any[]> {
+    getEntities(table: string,
+        query: { [key: string]: string | number } = {},
+        route: string = `${this.config.apiUrl}/${(endpoints[table] || table)}`,
+        extractFunction = this.extractData): Observable<any[]> {
+
         const params: URLSearchParams = new URLSearchParams();
 
         Object.keys(query)
@@ -44,12 +77,14 @@ export class RESTService {
                 }
             });
 
-        const endpoint = endpoints[table] || table; // Could be a table name or a named endpoint TODO: reconsider this
-
-        return this.http.get(`${this.config.apiUrl}/${endpoint}`, { search: params })
-            .map(this.extractData)
+        return this.http.get(route, { search: params })
+            .map(extractFunction)
             .catch(this.handleError);
     }
+
+    // getEntitiesThenNormalize(route: string, query, table: string): Observable<any> {
+    //     return this.getEntities(table, query, route, (obj) => normalize(obj, schemas[table]));
+    // }
 
     // TODO: make table the first parameter of all of these
 
@@ -59,10 +94,23 @@ export class RESTService {
             .catch(this.handleError);
     }
 
-    add(entity: any, table): Observable<any> {
-        return this.http.post(`${this.config.apiUrl}/${endpoints[table]}`, this.prepareRecord(entity))
+    add(entity: Entity, table: keyof RootState, state: RootState, store: Store<RootState>): Observable<any> {
+        let endpoint = endpointTransforms.add[table] || `${endpoints[table]}`;
+        let payload = this.prepareRecord(entity);
+
+        if (requestTransforms.add[table]) {
+            payload = requestTransforms.add[table](payload, state);
+        }
+
+        // store.dispatch(new SliceActions.ToggleLoading(table, { loading: true }));
+        // store.dispatch(new EntityActions.ToggleLoading(table, { id: entity.id, loading: true }));
+        return this.http.post(`${this.config.apiUrl}/${endpoint}`, payload)
             .map(this.extractData)
-            .catch(this.handleError);
+            .catch(this.handleError)
+            .finally(() => {
+                // store.dispatch(new SliceActions.ToggleLoading(table, { loading: false }));
+                // store.dispatch(new EntityActions.ToggleLoading(table, { id: entity.id, loading: false }));
+            });
     }
 
     get(route: string): Observable<any> {
@@ -77,13 +125,13 @@ export class RESTService {
             .catch(this.handleError);
     }
 
-    update(entity: any, table): Observable<any> {
+    update(entity: Entity, table, state: RootState, store: Store<RootState>): Observable<any> {
         return this.http.put(`${this.config.apiUrl}/${endpoints[table]}`, this.prepareRecord(entity))
             .map(this.extractData)
             .catch(this.handleError);
     }
 
-    remove(entity: any, table): Observable<any> {
+    remove(entity: Entity, table, state: RootState, store: Store<RootState>): Observable<any> {
         return this.http.delete(`${this.config.apiUrl}/${endpoints[table]}/${entity.id}`)
             .map(this.extractData)
             .catch(this.handleError);

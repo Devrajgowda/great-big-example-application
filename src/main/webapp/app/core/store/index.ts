@@ -101,6 +101,8 @@ export interface RootState {
     talk: Entities<Talk>;
 }
 
+export type RootStateKeys = keyof RootState;
+
 /**
  * Because metareducers take a reducer function and return a new reducer,
  * we can use our compose helper to chain them together. Here we are

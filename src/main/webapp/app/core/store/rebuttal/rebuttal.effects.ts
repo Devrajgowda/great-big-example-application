@@ -6,15 +6,15 @@ import { Rebuttal } from './rebuttal.model';
 import { slices } from '../util';
 import { RESTService } from '../../services/rest.service';
 import * as functions from '../entity/entity.functions';
+import { RootState } from '../';
 
 @Injectable()
 export class RebuttalEffects {
-  @Effect()
-  private loadFromRemote$ = functions.loadFromRemote$(this.actions$, slices.REBUTTAL, this.dataService);
+    @Effect()
+    private loadFromRemote$ = functions.loadFromRemote$(this.actions$, slices.REBUTTAL, this.dataService);
 
-  constructor(
-    private store: Store<Rebuttal>,
-    private actions$: Actions,
-    private dataService: RESTService
-  ) { }
+    constructor(
+        private actions$: Actions,
+        private dataService: RESTService
+    ) { }
 }

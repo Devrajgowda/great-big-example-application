@@ -1,12 +1,14 @@
 import { Observable } from 'rxjs/Observable';
 import { toPayload, Actions } from '@ngrx/effects';
-import { Action } from '@ngrx/store';
+import { Action, Store } from '@ngrx/store';
 
 import { Entities, Entity } from './entity.model';
 import { typeFor, PayloadAction, PayloadActions } from '../util';
 import { actions, EntityAction } from './entity.actions';
 import * as EntityActions from './entity.actions';
 import * as sliceFunctions from '../slice/slice.functions';
+import { RootState } from '../';
+import { DataService } from '../../services/data.service';
 
 export function addToStore<T extends Entity>(state: Entities<T>, action: EntityActions.Add<T> | EntityActions.Load<T>): Entities<T> {
     const entities = Object.assign({}, state.entities);
@@ -243,46 +245,42 @@ export function loadFromRemote$(actions$: PayloadActions, slice: string, dataSer
         );
 }
 
-// This way looks at the store for the new entity, not the action.payload
-// I got that from the notes demo. I don't know if that's necessary in cases of failures
-//
-// export function addToRemote$(actions$: Actions, slice: string, dataService, store): Observable<Action> {
-//     return actions$
-//         .ofType(typeFor(slice, actions.ADD), typeFor(slice, actions.ADD_OPTIMISTICALLY))
-//         .withLatestFrom(store.select(slice))
-//         .switchMap(([action, entities]) =>
-//             Observable
-//                 .from((<any>entities).ids)
-//                 .filter((id: string) => (<any>entities).entities[id].dirty)
-//                 .switchMap((id: string) => dataService.add(action.payloadForPost(), slice))
-//                 .map((responseEntity) => new EntityActions.AddSuccess(slice, responseEntity))
-//         );
-// }
-
-export function addToRemote$(actions$: Actions, slice: string, dataService, store): Observable<Action> {
+export function addToRemote$(actions$: Actions, slice: keyof RootState, dataService: DataService, store: Store<RootState>): Observable<Action> {
     return actions$
         .ofType(typeFor(slice, actions.ADD), typeFor(slice, actions.ADD_OPTIMISTICALLY))
-        .switchMap((action) => dataService.add((<any>action).payloadForPost(), slice))  // TODO: find better way
+        .withLatestFrom(store)
+        .switchMap(([action, state]) => dataService.add((<any>action).payloadForPost(), slice, state, store))  // TODO: find better way
         .map((responseEntity: Entity) => new EntityActions.AddSuccess(slice, responseEntity));
 }
 
-export function updateToRemote$(actions$: Actions, slice: string, dataService, store): Observable<Action> {
+/**
+ * @whatItDoes This function creates a subscription to UPDATE and PATCH actions for a given entity type and calls the dataservice to send the
+ * update to the server
+ *
+ * @param actions$
+ * @param slice
+ * @param dataService
+ * @param store
+ */
+export function updateToRemote$(actions$: Actions, slice: keyof RootState, dataService: DataService, store: Store<RootState>): Observable<Action> {
     return actions$
-        .ofType(typeFor(slice, actions.UPDATE))
-        .withLatestFrom(store.select(slice))
-        .switchMap(([{ }, entities]) =>  // first element is action, but it isn't used
-            Observable
+        .ofType(typeFor(slice, actions.UPDATE), typeFor(slice, actions.PATCH))
+        .withLatestFrom(store)
+        .switchMap(([{ }, state]) => { // first element is action, but it isn't used
+            let entities = state[slice];
+            return Observable
                 .from((<any>entities).ids)
                 .filter((id: string) => (<any>entities).entities[id].dirty)
-                .switchMap((id: string) => dataService.update((<any>entities).entities[id], slice))
+                .switchMap((id: string) => dataService.update((<any>entities).entities[id], slice, state, store))
                 .map((responseEntity: Entity) => new EntityActions.UpdateSuccess(slice, responseEntity))
-        );
+        });
 }
 
-export function deleteFromRemote$(actions$: Actions, slice: string, dataService, store): Observable<EntityAction<any>> {  // TODO: fix this any
+export function deleteFromRemote$(actions$: Actions, slice: keyof RootState, dataService: DataService, store: Store<RootState>): Observable<EntityAction<any>> {  // TODO: fix this any
     return actions$
         .ofType(typeFor(slice, actions.DELETE))
-        .switchMap((action) => dataService.remove((<EntityAction<any>>action).payload, slice))
+        .withLatestFrom(store)
+        .switchMap(([action, state]) => dataService.remove((<EntityAction<any>>action).payload, slice, state, store))
         .map((responseEntity: Entity) => new EntityActions.DeleteSuccess(slice, responseEntity))
         .catch((err) => {
             console.log(err);

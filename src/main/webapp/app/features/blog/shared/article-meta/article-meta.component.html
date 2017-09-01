@@ -1,9 +1,9 @@
 <div class="article-meta">
-    <a [routerLink]="['/profile', article.author.user.login]">
+    <a [routerLink]="['/profile', article.author.username]">
     <img [src]="article.author.image" />
   </a> {{ article | json }}
     <div class="info">
-        <a class="author" [routerLink]="['/profile', article.author.user.login]">
+        <a class="author" [routerLink]="['/profile', article.author.username]">
       {{ article.author.username }}
     </a>
         <span class="date">

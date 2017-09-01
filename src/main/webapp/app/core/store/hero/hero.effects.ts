@@ -6,6 +6,7 @@ import { Hero } from './hero.model';
 import { slices } from '../util';
 import { RESTService } from '../../services/rest.service';
 import * as functions from '../entity/entity.functions';
+import { RootState } from '../';
 
 @Injectable()
 export class HeroEffects {
@@ -19,7 +20,7 @@ export class HeroEffects {
     private addToRemote$ = functions.addToRemote$(this.actions$, slices.HERO, this.dataService, this.store);
 
     constructor(
-        private store: Store<Hero>,
+        private store: Store<RootState>,
         private actions$: Actions,
         private dataService: RESTService
     ) { }

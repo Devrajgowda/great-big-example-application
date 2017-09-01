@@ -17,7 +17,7 @@ if(!fs.existsSync(ddlPath)) {
 }
 
 module.exports = webpackMerge(commonConfig({ env: ENV }), {
-    devtool: 'inline-source-map',
+    devtool: 'source-map',
     devServer: {
         contentBase: './target/www',
         proxy: [{

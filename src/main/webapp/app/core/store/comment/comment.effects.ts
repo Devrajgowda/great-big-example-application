@@ -6,6 +6,7 @@ import { Comment } from './comment.model';
 import { slices } from '../util';
 import { RESTService } from '../../services/rest.service';
 import * as functions from '../entity/entity.functions';
+import { RootState } from '../';
 
 @Injectable()
 export class CommentEffects {
@@ -17,7 +18,7 @@ export class CommentEffects {
     private addToRemote$ = functions.addToRemote$(this.actions$, slices.COMMENT, this.dataService, this.store);
 
     constructor(
-        private store: Store<Comment>,
+        private store: Store<RootState>,
         private actions$: Actions,
         private dataService: RESTService
     ) { }

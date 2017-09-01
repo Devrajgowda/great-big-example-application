@@ -1,5 +1,7 @@
 import { Profile } from '../profile/profile.model';
 import { Entity } from '../entity/entity.model';
+import { Comment } from '../comment/comment.model';
+// import { normalize, schema } from 'normalizr';
 
 export interface Article extends Entity {
     slug: string;
@@ -7,6 +9,7 @@ export interface Article extends Entity {
     description: string;
     body: string;
     tagList: Array<string>;
+    comments: Array<Comment>;
     createdAt: string;
     updatedAt: string;
     favorited: boolean;
@@ -20,6 +23,7 @@ export const initialArticle = {
     description: '',
     body: '',
     tagList: [],
+    comments: [],
     createdAt: '',
     updatedAt: '',
     favorited: false,
@@ -32,3 +36,7 @@ export const initialArticle = {
         this.slug = slug;
     }
 };
+
+// const comment = new schema.Entity('comments');
+// const article = new schema.Entity('articles', { comments: [comment] }, { idAttribute: 'slug' });
+// export const articleSchema = { articles: [article] }

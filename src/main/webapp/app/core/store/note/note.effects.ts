@@ -6,6 +6,7 @@ import { Note } from './note.model';
 import { slices } from '../util';
 import { RESTService } from '../../services/rest.service';
 import * as functions from '../entity/entity.functions';
+import { RootState } from '../';
 
 @Injectable()
 export class NoteEffects {
@@ -19,7 +20,7 @@ export class NoteEffects {
     private addToRemote$ = functions.addToRemote$(this.actions$, slices.NOTE, this.dataService, this.store);
 
     constructor(
-        private store: Store<Note>,
+        private store: Store<RootState>,
         private actions$: Actions,
         private dataService: RESTService
     ) { }

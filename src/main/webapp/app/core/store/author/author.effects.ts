@@ -6,6 +6,7 @@ import { Author } from './author.model';
 import { slices } from '../util';
 import { RESTService } from '../../services/rest.service';
 import * as functions from '../entity/entity.functions';
+import { RootState } from '../';
 
 @Injectable()
 export class AuthorEffects {
@@ -13,7 +14,7 @@ export class AuthorEffects {
     // private loadFromRemote$ = functions.loadFromRemote$(this.actions$, slices.AUTHOR, this.dataService);
 
     constructor(
-        private store: Store<Author>,
+        private store: Store<RootState>,
         private actions$: Actions,
         private dataService: RESTService
     ) { }

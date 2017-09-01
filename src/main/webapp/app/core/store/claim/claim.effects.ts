@@ -6,15 +6,16 @@ import { Claim } from './claim.model';
 import { slices } from '../util';
 import { RESTService } from '../../services/rest.service';
 import * as functions from '../entity/entity.functions';
+import { RootState } from '../';
 
 @Injectable()
 export class ClaimEffects {
-  @Effect()
-  private loadFromRemote$ = functions.loadFromRemote$(this.actions$, slices.CLAIM, this.dataService);
+    @Effect()
+    private loadFromRemote$ = functions.loadFromRemote$(this.actions$, slices.CLAIM, this.dataService);
 
-  constructor(
-    private store: Store<Claim>,
-    private actions$: Actions,
-    private dataService: RESTService
-  ) { }
+    constructor(
+        private store: Store<RootState>,
+        private actions$: Actions,
+        private dataService: RESTService
+    ) { }
 }

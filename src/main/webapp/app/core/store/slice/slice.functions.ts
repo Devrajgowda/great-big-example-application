@@ -108,36 +108,36 @@ function isPostLoadingAction(verb: string) {
 /**
  * Effects
  */
-export function loadFromRemote$(actions$: Actions, slice: string, dataService, dataGetter: string, transform: Function = ((resp) => resp)): Observable<Action> {
+export function loadFromRemote$(actions$: Actions, slice: string, dataService, dataGetter: string, responseTransform: Function = ((resp) => resp)): Observable<Action> {
     return actions$
         .ofType(typeFor(slice, actions.LOAD))
         .switchMap((action: PayloadAction) =>
             dataService[dataGetter](action.payload)
-                .map(transform)
+                .map(responseTransform)
                 .map((responseSlice: any) =>
                     new ActionClasses.LoadSuccess(slice, responseSlice))
                 .catch((error) => of(new ActionClasses.LoadFail(slice, error)))
         );
 }
 
-export function postToRemote$(actions$: Actions, slice: string, dataService, triggerAction: string, successAction: SliceAction, errorAction: SliceAction, transform: Function = ((resp) => resp)): Observable<Action> {
-    return httpToRemote$('post', actions$, slice, dataService, triggerAction, successAction, errorAction, transform);
+export function postToRemote$(actions$: Actions, slice: string, dataService, triggerAction: string, successAction: SliceAction, errorAction: SliceAction, responseTransform: Function = ((resp) => resp)): Observable<Action> {
+    return httpToRemote$('post', actions$, slice, dataService, triggerAction, successAction, errorAction, responseTransform);
 }
 
-export function deleteFromRemote$(actions$: Actions, slice: string, dataService, triggerAction: string, successAction: SliceAction, errorAction: SliceAction, transform: Function = ((resp) => resp)): Observable<Action> {
-    return httpToRemote$('delete', actions$, slice, dataService, triggerAction, successAction, errorAction, transform);
+export function deleteFromRemote$(actions$: Actions, slice: string, dataService, triggerAction: string, successAction: SliceAction, errorAction: SliceAction, responseTransform: Function = ((resp) => resp)): Observable<Action> {
+    return httpToRemote$('delete', actions$, slice, dataService, triggerAction, successAction, errorAction, responseTransform);
 }
 
-export function getFromRemote$(actions$: Actions, slice: string, dataService, triggerAction: string, successAction: SliceAction, errorAction: SliceAction, transform: Function = ((resp) => resp)): Observable<Action> {
-    return httpToRemote$('get', actions$, slice, dataService, triggerAction, successAction, errorAction, transform);
+export function getFromRemote$(actions$: Actions, slice: string, dataService, triggerAction: string, successAction: SliceAction, errorAction: SliceAction, responseTransform: Function = ((resp) => resp)): Observable<Action> {
+    return httpToRemote$('get', actions$, slice, dataService, triggerAction, successAction, errorAction, responseTransform);
 }
 
-function httpToRemote$(method: string, actions$: Actions, slice: string, dataService, triggerAction: string, successAction: SliceAction, errorAction: SliceAction, transform: Function = ((resp) => resp)): Observable<Action> {
+function httpToRemote$(method: string, actions$: Actions, slice: string, dataService, triggerAction: string, successAction: SliceAction, errorAction: SliceAction, responseTransform: Function = ((resp) => resp)): Observable<Action> {
     return actions$
         .ofType(typeFor(slice, triggerAction))
         .switchMap((action: PayloadAction) =>
             dataService[method](action.payload.route, action.payload.requestObject || {})
-                .map(transform)
+                .map(responseTransform)
                 .map((responseSlice: any) => {
                     successAction.payload = responseSlice;
                     return successAction;

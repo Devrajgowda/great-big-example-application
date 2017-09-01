@@ -8,6 +8,7 @@ import * as functions from '../entity/entity.functions';
 import { typeFor, slices } from '../util';
 import { actions, SliceAction } from '../slice/slice.actions';
 import * as SliceActions from '../slice/slice.actions';
+import { RootState } from '../';
 
 /*
  * @whatItDoes This just resets the counter whenever someone logs in or logs out
@@ -26,7 +27,7 @@ export class CounterEffects {
         });
 
     constructor(
-        private store: Store<Counter>,
+        private store: Store<RootState>,
         private actions$: Actions
     ) { }
 }

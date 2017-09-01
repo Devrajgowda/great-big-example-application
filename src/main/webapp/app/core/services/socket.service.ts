@@ -2,7 +2,7 @@ import { Injectable, Inject } from '@angular/core';
 import { Router, NavigationEnd } from '@angular/router';
 import { Observable } from 'rxjs/Observable';
 import { Observer } from 'rxjs/Observer';
-import {  Subscription } from 'rxjs/Subscription';
+import { Subscription } from 'rxjs/Subscription';
 import { Store } from '@ngrx/store';
 import * as SockJS from 'sockjs-client';
 import * as Stomp from 'webstomp-client';
@@ -11,6 +11,7 @@ import { CSRFService } from '../../shared/auth/csrf.service';
 import { WindowRef } from '../../shared/services/window.service';
 import { AuthServerProvider } from '../../shared/auth/auth-jwt.service';
 import * as EntityActions from '../store/entity/entity.actions';
+import { DataService } from './data.service';
 
 // const io = require('socket.io-client');
 // const hooks = require('feathers-hooks');
@@ -22,7 +23,7 @@ import * as EntityActions from '../store/entity/entity.actions';
 // import { helpers } from '../config/helpers';
 
 @Injectable()
-export class SocketService {
+export class SocketService implements DataService {
     stompClient = null;
     subscriber = null;
     connection: Promise<any>;
@@ -46,10 +47,14 @@ export class SocketService {
         this.resource$ = new Observable((observable) => this.observable = observable);
     }
 
+    // TODO: fix these up.
     add(entity: any, service: string): Observable<any> {
         return this.sendData(`/topic/${service}`, entity);
     }
     update(entity: any, service: string): Observable<any> {
+        return this.sendData(`/topic/${service}`, entity);
+    }
+    remove(entity: any, service: string): Observable<any> {
         return this.sendData(`/topic/${service}`, entity);
     }
 

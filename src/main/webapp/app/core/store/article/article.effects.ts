@@ -29,12 +29,14 @@ export class ArticleEffects {
     private updateToRemote$ = entityFunctions.updateToRemote$(this.actions$, slices.ARTICLE, this.dataService, this.store);
     @Effect()
     private addToRemote$ = entityFunctions.addToRemote$(this.actions$, slices.ARTICLE, this.dataService, this.store);
+    // @Effect()
+    // private addCommentToRemote$ = sliceFunctions.postToRemote$(this.actions$, slices.COMMENT, this.dataService, this.store, new EntityActions.AddSuccess(), new EntityActions.AddUpdateFail());
 
     @Effect()
     private navigateOnArticleAddSuccess = this.actions$
         .ofType(typeFor(slices.ARTICLE, actions.ADD_SUCCESS))
         .map((action) => {
-            this.router.navigateByUrl('/features/blog/article/' + action.payload.slug);
+            this.router.navigateByUrl('/features/blog/article/' + action.payload.article.slug);
             return Observable.empty();
         });
 
@@ -51,16 +53,12 @@ export class ArticleEffects {
      */
     @Effect()
     navigateToArticle$ = handleNavigation(this.store, this.actions$, '/features/blog/article/:slug', (r: ActivatedRouteSnapshot, state: RootState) => {
-        const slug = r.paramMap.get('slug');
-        // const articleId = state.article.ids.filter((id) => {
-        //     return state.article.entities[id].slug === slug
-        // }
-        // )[0];
+        const slug = r.firstChild.firstChild.paramMap.get('slug');
 
         if (state.article.entities[slug]) {
             return of(new EntityActions.Select(slices.ARTICLE, state.article[slug]));
         } else {
-            return this.dataService.get('articles/' + slug).map((responseEntity) => new EntityActions.LoadSuccess(slices.ARTICLE, responseEntity));
+            return this.dataService.get('articles/' + slug).map((responseEntity) => new EntityActions.LoadSuccess(slices.ARTICLE, responseEntity.article));
         }
     });
 
