@@ -5,7 +5,7 @@ import { Observable } from 'rxjs/Observable';
 import { ActivatedRoute, Router, ActivatedRouteSnapshot } from '@angular/router';
 import { of } from 'rxjs/observable/of';
 
-import { Article } from './article.model';
+import { Article, initialArticle } from './article.model';
 import { slices } from '../util';
 import { RESTService } from '../../services/rest.service';
 import * as entityFunctions from '../entity/entity.functions';
@@ -58,9 +58,33 @@ export class ArticleEffects {
         if (state.article.entities[slug]) {
             return of(new EntityActions.Select(slices.ARTICLE, state.article[slug]));
         } else {
-            return this.dataService.get('articles/' + slug).map((responseEntity) => new EntityActions.LoadSuccess(slices.ARTICLE, responseEntity.article));
+            return this.dataService.get('articles/' + slug).map((responseEntity) => {
+                const payload = this.completeAssign({}, initialArticle, responseEntity.article)
+                return new EntityActions.LoadSuccess(slices.ARTICLE, payload
+                )
+            });
         }
     });
+
+
+    completeAssign(target, ...sources) {
+        sources.forEach(source => {
+            let descriptors = Object.keys(source).reduce((descriptors, key) => {
+                descriptors[key] = Object.getOwnPropertyDescriptor(source, key);
+                return descriptors;
+            }, {});
+            // by default, Object.assign copies enumerable Symbols too
+            Object.getOwnPropertySymbols(source).forEach(sym => {
+                let descriptor = Object.getOwnPropertyDescriptor(source, sym);
+                if (descriptor.enumerable) {
+                    descriptors[sym] = descriptor;
+                }
+            });
+            Object.defineProperties(target, descriptors);
+        });
+        return target;
+    }
+
 
     @Effect()
     private favorite$ = sliceFunctions.postToRemote$(this.actions$, slices.ARTICLE, this.dataService, actions.FAVORITE, new ArticleActions.FavoriteSuccess(), new ArticleActions.FavoriteFail());

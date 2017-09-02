@@ -34,6 +34,9 @@ export const initialArticle = {
     },
     set id(slug: string) {
         this.slug = slug;
+    },
+    somefunc() {
+        console.log('hey')
     }
 };
 

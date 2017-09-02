@@ -95,7 +95,7 @@ export function union<T extends Entity>(state: Entities<T>, action: EntityAction
     const newEntityIds = newEntities.map((entity) => entity.id);
     newEntities = newEntities.reduce((ents: { [id: string]: T }, entity: T) => {
         return Object.assign(ents, {
-            [entity['id']]: entity
+            [entity.id]: entity
         });
     }, {});
 
@@ -179,11 +179,7 @@ function reduceOne<T extends Entity>(state: Entities<T>, entity: T = null, actio
             newState = Object.assign({}, state.initialEntity, action.payload, { dirty: false });
             break;
         case typeFor(state.slice, actions.UPDATE_SUCCESS):
-            if (entity['id'] === action.payload.id) {
-                newState = Object.assign({}, entity, { dirty: false });
-            } else {
-                newState = entity;
-            }
+            newState = Object.assign({}, entity, { dirty: false });
             break;
         default:
             newState = entity;

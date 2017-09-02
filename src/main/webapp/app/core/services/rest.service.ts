@@ -53,7 +53,7 @@ const requestTransforms = {
 const endpointTransforms = {
     add: {
         comment(comment: Comment, state: RootState) {
-            let slug = state.article.entities[comment.articleId].slug;
+            let slug = comment.articleId;
             return `articles/${slug}/comments`;
         }
     }
@@ -95,7 +95,7 @@ export class RESTService implements DataService {
     }
 
     add(entity: Entity, table: keyof RootState, state: RootState, store: Store<RootState>): Observable<any> {
-        let endpoint = endpointTransforms.add[table] || `${endpoints[table]}`;
+        let endpoint = endpointTransforms.add[table] && endpointTransforms.add[table](entity, state) || `${endpoints[table]}`;
         let payload = this.prepareRecord(entity);
 
         if (requestTransforms.add[table]) {
