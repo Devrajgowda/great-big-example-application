@@ -71,9 +71,10 @@ export class ContactPage implements OnInit, OnDestroy {
     }
 
     ngOnDestroy() {
-        if (this.contactForm.value.id === EntityActions.TEMP) {
-            this.store.dispatch(new EntityActions.DeleteTemp(slices.CONTACT));
-        }
+        // TODO: find a way to make this unnecessary
+        // if (this.contactForm.value.id === EntityActions.TEMP) {
+        //     this.store.dispatch(new EntityActions.DeleteTemp(slices.CONTACT));
+        // }
         this.contactSub && this.contactSub.unsubscribe();
     }
 

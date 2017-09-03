@@ -11,7 +11,6 @@ export function reducer(state = initialEntities<Author>(slices.AUTHOR, initialAu
     action: EntityAction<Author>): Entities<Author> {
     switch (action.type) {
         case typeFor(slices.AUTHOR, actions.ADD_SUCCESS):
-            return entityFunctions.addSuccess<Author>(state, <any>action);
         case typeFor(slices.AUTHOR, actions.ADD_TEMP):
         case typeFor(slices.AUTHOR, actions.LOAD_SUCCESS):
             return entityFunctions.addToStore<Author>(state, <any>action);

@@ -536,6 +536,8 @@ export const getCommentsForSelectedArticle = createSelector(getComments, getSele
  */
 export const getTalksState = (state: RootState) => state.talk;
 export const getTalkEntities = createSelector(getTalksState, fromTalks.getEntities);
+export const getSelectedTalkId = createSelector(getTalksState, fromTalks.getSelectedId);
+export const getSelectedTalk = createSelector(getTalksState, fromTalks.getSelected);
 export const getTalkIds = createSelector(getTalksState, fromTalks.getIds);
 export const getTalks = createSelector(getTalkEntities, getTalkIds, (entities, ids) => {
     return ids.map((id) => entities[id]);

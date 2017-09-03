@@ -1,3 +1,5 @@
+import { createSelector } from 'reselect';
+
 import { Observable } from 'rxjs/Observable';
 import { Subject } from 'rxjs/Subject';
 import { Store } from '@ngrx/store';
@@ -18,6 +20,9 @@ import { actions, EntityAction } from '../entity/entity.actions';
 export function reducer(state: Entities<Talk> = initialEntities<Talk>(slices.TALK, initialTalk), action: EntityAction<Talk>): Entities<Talk> {
 
     switch (action.type) {
+        case typeFor(slices.TALK, actions.ADD_SUCCESS):
+        case typeFor(slices.TALK, actions.LOAD_SUCCESS):
+            return functions.addToStore<Talk>(state, <any>action);
         case typeFor(slices.TALK, actions.LOAD_ALL_SUCCESS):
             return functions.newEntities<Talk>(state, <any>action);
         case typeFor(slices.TALK, actions.PATCH):
@@ -32,6 +37,8 @@ export function reducer(state: Entities<Talk> = initialEntities<Talk>(slices.TAL
             });
         case typeFor(slices.TALK, actions.PATCH_FAIL):
             return functions.update<Talk>(state, <any>action);
+        case typeFor(slices.TALK, actions.SELECT):
+            return functions.select<Talk>(state, <any>action);
         default:
             return state;
     }
@@ -40,3 +47,9 @@ export function reducer(state: Entities<Talk> = initialEntities<Talk>(slices.TAL
 export const getEntities = (state: Entities<Talk>) => state.entities;
 
 export const getIds = (state: Entities<Talk>) => state.ids.filter((id) => state.entities[id] && !state.entities[id].deleteMe);
+
+export const getSelectedId = (state: Entities<Talk>): string => state.selectedEntityId;
+
+export const getSelected = createSelector(getEntities, getSelectedId, (entities, selectedId) => {
+    return entities[selectedId];
+});

@@ -12,7 +12,6 @@ export function reducer(state: Entities<Crisis> =
     action: EntityAction<Crisis>): Entities<Crisis> {
     switch (action.type) {
         case typeFor(slices.CRISIS, actions.ADD_SUCCESS):
-            return functions.addSuccess<Crisis>(state, <any>action);
         case typeFor(slices.CRISIS, actions.ADD_TEMP):
         case typeFor(slices.CRISIS, actions.LOAD):
         case typeFor(slices.CRISIS, actions.LOAD_SUCCESS):

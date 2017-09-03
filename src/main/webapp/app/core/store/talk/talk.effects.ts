@@ -10,7 +10,8 @@ import { Action } from '@ngrx/store';
 import { WatchService } from '../../../features/talks/services/watch.service';
 import { Filters } from '../../../features/talks/talks.layout';
 import { RESTService } from '../../services/rest.service';
-import { Talk } from './talk.model';
+import * as entityFunctions from '../entity/entity.functions';
+import { Talk, initialTalk } from './talk.model';
 import { RootState } from '../';
 import { slices, PayloadAction, handleNavigation } from '../util';
 import * as EntityActions from '../entity/entity.actions';
@@ -28,13 +29,19 @@ export class TalkEffects {
 
     @Effect()
     navigateToTalk$ = handleNavigation(this.store, this.actions$, '/features/talks/talk/:id', (r: ActivatedRouteSnapshot, state: RootState) => {
-        const id = +r.firstChild.firstChild.firstChild.paramMap.get('id');
-        if (!state.talk.entities[id]) {
-            return this.dataService.getEntity(r.paramMap.get('id'), slices.TALK).map((responseEntity) => new EntityActions.UpdateSuccess(slices.TALK, responseEntity));
-        } else {
-            return of();
-        }
+        const id = r.firstChild.firstChild.firstChild.paramMap.get('id');
+        this.store.dispatch(new EntityActions.Select(slices.TALK, { id: id }));
+        return of();
+        // const id = +r.firstChild.firstChild.firstChild.paramMap.get('id');
+        // if (!state.talk.entities[id]) {
+        //     return this.dataService.getEntity(r.paramMap.get('id'), slices.TALK).map((responseEntity) => new EntityActions.UpdateSuccess(slices.TALK, responseEntity));
+        // } else {
+        //     return of();
+        // }
     });
+
+    @Effect()
+    selectTalk$ = entityFunctions.select$(this.actions$, slices.TALK, this.dataService, this.store, initialTalk);
 
     @Effect() rateTalk$ = this.actions$.ofType(typeFor(slices.TALK, actions.PATCH))
         .withLatestFrom(this.store)

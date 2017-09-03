@@ -29,23 +29,23 @@ export class ArticleEffects {
     private updateToRemote$ = entityFunctions.updateToRemote$(this.actions$, slices.ARTICLE, this.dataService, this.store);
     @Effect()
     private addToRemote$ = entityFunctions.addToRemote$(this.actions$, slices.ARTICLE, this.dataService, this.store, initialArticle);
+    @Effect()
+    private deleteFromRemote$ = entityFunctions.deleteFromRemote$(this.actions$, slices.ARTICLE, this.dataService, this.store);
     // @Effect()
     // private addCommentToRemote$ = sliceFunctions.postToRemote$(this.actions$, slices.COMMENT, this.dataService, this.store, new EntityActions.AddSuccess(), new EntityActions.AddUpdateFail());
 
-    @Effect()
+    @Effect({ dispatch: false })
     private navigateOnArticleAddSuccess = this.actions$
         .ofType(typeFor(slices.ARTICLE, actions.ADD_SUCCESS))
         .map((action) => {
             this.router.navigateByUrl('/features/blog/article/' + action.payload.slug);
-            return Observable.empty();
         });
 
-    @Effect()
+    @Effect({ dispatch: false })
     private navigateOnArticleDeleteSuccess = this.actions$
         .ofType(typeFor(slices.ARTICLE, actions.DELETE_SUCCESS))
         .map((action) => {
             this.router.navigateByUrl('/features/blog/article/');
-            return Observable.empty();
         });
 
     /*
@@ -60,8 +60,6 @@ export class ArticleEffects {
 
     @Effect()
     selectArticle$ = entityFunctions.select$(this.actions$, slices.ARTICLE, this.dataService, this.store, initialArticle);
-
-
 
     @Effect()
     private favorite$ = sliceFunctions.postToRemote$(this.actions$, slices.ARTICLE, this.dataService, actions.FAVORITE, new ArticleActions.FavoriteSuccess(), new ArticleActions.FavoriteFail());

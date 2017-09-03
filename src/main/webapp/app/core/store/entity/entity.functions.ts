@@ -5,7 +5,7 @@ import { toPayload, Actions } from '@ngrx/effects';
 import { Action, Store } from '@ngrx/store';
 
 import { Entities, Entity } from './entity.model';
-import { typeFor, PayloadAction, PayloadActions } from '../util';
+import { typeFor, PayloadAction, PayloadActions, completeAssign } from '../util';
 import { actions, EntityAction } from './entity.actions';
 import * as EntityActions from './entity.actions';
 import * as sliceFunctions from '../slice/slice.functions';
@@ -26,18 +26,16 @@ export function addToStore<T extends Entity>(state: Entities<T>, action: EntityA
 /**
  * Called after response from an add request returns from the server
  */
-export function addSuccess<T extends Entity>(state: Entities<T>, action: EntityActions.AddTemp<T>): Entities<T> {
-    const entities = Object.assign({}, state.entities);
-    const optimisticObject = entities[EntityActions.TEMP] || null;
-    entities[action.payload.id] = reduceOne(state, optimisticObject, action);
-    entities[EntityActions.TEMP] && delete entities[EntityActions.TEMP];
-    let newState = Object.assign({}, state, {
-        ids: Object.keys(entities),
-        entities,
-        selectedEntityId: action.payload.id
-    });
-    return sliceFunctions.setSliceLoading(newState, action);
-};
+// export function addSuccess<T extends Entity>(state: Entities<T>, action: EntityActions.AddTemp<T>): Entities<T> {
+//     const entities = Object.assign({}, state.entities);
+//     entities[action.payload.id] = reduceOne(state, null, action);
+//     let newState = Object.assign({}, state, {
+//         ids: Object.keys(entities),
+//         entities,
+//         selectedEntityId: action.payload.id
+//     });
+//     return sliceFunctions.setSliceLoading(newState, action);
+// };
 /*
  * Delete the property from state.entities, the element from state.ids and
  * if the one being deleted is the selectedEntity, then select a different one.
@@ -248,8 +246,14 @@ export function addToRemote$(actions$: Actions, slice: keyof RootState, dataServ
     return actions$
         .ofType(typeFor(slice, actions.ADD), typeFor(slice, actions.ADD_OPTIMISTICALLY))
         .withLatestFrom(store)
-        .switchMap(([action, state]) => dataService.add((<any>action).payloadForPost(), slice, state, store))  // TODO: find better way
-        .map((responseEntity: Entity) => new EntityActions.AddSuccess(slice, responseEntity));
+        .switchMap(([action, state]) =>
+            dataService.add((<any>action).payloadForPost(), slice, state, store)  // TODO: find better way
+                .map((responseEntity: Entity) => new EntityActions.AddSuccess(slice, completeAssign({}, initialEntity, responseEntity)))
+                .catch((err) => {
+                    console.log(err);
+                    return Observable.of(new EntityActions.AddUpdateFail(slice, null));
+                })
+        );
 }
 
 /**
@@ -297,35 +301,11 @@ export function select$(actions$: Actions, slice: keyof RootState, dataService: 
         .switchMap(([action, state]) => {
             return dataService.getEntity((<EntityAction<any>>action).payload.id, slice, state, store)
                 .map((responseEntity) => {    //('articles/' + slug)
-                    const payload = completeAssign({}, initialEntity, responseEntity)
+                    const payload = { ...initialEntity };
+                    completeAssign(payload, initialEntity, responseEntity)
                     return new EntityActions.LoadSuccess(slice, payload);
                 });
         });
-}
-
-/**
- * @whatItDoes This is here to copy accessors (getters/setters) of entities which Object.assign doesn't do.
- * It's useful for the case of entities that use slugs for keys instead of ids. When that happens you should
- * use id accessors that get and set the slug
- * @param target
- * @param sources
- */
-function completeAssign(target, ...sources) {
-    sources.forEach(source => {
-        let descriptors = Object.keys(source).reduce((descriptors, key) => {
-            descriptors[key] = Object.getOwnPropertyDescriptor(source, key);
-            return descriptors;
-        }, {});
-        // by default, Object.assign copies enumerable Symbols too
-        Object.getOwnPropertySymbols(source).forEach(sym => {
-            let descriptor = Object.getOwnPropertyDescriptor(source, sym);
-            if (descriptor.enumerable) {
-                descriptors[sym] = descriptor;
-            }
-        });
-        Object.defineProperties(target, descriptors);
-    });
-    return target;
 }
 
 //  Load if not loaded

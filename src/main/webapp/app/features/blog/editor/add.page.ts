@@ -79,8 +79,8 @@ export class AddPage implements OnInit, OnDestroy {
 
     ngOnDestroy() {
         this.articleSub && this.articleSub.unsubscribe();
-        if (this.articleForm.value.id === EntityActions.TEMP) {
-            this.store.dispatch(new EntityActions.DeleteTemp(slices.CONTACT));
-        }
+        // if (this.articleForm.value.id === EntityActions.TEMP) {
+        //     this.store.dispatch(new EntityActions.DeleteTemp(slices.CONTACT));
+        // }
     }
 }

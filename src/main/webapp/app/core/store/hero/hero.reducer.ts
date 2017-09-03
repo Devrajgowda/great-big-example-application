@@ -12,7 +12,6 @@ export function reducer(state: Entities<Hero> = initialEntities<Hero>(slices.HER
 
     switch (action.type) {
         case typeFor(slices.HERO, actions.ADD_SUCCESS):
-            return functions.addSuccess<Hero>(state, <any>action);
         case typeFor(slices.HERO, actions.ADD_TEMP):
         case typeFor(slices.HERO, actions.LOAD_SUCCESS):
         case typeFor(slices.HERO, actions.DELETE_FAIL):

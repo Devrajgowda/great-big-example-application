@@ -12,7 +12,6 @@ export function reducer(state: Entities<Message> = initialEntities<Message>(slic
 
     switch (action.type) {
         case typeFor(slices.MESSAGE, actions.ADD_SUCCESS):
-            return functions.addSuccess<Message>(state, <any>action);
         case typeFor(slices.MESSAGE, actions.ADD_TEMP):
         case typeFor(slices.MESSAGE, actions.LOAD_SUCCESS):
             return functions.addToStore<Message>(state, <any>action);

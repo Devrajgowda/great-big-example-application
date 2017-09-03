@@ -19,7 +19,9 @@ import { DataService } from './data.service';
 import { RootState } from '../store';
 import { Entity } from '../store/entity/entity.model';
 import * as SliceActions from '../store/slice/slice.actions';
-import * as EntityActions from '../store/slice/slice.actions';
+import * as EntityActions from '../store/entity/entity.actions';
+import { completeAssign } from '../store/util';
+
 /**
  * This mapping exists because I don't like pluralization of entity names. The JHipster
  * approach uses plurals so this takes care of that.
@@ -120,7 +122,21 @@ export class RESTService implements DataService {
         // store.dispatch(new SliceActions.ToggleLoading(table, { loading: true }));
         // store.dispatch(new EntityActions.ToggleLoading(table, { id: entity.id, loading: true }));
         return this.http.post(`${this.config.apiUrl}/${endpoint}`, payload)
-            .map(this.extractData)
+            .map((result) => {
+                const tempEntity = state[table].entities[EntityActions.TEMP];
+                let oldObject = {};
+                if (tempEntity) {
+                    oldObject = completeAssign({}, ...tempEntity);
+                    if (typeof oldObject['id'] !== 'undefined') {
+                        delete oldObject['id'];
+                    }
+                }
+                const newObject = this.extractData(result);
+                if (tempEntity) {
+                    store.dispatch(new EntityActions.DeleteTemp(table));
+                }
+                return completeAssign(oldObject, newObject);
+            })
             .catch(this.handleError)
             .finally(() => {
                 // store.dispatch(new SliceActions.ToggleLoading(table, { loading: false }));

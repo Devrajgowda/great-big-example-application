@@ -11,7 +11,6 @@ export function reducer(state = initialEntities<Claim>(slices.CLAIM, initialClai
     action: EntityAction<Claim>): Entities<Claim> {
     switch (action.type) {
         case typeFor(slices.CLAIM, actions.ADD_SUCCESS):
-            return entityFunctions.addSuccess<Claim>(state, <any>action);
         case typeFor(slices.CLAIM, actions.ADD_TEMP):
         case typeFor(slices.CLAIM, actions.LOAD_SUCCESS):
             return entityFunctions.addToStore<Claim>(state, <any>action);
