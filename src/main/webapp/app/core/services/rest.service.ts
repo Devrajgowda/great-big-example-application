@@ -44,9 +44,22 @@ const endpoints = {
 
 const requestTransforms = {
     add: {
-        comment(comment: Comment, state: RootState) {
-            return { comment: { body: comment.body } };
+        comment(response: any, state: RootState) {
+            // return { comment: { body: comment.body } };
+            return { body: response.body };
         }
+    }
+}
+
+const responseTransforms = {
+    get: {
+        // From ng-redux demo. Not needed now
+        // session(response: any, state: RootState) {
+        //     return {
+        //         token: response.meta.token,
+        //         user: { firstName: response.meta.profile.firstName, lastName: response.meta.profile.lastName }
+        //     };
+        // }
     }
 }
 
@@ -79,6 +92,7 @@ export class RESTService implements DataService {
 
         return this.http.get(route, { search: params })
             .map(extractFunction)
+            .map(responseTransforms.get[table] || ((resp) => resp))
             .catch(this.handleError);
     }
 
@@ -88,9 +102,10 @@ export class RESTService implements DataService {
 
     // TODO: make table the first parameter of all of these
 
-    getEntity(id: number | string, table: string): Observable<any> {
+    getEntity(id: string, table: string): Observable<any> {
         return this.http.get(`${this.config.apiUrl}/${endpoints[table]}/${id}`)
             .map(this.extractData)
+            .map(responseTransforms.get[table] || ((resp) => resp))
             .catch(this.handleError);
     }
 

@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { Store } from '@ngrx/store';
 import { Actions, Effect } from '@ngrx/effects';
 
-import { Message } from './message.model';
+import { Message, initialMessage } from './message.model';
 import { slices } from '../util';
 import { SocketService } from '../../services/socket.service';
 import * as functions from '../entity/entity.functions';
@@ -14,7 +14,7 @@ export class MessageEffects {
     // @Effect()
     // private loadFromRemote$ = functions.loadFromRemote$(this.actions$, slices.MESSAGE, this.dataService);
     @Effect()
-    private addToRemote$ = functions.addToRemote$(this.actions$, slices.MESSAGE, this.dataService, this.store);
+    private addToRemote$ = functions.addToRemote$(this.actions$, slices.MESSAGE, this.dataService, this.store, initialMessage);
 
     constructor(
         private store: Store<RootState>,

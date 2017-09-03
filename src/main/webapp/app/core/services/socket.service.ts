@@ -48,6 +48,9 @@ export class SocketService implements DataService {
     }
 
     // TODO: fix these up.
+    getEntity(id: string, service: string): Observable<any> {
+        return this.sendData(`/topic/${service}`, id);
+    }
     add(entity: any, service: string): Observable<any> {
         return this.sendData(`/topic/${service}`, entity);
     }

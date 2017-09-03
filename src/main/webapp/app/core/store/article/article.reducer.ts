@@ -20,6 +20,8 @@ export function reducer(state: Entities<Article> = initialEntities<Article>(slic
             return entityFunctions.addToStore<Article>(state, <any>action);
         case typeFor(slices.ARTICLE, actions.ADD_COMMENT):  // this is here to set loading=true
             return entityFunctions.update(state, <any>action);
+        case typeFor(slices.ARTICLE, actions.ADD_SUCCESS):
+            return entityFunctions.addSuccess<Article>(state, <any>action);
         case typeFor(slices.ARTICLE, actions.SELECT):
             return entityFunctions.select<Article>(state, <any>action);
         default:

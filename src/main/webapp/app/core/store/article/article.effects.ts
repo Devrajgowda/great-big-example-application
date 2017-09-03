@@ -23,12 +23,12 @@ import { RootState } from '../';
 
 @Injectable()
 export class ArticleEffects {
-    @Effect()
-    private loadFromRemote$ = entityFunctions.loadFromRemote$(this.actions$, slices.ARTICLE, this.dataService);
+    // @Effect()
+    // private loadFromRemote$ = entityFunctions.loadFromRemote$(this.actions$, slices.ARTICLE, this.dataService);
     @Effect()
     private updateToRemote$ = entityFunctions.updateToRemote$(this.actions$, slices.ARTICLE, this.dataService, this.store);
     @Effect()
-    private addToRemote$ = entityFunctions.addToRemote$(this.actions$, slices.ARTICLE, this.dataService, this.store);
+    private addToRemote$ = entityFunctions.addToRemote$(this.actions$, slices.ARTICLE, this.dataService, this.store, initialArticle);
     // @Effect()
     // private addCommentToRemote$ = sliceFunctions.postToRemote$(this.actions$, slices.COMMENT, this.dataService, this.store, new EntityActions.AddSuccess(), new EntityActions.AddUpdateFail());
 
@@ -36,7 +36,7 @@ export class ArticleEffects {
     private navigateOnArticleAddSuccess = this.actions$
         .ofType(typeFor(slices.ARTICLE, actions.ADD_SUCCESS))
         .map((action) => {
-            this.router.navigateByUrl('/features/blog/article/' + action.payload.article.slug);
+            this.router.navigateByUrl('/features/blog/article/' + action.payload.slug);
             return Observable.empty();
         });
 
@@ -54,36 +54,13 @@ export class ArticleEffects {
     @Effect()
     navigateToArticle$ = handleNavigation(this.store, this.actions$, '/features/blog/article/:slug', (r: ActivatedRouteSnapshot, state: RootState) => {
         const slug = r.firstChild.firstChild.paramMap.get('slug');
-
-        if (state.article.entities[slug]) {
-            return of(new EntityActions.Select(slices.ARTICLE, state.article[slug]));
-        } else {
-            return this.dataService.get('articles/' + slug).map((responseEntity) => {
-                const payload = this.completeAssign({}, initialArticle, responseEntity.article)
-                return new EntityActions.LoadSuccess(slices.ARTICLE, payload
-                )
-            });
-        }
+        this.store.dispatch(new EntityActions.Select(slices.ARTICLE, { id: slug }));
+        return of();
     });
 
+    @Effect()
+    selectArticle$ = entityFunctions.select$(this.actions$, slices.ARTICLE, this.dataService, this.store, initialArticle);
 
-    completeAssign(target, ...sources) {
-        sources.forEach(source => {
-            let descriptors = Object.keys(source).reduce((descriptors, key) => {
-                descriptors[key] = Object.getOwnPropertyDescriptor(source, key);
-                return descriptors;
-            }, {});
-            // by default, Object.assign copies enumerable Symbols too
-            Object.getOwnPropertySymbols(source).forEach(sym => {
-                let descriptor = Object.getOwnPropertyDescriptor(source, sym);
-                if (descriptor.enumerable) {
-                    descriptors[sym] = descriptor;
-                }
-            });
-            Object.defineProperties(target, descriptors);
-        });
-        return target;
-    }
 
 
     @Effect()

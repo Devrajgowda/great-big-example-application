@@ -298,15 +298,19 @@ class ArticleHandler(val repository: ArticleRepository,
     // helpers
 
     fun articleView(article: Article, currentAuthor: Author)
-        = mapOf("article" to ArticleIO.fromModel(article, currentAuthor))
+        // = mapOf("article" to ArticleIO.fromModel(article, currentAuthor))
+        = ArticleIO.fromModel(article, currentAuthor)
 
     fun articlesView(articles: List<Article>, currentAuthor: Author)
-        = mapOf("articles" to articles.map { ArticleIO.fromModel(it, currentAuthor) },
-        "articlesCount" to articles.size)
+        // = mapOf("articles" to articles.map { ArticleIO.fromModel(it, currentAuthor) },
+        // "articlesCount" to articles.size)
+        = articles.map { ArticleIO.fromModel(it, currentAuthor) }
 
     fun commentView(comment: Comment, currentAuthor: Author)
-        = mapOf("comment" to CommentOut.fromModel(comment, currentAuthor))
+        // = mapOf("comment" to CommentOut.fromModel(comment, currentAuthor))
+        = CommentOut.fromModel(comment, currentAuthor)
 
     fun commentsView(comments: List<Comment>, currentAuthor: Author)
-        = mapOf("comments" to comments.map { CommentOut.fromModel(it, currentAuthor) })
+        // = mapOf("comments" to comments.map { CommentOut.fromModel(it, currentAuthor) })
+        = comments.map { CommentOut.fromModel(it, currentAuthor) }
 }

@@ -1,4 +1,6 @@
 import { Observable } from 'rxjs/Observable';
+import { of } from 'rxjs/observable/of';
+import { empty } from 'rxjs/observable/empty';
 import { toPayload, Actions } from '@ngrx/effects';
 import { Action, Store } from '@ngrx/store';
 
@@ -220,6 +222,7 @@ function isPostLoadingAction(verb: string) {
             return false;
     }
 }
+
 /**
  *
  * Effects
@@ -241,7 +244,7 @@ export function loadFromRemote$(actions$: PayloadActions, slice: string, dataSer
         );
 }
 
-export function addToRemote$(actions$: Actions, slice: keyof RootState, dataService: DataService, store: Store<RootState>): Observable<Action> {
+export function addToRemote$(actions$: Actions, slice: keyof RootState, dataService: DataService, store: Store<RootState>, initialEntity: Entity): Observable<Action> {
     return actions$
         .ofType(typeFor(slice, actions.ADD), typeFor(slice, actions.ADD_OPTIMISTICALLY))
         .withLatestFrom(store)
@@ -282,6 +285,47 @@ export function deleteFromRemote$(actions$: Actions, slice: keyof RootState, dat
             console.log(err);
             return Observable.of(new EntityActions.DeleteFail(slice, err));
         })
+}
+
+export function select$(actions$: Actions, slice: keyof RootState, dataService: DataService, store: Store<RootState>, initialEntity: Entity): Observable<EntityAction<any>> {  // TODO: fix this any
+    return actions$
+        .ofType(typeFor(slice, actions.SELECT))
+        .withLatestFrom(store)
+        .filter(([action, state]) => {
+            return !state[slice].entities[(<EntityAction<any>>action).payload.id];
+        })
+        .switchMap(([action, state]) => {
+            return dataService.getEntity((<EntityAction<any>>action).payload.id, slice, state, store)
+                .map((responseEntity) => {    //('articles/' + slug)
+                    const payload = completeAssign({}, initialEntity, responseEntity)
+                    return new EntityActions.LoadSuccess(slice, payload);
+                });
+        });
+}
+
+/**
+ * @whatItDoes This is here to copy accessors (getters/setters) of entities which Object.assign doesn't do.
+ * It's useful for the case of entities that use slugs for keys instead of ids. When that happens you should
+ * use id accessors that get and set the slug
+ * @param target
+ * @param sources
+ */
+function completeAssign(target, ...sources) {
+    sources.forEach(source => {
+        let descriptors = Object.keys(source).reduce((descriptors, key) => {
+            descriptors[key] = Object.getOwnPropertyDescriptor(source, key);
+            return descriptors;
+        }, {});
+        // by default, Object.assign copies enumerable Symbols too
+        Object.getOwnPropertySymbols(source).forEach(sym => {
+            let descriptor = Object.getOwnPropertyDescriptor(source, sym);
+            if (descriptor.enumerable) {
+                descriptors[sym] = descriptor;
+            }
+        });
+        Object.defineProperties(target, descriptors);
+    });
+    return target;
 }
 
 //  Load if not loaded

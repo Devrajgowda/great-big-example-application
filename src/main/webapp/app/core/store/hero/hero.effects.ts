@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { Store } from '@ngrx/store';
 import { Actions, Effect } from '@ngrx/effects';
 
-import { Hero } from './hero.model';
+import { Hero, initialHero } from './hero.model';
 import { slices } from '../util';
 import { RESTService } from '../../services/rest.service';
 import * as functions from '../entity/entity.functions';
@@ -17,7 +17,7 @@ export class HeroEffects {
     @Effect()
     private deleteFromRemote$ = functions.deleteFromRemote$(this.actions$, slices.HERO, this.dataService, this.store);
     @Effect()
-    private addToRemote$ = functions.addToRemote$(this.actions$, slices.HERO, this.dataService, this.store);
+    private addToRemote$ = functions.addToRemote$(this.actions$, slices.HERO, this.dataService, this.store, initialHero);
 
     constructor(
         private store: Store<RootState>,

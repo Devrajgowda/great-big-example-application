@@ -30,7 +30,7 @@ export class TalkEffects {
     navigateToTalk$ = handleNavigation(this.store, this.actions$, '/features/talks/talk/:id', (r: ActivatedRouteSnapshot, state: RootState) => {
         const id = +r.firstChild.firstChild.firstChild.paramMap.get('id');
         if (!state.talk.entities[id]) {
-            return this.dataService.getEntity(+r.paramMap.get('id'), slices.TALK).map((responseEntity) => new EntityActions.UpdateSuccess(slices.TALK, responseEntity));
+            return this.dataService.getEntity(r.paramMap.get('id'), slices.TALK).map((responseEntity) => new EntityActions.UpdateSuccess(slices.TALK, responseEntity));
         } else {
             return of();
         }

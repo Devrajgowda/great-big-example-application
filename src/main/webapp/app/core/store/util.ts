@@ -85,7 +85,8 @@ export function handleNavigation(store: Store<RootState>, actions$: Actions, pat
     return actions$.ofType(ROUTER_NAVIGATION)
         .map(actionToSnapshot)
         .filter((s) => getFullRouteConfigPath('', s) === pathOfInterest)
-        .withLatestFrom(store).switchMap((a) => {
+        .withLatestFrom(store)
+        .switchMap((a) => {
             return callback(a[0], a[1])
         })
         .catch((e) => {

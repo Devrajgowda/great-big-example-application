@@ -108,12 +108,11 @@ function isPostLoadingAction(verb: string) {
 /**
  * Effects
  */
-export function loadFromRemote$(actions$: Actions, slice: string, dataService, dataGetter: string, responseTransform: Function = ((resp) => resp)): Observable<Action> {
+export function loadFromRemote$(actions$: Actions, slice: string, dataService, dataGetter: string): Observable<Action> {
     return actions$
         .ofType(typeFor(slice, actions.LOAD))
         .switchMap((action: PayloadAction) =>
             dataService[dataGetter](action.payload)
-                .map(responseTransform)
                 .map((responseSlice: any) =>
                     new ActionClasses.LoadSuccess(slice, responseSlice))
                 .catch((error) => of(new ActionClasses.LoadFail(slice, error)))

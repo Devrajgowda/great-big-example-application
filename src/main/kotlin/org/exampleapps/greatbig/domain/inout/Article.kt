@@ -6,7 +6,7 @@ import java.time.OffsetDateTime
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 
-@JsonRootName("article")
+// @JsonRootName("article")
 data class Article(var title: String? = null,
                    var description: String? = null,
                    var body: String? = null,
