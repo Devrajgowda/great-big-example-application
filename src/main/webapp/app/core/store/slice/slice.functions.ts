@@ -33,10 +33,6 @@ export function loadSuccess(state, action): any {
 }
 
 export function update(state: any, action: SliceAction): any {
-    return patch({}, action);
-}
-
-export function patch(state: any, action: SliceAction): any {
     const obj = [state];
     const path = action.payload.path;
     const val = action.payload.val;
