@@ -43,7 +43,7 @@ export function addToStore<T extends Entity>(state: Entities<T>, action: EntityA
  * Only delete pessimistically
  */
 export function deleteEntity<T extends Entity>(state: Entities<T>, action: EntityActions.Delete<T> | EntityActions.DeleteTemp<T>): Entities<T> {
-    const entities = Object.assign({}, state.entities);
+    const entities = completeAssign({}, state.entities);
 
     const id = action.payload.id;
 
@@ -301,8 +301,8 @@ export function select$(actions$: Actions, slice: keyof RootState, dataService: 
         .switchMap(([action, state]) => {
             return dataService.getEntity((<EntityAction<any>>action).payload.id, slice, state, store)
                 .map((responseEntity) => {    //('articles/' + slug)
-                    const payload = { ...initialEntity };
-                    completeAssign(payload, initialEntity, responseEntity)
+                    // const payload = { ...initialEntity };
+                    const payload = completeAssign({}, initialEntity, responseEntity)
                     return new EntityActions.LoadSuccess(slice, payload);
                 });
         });

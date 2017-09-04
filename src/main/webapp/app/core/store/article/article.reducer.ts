@@ -24,6 +24,8 @@ export function reducer(state: Entities<Article> = initialEntities<Article>(slic
         case typeFor(slices.ARTICLE, actions.DELETE):
         case typeFor(slices.ARTICLE, actions.DELETE_FAIL):
             return entityFunctions.update(state, <any>action);
+        case typeFor(slices.ARTICLE, actions.DELETE_TEMP):
+            return entityFunctions.deleteTemp<Article>(state, <any>action);
         case typeFor(slices.ARTICLE, actions.DELETE_SUCCESS):
             return entityFunctions.deleteEntity<Article>(state, <any>action);
         case typeFor(slices.ARTICLE, actions.SELECT):

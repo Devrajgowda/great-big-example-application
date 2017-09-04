@@ -1,4 +1,4 @@
-<div class="jhi-article-component" *ngIf="article$ | async as article">
+<div class="jhi-article-component" *ngIf="article">
     <div class="banner">
         <div class="container">
             <h1>{{ article.title }}</h1>
@@ -80,7 +80,6 @@
 
             </article-meta>
         </div>
-        {{ article | json }}
         <div class="row">
             <div class="col-xs-12 col-md-8 offset-md-2">
 

@@ -41,11 +41,11 @@ export class ArticleEffects {
             this.router.navigateByUrl('/features/blog/article/' + action.payload.slug);
         });
 
-    @Effect({ dispatch: false })
+    @Effect({ dispatch: false })  // Without { dispatch: false } you get 'Actions must be objects' error
     private navigateOnArticleDeleteSuccess = this.actions$
         .ofType(typeFor(slices.ARTICLE, actions.DELETE_SUCCESS))
         .map((action) => {
-            this.router.navigateByUrl('/features/blog/article/');
+            this.router.navigateByUrl('/features/blog');   // don't include a trailing '/'
         });
 
     /*
