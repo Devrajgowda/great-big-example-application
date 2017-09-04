@@ -10,7 +10,7 @@ const routes: Routes = [
         component: HomePage,
         data: {
             authorities: ['ROLE_USER'],
-            pageTitle: 'greatBigExampleApplicationApp.home.home.title'
+            pageTitle: 'greatBigExampleApplicationApp.blog.home.title'
         },
         canActivate: [UserRouteAccessService]
     }

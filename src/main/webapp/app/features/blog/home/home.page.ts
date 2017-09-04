@@ -20,7 +20,6 @@ import { BlogPageLayout } from '../blog.layout';
 export class HomePage implements OnInit, OnDestroy {
     user$: Observable<User>;
     userSub: Subscription;
-    isAuthenticated: boolean;
     tags$: Observable<string[]>;
     tagsSub: Subscription;
     tags: Array<string> = [];
@@ -53,8 +52,8 @@ export class HomePage implements OnInit, OnDestroy {
 
     setListTo(type = '', filters: Object = {}) {
         // If feed is requested but user is not authenticated, redirect to login
-        if (type === 'feed' && !this.isAuthenticated) {
-            this.router.navigateByUrl('/login');
+        if (type === 'feed' && !this.principal.isAuthenticated()) {
+            this.router.navigateByUrl('/');
             return;
         }
 

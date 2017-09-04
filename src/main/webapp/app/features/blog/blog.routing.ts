@@ -7,11 +7,32 @@ import { UserRouteAccessService } from '../../shared';
 const routes: Routes = [
     {
         path: '', component: BlogPage,
+        children: [
+            {
+                path: '',
+                loadChildren: './home/home.module#HomeModule',
+            },
+            {
+                path: 'article',
+                loadChildren: './article/article.module#ArticleModule'
+            },
+            {
+                path: 'editor',
+                loadChildren: './editor/editor.module#EditorModule'
+            },
+            {
+                path: 'profile',
+                loadChildren: './profile/profile.module#ProfileModule'
+            },
+            {
+                path: '',
+                redirectTo: 'home',
+                pathMatch: 'full'
+            }
+        ],
         data: {
             authorities: ['ROLE_USER'],
-            pageTitle: 'greatBigExampleApplicationApp.blog.home.title',
-            source: 'https://github.com/gothinkster/angular-realworld-example-app',
-            tags: ['pagination']
+            pageTitle: 'greatBigExampleApplicationApp.blog.home.title'
         },
         canActivate: [UserRouteAccessService]
     }

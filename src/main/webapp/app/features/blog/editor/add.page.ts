@@ -51,9 +51,7 @@ export class AddPage implements OnInit, OnDestroy {
                 this.loading = articlesState.loading;
             }
         });
-        if (this.route.snapshot.url.length == 1) {
-            this.store.dispatch(new EntityActions.AddTemp(slices.ARTICLE));
-        }
+        this.store.dispatch(new EntityActions.AddTemp(slices.ARTICLE));
     }
 
     addTag() {

@@ -21,7 +21,7 @@ export const features = [
         id: 'blog',
         link: 'features/blog',
         source: 'https://github.com/gothinkster/angular-realworld-example-app',
-        tags: ['blog', 'rest api']
+        tags: ['blog', 'rest api', 'pagination']
     },
     {
         id: 'booksFind',

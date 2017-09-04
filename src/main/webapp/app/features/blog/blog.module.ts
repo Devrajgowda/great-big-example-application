@@ -19,11 +19,11 @@ import { AuthorEffects } from '../../core/store/author/author.effects';
 
 @NgModule({
     imports: [
-        ArticleModule,
+        // ArticleModule,
         BlogRouting,
-        EditorModule,
-        HomeModule,
-        ProfileModule,
+        // EditorModule,
+        // HomeModule,
+        // ProfileModule,
         SharedModule,
         EffectsModule.forRoot([
             ArticleEffects,

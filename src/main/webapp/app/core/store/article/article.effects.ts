@@ -53,7 +53,7 @@ export class ArticleEffects {
      */
     @Effect()
     navigateToArticle$ = handleNavigation(this.store, this.actions$, '/features/blog/article/:slug', (r: ActivatedRouteSnapshot, state: RootState) => {
-        const slug = r.firstChild.firstChild.paramMap.get('slug');
+        const slug = r.firstChild.firstChild.firstChild.firstChild.paramMap.get('slug');
         this.store.dispatch(new EntityActions.Select(slices.ARTICLE, { id: slug }));
         return of();
     });

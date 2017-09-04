@@ -8,7 +8,7 @@ import { UserRouteAccessService } from '../../../shared';
 
 const routes: Routes = [
     {
-        path: 'profile/:username',
+        path: ':username',
         component: ProfileComponent,
         children: [
             {
@@ -22,9 +22,7 @@ const routes: Routes = [
         ],
         data: {
             authorities: ['ROLE_USER'],
-            pageTitle: 'greatBigExampleApplicationApp.profile.home.title',
-            source: 'https://angular2.realworld.io',
-            tags: []
+            pageTitle: 'greatBigExampleApplicationApp.profile.home.title'
         },
         canActivate: [UserRouteAccessService]
     }

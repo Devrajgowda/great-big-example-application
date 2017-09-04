@@ -8,7 +8,7 @@ import { UserRouteAccessService } from '../../../shared';
 
 const routes: Routes = [
     {
-        path: 'editor',
+        path: '',
         component: AddPage,
         data: {
             authorities: ['ROLE_USER'],
@@ -18,7 +18,7 @@ const routes: Routes = [
         canActivate: [UserRouteAccessService]
     },
     {
-        path: 'editor/:slug',
+        path: ':slug',
         component: EditorPage,
         data: {
             authorities: ['ROLE_USER'],
