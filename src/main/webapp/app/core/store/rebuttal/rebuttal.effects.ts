@@ -11,9 +11,10 @@ import { RootState } from '../';
 @Injectable()
 export class RebuttalEffects {
     @Effect()
-    private loadFromRemote$ = functions.loadFromRemote$(this.actions$, slices.REBUTTAL, this.dataService);
+    private loadFromRemote$ = functions.loadFromRemote$(this.actions$, slices.REBUTTAL, this.dataService, this.store);
 
     constructor(
+        private store: Store<RootState>,
         private actions$: Actions,
         private dataService: RESTService
     ) { }

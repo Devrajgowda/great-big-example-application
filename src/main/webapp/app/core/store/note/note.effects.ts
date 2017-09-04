@@ -11,7 +11,7 @@ import { RootState } from '../';
 @Injectable()
 export class NoteEffects {
     @Effect()
-    private loadFromRemote$ = functions.loadFromRemote$(this.actions$, slices.NOTE, this.dataService);
+    private loadFromRemote$ = functions.loadFromRemote$(this.actions$, slices.NOTE, this.dataService, this.store);
     @Effect()
     private updateToRemote$ = functions.updateToRemote$(this.actions$, slices.NOTE, this.dataService, this.store);
     @Effect()

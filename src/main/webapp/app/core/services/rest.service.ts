@@ -71,6 +71,12 @@ const endpointTransforms = {
             let slug = comment.articleId;
             return `articles/${slug}/comments`;
         }
+    },
+    getEntities: {
+        article(state: RootState) {
+            const layout = state.layout;
+            return 'articles' + (layout.blogPage.type === 'feed') ? '/feed' : '';
+        }
     }
 }
 
@@ -78,10 +84,10 @@ const endpointTransforms = {
 export class RESTService implements DataService {
     constructor(private http: Http, private config: AppConfig) { }
 
-    getEntities(table: string,
-        query: { [key: string]: string | number } = {},
-        route: string = `${this.config.apiUrl}/${(endpoints[table] || table)}`,
-        extractFunction = this.extractData): Observable<any[]> {
+    getEntities(table: keyof RootState,
+        query: { [key: string]: string | number } = {}, state: RootState): Observable<any[]> {
+
+        let endpoint = endpointTransforms.getEntities[table] ? endpointTransforms.getEntities[table](state) : `${endpoints[table]}` || table;
 
         const params: URLSearchParams = new URLSearchParams();
 
@@ -92,8 +98,8 @@ export class RESTService implements DataService {
                 }
             });
 
-        return this.http.get(route, { search: params })
-            .map(extractFunction)
+        return this.http.get(`${this.config.apiUrl}/${endpoint}`, { search: params })
+            .map(this.extractData)
             .map(responseTransforms.get[table] || ((resp) => resp))
             .catch(this.handleError);
     }
@@ -102,16 +108,14 @@ export class RESTService implements DataService {
     //     return this.getEntities(table, query, route, (obj) => normalize(obj, schemas[table]));
     // }
 
-    // TODO: make table the first parameter of all of these
-
-    getEntity(id: string, table: string): Observable<any> {
+    getEntity(table: keyof RootState, id: string): Observable<any> {
         return this.http.get(`${this.config.apiUrl}/${endpoints[table]}/${id}`)
             .map(this.extractData)
             .map(responseTransforms.get[table] || ((resp) => resp))
             .catch(this.handleError);
     }
 
-    add(entity: Entity, table: keyof RootState, state: RootState, store: Store<RootState>): Observable<any> {
+    add(table: keyof RootState, entity: Entity, state: RootState, store: Store<RootState>): Observable<any> {
         let endpoint = endpointTransforms.add[table] && endpointTransforms.add[table](entity, state) || `${endpoints[table]}`;
         let payload = this.prepareRecord(entity);
 
@@ -156,13 +160,13 @@ export class RESTService implements DataService {
             .catch(this.handleError);
     }
 
-    update(entity: Entity, table, state: RootState, store: Store<RootState>): Observable<any> {
+    update(table: keyof RootState, entity: Entity, state: RootState, store: Store<RootState>): Observable<any> {
         return this.http.put(`${this.config.apiUrl}/${endpoints[table]}`, this.prepareRecord(entity))
             .map(this.extractData)
             .catch(this.handleError);
     }
 
-    remove(entity: Entity, table, state: RootState, store: Store<RootState>): Observable<any> {
+    remove(table: keyof RootState, entity: Entity, state: RootState, store: Store<RootState>): Observable<any> {
         return this.http.delete(`${this.config.apiUrl}/${endpoints[table]}/${entity.id}`)
             .map(this.extractData)
             .catch(this.handleError);

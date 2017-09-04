@@ -7,6 +7,7 @@ import { Store } from '@ngrx/store';
 import * as SockJS from 'sockjs-client';
 import * as Stomp from 'webstomp-client';
 
+import { RootState } from '../store';
 import { CSRFService } from '../../shared/auth/csrf.service';
 import { WindowRef } from '../../shared/services/window.service';
 import { AuthServerProvider } from '../../shared/auth/auth-jwt.service';
@@ -47,18 +48,22 @@ export class SocketService implements DataService {
         this.resource$ = new Observable((observable) => this.observable = observable);
     }
 
-    // TODO: fix these up.
-    getEntity(id: string, service: string): Observable<any> {
+    // TODO: fix these up. I'm not sure how these work with sockets
+    getEntity(id: string, service: keyof RootState): Observable<any> {
         return this.sendData(`/topic/${service}`, id);
     }
-    add(entity: any, service: string): Observable<any> {
+    add(service: keyof RootState, entity: any, ): Observable<any> {
         return this.sendData(`/topic/${service}`, entity);
     }
-    update(entity: any, service: string): Observable<any> {
+    update(service: keyof RootState, entity: any): Observable<any> {
         return this.sendData(`/topic/${service}`, entity);
     }
-    remove(entity: any, service: string): Observable<any> {
+    remove(service: keyof RootState, entity: any): Observable<any> {
         return this.sendData(`/topic/${service}`, entity);
+    }
+    getEntities(table: keyof RootState,
+        query: { [key: string]: string | number } = {}, state: RootState): Observable<any[]> {
+        return this.sendData(`/topic/${table}`, query);
     }
 
     sendData(dest: string, data: any): Observable<any> {

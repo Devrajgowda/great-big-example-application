@@ -17,10 +17,8 @@ import { slices } from '../../../../core/store/util';
 export class ArticleListComponent implements OnDestroy {
     articles$: Observable<Article[]>;
     articlesSub: Subscription;
-    query: BlogPageLayout;
-    articles: Article[];
+    articles: Article[] = [];
     loading = false;
-    currentPage = 1;
     totalPages: Array<number> = [1];
 
     constructor(
@@ -28,19 +26,11 @@ export class ArticleListComponent implements OnDestroy {
     ) { }
 
     @Input() limit: number;
-    @Input()
-    set config(config: BlogPageLayout) {
-        if (config) {
-            this.query = config;
-            this.currentPage = 1;
-            this.runQuery();
-        }
-    }
 
     ngOninit() {
         this.articles$ = this.store.select(fromRoot.getArticlesForQuery);
         this.articlesSub = this.articles$.subscribe((articles) => {
-            this.loading = false;
+            // this.loading = articles.loading;
             this.articles = articles;
 
             // Used from http://www.jstips.co/en/create-range-0...n-easily-using-one-line/
@@ -49,29 +39,20 @@ export class ArticleListComponent implements OnDestroy {
     }
 
     setPageTo(pageNumber) {
-        this.currentPage = pageNumber;
-        this.runQuery();
-    }
-
-    runQuery() {
         // Create limit and offset filter (if necessary)
+        let query: any = {
+            currentPage: pageNumber,
+        };
         if (this.limit) {
-            this.query.filters.limit = this.limit;
-            this.query.filters.offset = (this.limit * (this.currentPage - 1))
+            query.filters = {
+                limit: this.limit,
+                offset: (this.limit * (pageNumber - 1))
+            };
         }
 
-        this.store.dispatch(new SliceActions.Update(slices.LAYOUT, ['blogPage'], this.query));
+        this.store.dispatch(new SliceActions.Patch(slices.LAYOUT, ['blogPage'], query));
         this.loading = true;
         this.articles = [];
-
-        // this.articlesService.query(this.query)
-        //     .subscribe(data => {
-        //         this.loading = false;
-        //         this.articles = data.articles;
-
-        //         // Used from http://www.jstips.co/en/create-range-0...n-easily-using-one-line/
-        //         this.totalPages = Array.from(new Array(Math.ceil(data.articlesCount / this.limit)), (val, index) => index + 1);
-        //     });
     }
 
     ngOnDestroy() {

@@ -11,7 +11,7 @@ import { RootState } from '../';
 @Injectable()
 export class HeroEffects {
     @Effect()
-    private loadFromRemote$ = functions.loadFromRemote$(this.actions$, slices.HERO, this.dataService);
+    private loadFromRemote$ = functions.loadFromRemote$(this.actions$, slices.HERO, this.dataService, this.store);
     @Effect()
     private updateToRemote$ = functions.updateToRemote$(this.actions$, slices.HERO, this.dataService, this.store);
     @Effect()

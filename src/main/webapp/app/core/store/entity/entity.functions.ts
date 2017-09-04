@@ -227,12 +227,13 @@ function isPostLoadingAction(verb: string) {
  *
  */
 
-export function loadFromRemote$(actions$: PayloadActions, slice: string, dataService): Observable<Action> {  // TODO: should return PayloadAction
+export function loadFromRemote$(actions$: PayloadActions, slice: keyof RootState, dataService: DataService, store: Store<RootState>): Observable<Action> {  // TODO: should return PayloadAction
     return actions$
         .ofType(typeFor(slice, actions.LOAD))
         .startWith(new EntityActions.Load(slice, null))
-        .switchMap((action) =>
-            dataService.getEntities(slice || action.payload.route, action.payload ? action.payload.query : undefined)
+        .withLatestFrom(store)
+        .switchMap(([action, state]) =>
+            dataService.getEntities(slice, action.payload ? action.payload.query : undefined, state)
                 .mergeMap((fetchedEntities) => Observable.from(fetchedEntities))
                 .map((fetchedEntity) => new EntityActions.LoadSuccess(slice, fetchedEntity))  // one action per entity
                 .catch((err) => {
@@ -247,7 +248,7 @@ export function addToRemote$(actions$: Actions, slice: keyof RootState, dataServ
         .ofType(typeFor(slice, actions.ADD), typeFor(slice, actions.ADD_OPTIMISTICALLY))
         .withLatestFrom(store)
         .switchMap(([action, state]) =>
-            dataService.add((<any>action).payloadForPost(), slice, state, store)  // TODO: find better way
+            dataService.add(slice, (<any>action).payloadForPost(), state, store)  // TODO: find better way
                 .map((responseEntity: Entity) => new EntityActions.AddSuccess(slice, completeAssign({}, initialEntity, responseEntity)))
                 .catch((err) => {
                     console.log(err);
@@ -274,7 +275,7 @@ export function updateToRemote$(actions$: Actions, slice: keyof RootState, dataS
             return Observable
                 .from((<any>entities).ids)
                 .filter((id: string) => (<any>entities).entities[id].dirty)
-                .switchMap((id: string) => dataService.update((<any>entities).entities[id], slice, state, store))
+                .switchMap((id: string) => dataService.update(slice, (<any>entities).entities[id], state, store))
                 .map((responseEntity: Entity) => new EntityActions.UpdateSuccess(slice, responseEntity))
         });
 }
@@ -283,7 +284,7 @@ export function deleteFromRemote$(actions$: Actions, slice: keyof RootState, dat
     return actions$
         .ofType(typeFor(slice, actions.DELETE))
         .withLatestFrom(store)
-        .switchMap(([action, state]) => dataService.remove((<EntityAction<any>>action).payload, slice, state, store))
+        .switchMap(([action, state]) => dataService.remove(slice, (<EntityAction<any>>action).payload, state, store))
         .map((responseEntity: Entity) => new EntityActions.DeleteSuccess(slice, responseEntity))
         .catch((err) => {
             console.log(err);
@@ -299,7 +300,7 @@ export function select$(actions$: Actions, slice: keyof RootState, dataService: 
             return !state[slice].entities[(<EntityAction<any>>action).payload.id];
         })
         .switchMap(([action, state]) => {
-            return dataService.getEntity((<EntityAction<any>>action).payload.id, slice, state, store)
+            return dataService.getEntity(slice, (<EntityAction<any>>action).payload.id, state, store)
                 .map((responseEntity) => {    //('articles/' + slug)
                     // const payload = { ...initialEntity };
                     const payload = completeAssign({}, initialEntity, responseEntity)

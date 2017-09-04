@@ -28,10 +28,9 @@ export class LayoutEffects {
     private loadForQueryFromRemote = this.actions$
         .ofType(typeFor(slices.LAYOUT, SliceActions.actions.UPDATE))
         .filter((action: SliceAction) => action.payload.filters)   // TODO: make this a better test for this being the blog page layout
-        .withLatestFrom(this.store.select('layout'))
-        .switchMap(([action, layout]) => {
-            const route = '/articles' + (layout.blogPage.type === 'feed') ? '/feed' : '';
-            return this.dataService.getEntities(route, layout.blogPage.filters)
+        .withLatestFrom(this.store)
+        .switchMap(([action, state]) => {
+            return this.dataService.getEntities(slices.ARTICLE, state.layout.blogPage.filters, state)
                 .mergeMap((fetchedEntities) => Observable.from(fetchedEntities))
                 .map((fetchedEntity) => new EntityActions.LoadSuccess(slices.ARTICLE, fetchedEntity))  // one action per entity
                 .catch((err) => {

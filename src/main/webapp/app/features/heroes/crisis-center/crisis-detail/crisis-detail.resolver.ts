@@ -15,7 +15,7 @@ export class CrisisDetailResolver implements Resolve<Crisis> {
     resolve(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Promise<Crisis> {
         const id = route.params['id'];
 
-        return this.ds.getEntity(id, 'crisis').toPromise().then((crisis) => {
+        return this.ds.getEntity(slices.CRISIS, id).toPromise().then((crisis) => {
             if (crisis) {
                 return crisis;
             } else { // id not found

@@ -6,14 +6,19 @@ import { actions } from '../slice/slice.actions';
 import * as SliceActions from '../slice/slice.actions';
 import { Contact } from '../contact/contact.model';
 
+
+// TODO: put all of this in reducers for the respective features
+
 export function reducer(state: Layout = initialLayout(), action: SliceAction): Layout {
 
     switch (action.type) {
         case typeFor(slices.LAYOUT, actions.UPDATE):
             return functions.update(state, action);
-        case typeFor(slices.CONTACT, actions.LOAD):
-            // TODO fix this. This action type doesn't go through the reducers because it's in the startsWith of an effect
-            return functions.update(state, new SliceActions.Update(slices.LAYOUT, ['msg'], 'Loading contacts...'));
+        case typeFor(slices.LAYOUT, actions.PATCH):
+            return functions.patch(state, action);
+        // case typeFor(slices.CONTACT, actions.LOAD):
+        //     // TODO fix this. This action type doesn't go through the reducers because it's in the startsWith of an effect
+        //     return functions.update(state, new SliceActions.Update(slices.LAYOUT, ['msg'], 'Loading contacts...'));
         case 'TALK_WATCHED': {
             const watched = { ...state.talksPage.watched };
             watched[action.payload.id] = true;

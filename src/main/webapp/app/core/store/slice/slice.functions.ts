@@ -33,12 +33,24 @@ export function loadSuccess(state, action): any {
 }
 
 export function update(state: any, action: SliceAction): any {
+    return patchOrUpdate(state, action, true);
+}
+
+export function patch(state: any, action: SliceAction): any {
+    return patchOrUpdate(state, action, false);
+}
+
+function patchOrUpdate(state: any, action: SliceAction, update: boolean): any {
     const obj = [state];
     const path = action.payload.path;
     const val = action.payload.val;
 
     if (!path || !path.length) {
-        return merge({}, state, evaluate(val, state));
+        const wiper = {}; // wipes out the meat of the state, leaving system stuff like loading
+        if (update) {
+            wiper[state.slice] = null;
+        }
+        return merge({}, merge({}, state, wiper), evaluate(val, state));
     }
 
     let i = 0;
@@ -59,7 +71,11 @@ export function update(state: any, action: SliceAction): any {
 
     let mutation = {};
     for (i = start; i > 0; i--) {
-        mutation = merge({}, obj[i], result);
+        if (i === start && update) {
+            mutation = result;
+        } else {
+            mutation = merge({}, obj[i], result);
+        }
         result = {};
         result[path[i - 1]] = mutation;
     }

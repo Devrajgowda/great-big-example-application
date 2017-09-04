@@ -21,9 +21,9 @@ import { actions } from '../entity/entity.actions';
 @Injectable()
 export class TalkEffects {
     @Effect()
-    navigateToTalks$ = handleNavigation(this.store, this.actions$, '/features/talks', (r: ActivatedRouteSnapshot) => {
+    navigateToTalks$ = handleNavigation(this.store, this.actions$, '/features/talks', (r: ActivatedRouteSnapshot, state: RootState) => {
         const filters = createFilters(r.firstChild.firstChild.params);
-        return this.dataService.getEntities(slices.TALK, { speaker: filters.speaker, title: filters.title, minRating: '' + filters.minRating })
+        return this.dataService.getEntities(slices.TALK, { speaker: filters.speaker, title: filters.title, minRating: '' + filters.minRating }, state)
             .map((fetchedEntities) => new EntityActions.LoadAllSuccess(slices.TALK, fetchedEntities));
     });
 
@@ -46,7 +46,7 @@ export class TalkEffects {
     @Effect() rateTalk$ = this.actions$.ofType(typeFor(slices.TALK, actions.PATCH))
         .withLatestFrom(this.store)
         .switchMap(([a, state]) => {
-            return this.dataService.update({ id: a.payload.id, yourRating: a.payload.rating }, slices.TALK, state, this.store)
+            return this.dataService.update(slices.TALK, { id: a.payload.id, yourRating: a.payload.rating }, state, this.store)
                 .switchMap(() => of())
                 .catch((e) => {
                     console.log('Error', e);

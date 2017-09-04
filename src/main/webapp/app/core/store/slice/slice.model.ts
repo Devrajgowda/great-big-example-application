@@ -1,13 +1,15 @@
+import { completeAssign } from '../util';
+
 export interface Slice {
-    loaded?: boolean;
-    loading?: boolean;
+    loaded: boolean;
+    loading: boolean;
     slice: string;
     hasError: boolean;
 };
 
-export function initialSlice(slice: string, vals?: any): Slice {
+export function initialSlice(slice: string, vals: any = {}): Slice {
 
-    return Object.assign({
+    return completeAssign({
         loaded: false,
         loading: false,
         slice: slice,
