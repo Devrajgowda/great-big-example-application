@@ -60,6 +60,7 @@ export class HomePage implements OnInit, OnDestroy {
 
         // Otherwise, set the list object
         this.store.dispatch(new SliceActions.Patch(slices.LAYOUT, ['blogPage'], { type, filters }));
+        this.store.dispatch(new EntityActions.Unload(slices.ARTICLE));
         this.store.dispatch(new EntityActions.Load(slices.ARTICLE, { filters }));
     }
 

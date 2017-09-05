@@ -1,5 +1,5 @@
 import { Session, initialSession } from './session.model';
-import * as functions from '../slice/slice.functions';
+import * as sliceFunctions from '../slice/slice.functions';
 import { typeFor, slices } from '../util';
 import { actions, SliceAction } from '../slice/slice.actions';
 
@@ -8,13 +8,13 @@ export function reducer(state: Session = initialSession(), action: SliceAction):
     switch (action.type) {
 
         case typeFor(slices.SESSION, actions.LOAD):
-            return functions.load(state, action);
+            return sliceFunctions.load(state, action);
         case typeFor(slices.SESSION, actions.LOAD_SUCCESS):
-            return functions.loadSuccess(state, action);
+            return sliceFunctions.loadSuccess(state, action);
         case typeFor(slices.SESSION, actions.LOAD_FAIL):
-            return functions.loadFail(state, action);
+            return sliceFunctions.loadFail(state, action);
         case typeFor(slices.SESSION, actions.UPDATE):
-            return functions.update(state, action);
+            return sliceFunctions.update(state, action);
         default:
             return state;
     }

@@ -5,19 +5,19 @@ import { Actions, Effect } from '@ngrx/effects';
 import { Note, initialNote } from './note.model';
 import { slices } from '../util';
 import { RESTService } from '../../services/rest.service';
-import * as functions from '../entity/entity.functions';
+import * as entityFunctions from '../entity/entity.functions';
 import { RootState } from '../';
 
 @Injectable()
 export class NoteEffects {
     @Effect()
-    private loadFromRemote$ = functions.loadFromRemote$(this.actions$, slices.NOTE, this.dataService, this.store);
+    private loadFromRemote$ = entityFunctions.loadFromRemote$(this.actions$, slices.NOTE, this.dataService, this.store);
     @Effect()
-    private updateToRemote$ = functions.updateToRemote$(this.actions$, slices.NOTE, this.dataService, this.store);
+    private updateToRemote$ = entityFunctions.updateToRemote$(this.actions$, slices.NOTE, this.dataService, this.store);
     @Effect()
-    private deleteFromRemote$ = functions.deleteFromRemote$(this.actions$, slices.NOTE, this.dataService, this.store);
+    private deleteFromRemote$ = entityFunctions.deleteFromRemote$(this.actions$, slices.NOTE, this.dataService, this.store);
     @Effect()
-    private addToRemote$ = functions.addToRemote$(this.actions$, slices.NOTE, this.dataService, this.store, initialNote);
+    private addToRemote$ = entityFunctions.addToRemote$(this.actions$, slices.NOTE, this.dataService, this.store, initialNote);
 
     constructor(
         private store: Store<RootState>,

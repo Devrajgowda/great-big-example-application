@@ -1,6 +1,6 @@
 import { SliceAction } from '../slice/slice.actions';
 import { Layout, initialLayout } from './layout.model';
-import * as functions from '../slice/slice.functions';
+import * as sliceFunctions from '../slice/slice.functions';
 import { typeFor, slices } from '../util';
 import { actions } from '../slice/slice.actions';
 import * as SliceActions from '../slice/slice.actions';
@@ -13,9 +13,9 @@ export function reducer(state: Layout = initialLayout(), action: SliceAction): L
 
     switch (action.type) {
         case typeFor(slices.LAYOUT, actions.UPDATE):
-            return functions.update(state, action);
+            return sliceFunctions.update(state, action);
         case typeFor(slices.LAYOUT, actions.PATCH):
-            return functions.patch(state, action);
+            return sliceFunctions.patch(state, action);
         // case typeFor(slices.CONTACT, actions.LOAD):
         //     // TODO fix this. This action type doesn't go through the reducers because it's in the startsWith of an effect
         //     return functions.update(state, new SliceActions.Update(slices.LAYOUT, ['msg'], 'Loading contacts...'));

@@ -46,6 +46,7 @@ export class ContactPage implements OnInit, OnDestroy {
             });
             this.adding = contact && contact.id !== EntityActions.TEMP
         });
+        this.store.dispatch(new EntityActions.Load(slices.CONTACT, null));
     }
 
     nextContact() {

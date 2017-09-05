@@ -23,7 +23,8 @@ export const actions = {
     PATCH_FAIL: 'PATCH_FAIL',
     PATCH_SUCCESS: 'PATCH_SUCCESS',
     SELECT: 'SELECT',
-    SELECT_NEXT: 'SELECT_NEXT'
+    SELECT_NEXT: 'SELECT_NEXT',
+    UNLOAD: 'UNLOAD'
 };
 
 export const TEMP = 'TEMP_ID_VALUE';
@@ -158,6 +159,13 @@ export class Select<T extends Entity> extends EntityAction<T> {
 
 export class SelectNext<T extends Entity> extends EntityAction<T> {
     protected actionName: string = actions.SELECT_NEXT;
+    constructor(public slice: string) {
+        super(slice, null);
+    }
+}
+
+export class Unload<T extends Entity> extends EntityAction<T> {
+    protected actionName: string = actions.UNLOAD;
     constructor(public slice: string) {
         super(slice, null);
     }

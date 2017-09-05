@@ -8,7 +8,6 @@ import { actions } from './profile.actions';
 import * as ProfileActions from './profile.actions';
 import { slices } from '../util';
 import { RESTService } from '../../services/rest.service';
-import * as functions from '../entity/entity.functions';
 
 @Injectable()
 export class ProfileEffects {

@@ -5,7 +5,7 @@ import { Actions, Effect } from '@ngrx/effects';
 import { Author } from './author.model';
 import { slices } from '../util';
 import { RESTService } from '../../services/rest.service';
-import * as functions from '../entity/entity.functions';
+import * as entityFunctions from '../entity/entity.functions';
 import { RootState } from '../';
 
 @Injectable()

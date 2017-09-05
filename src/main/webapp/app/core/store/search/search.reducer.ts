@@ -3,14 +3,14 @@ import { slices } from '../util';
 import { actions } from '../id/id.actions';
 import { typeFor } from '../util';
 import { SliceAction } from '../slice/slice.actions';
-import * as functions from '../id/id.functions';
+import * as entityFunctions from '../id/id.functions';
 
 export function reducer(state = initialIDs(slices.SEARCH), action: SliceAction): IDs {
     switch (action.type) {
         case typeFor(slices.SEARCH, actions.LOAD):
-            return functions.addLoadID(state, action);
+            return entityFunctions.addLoadID(state, action);
         case typeFor(slices.SEARCH, actions.LOAD_SUCCESS):
-            return functions.updateIDs(state, action);
+            return entityFunctions.updateIDs(state, action);
         default: {
             return state;
         }

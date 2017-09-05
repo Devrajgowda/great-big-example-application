@@ -5,15 +5,15 @@ import { Actions, Effect } from '@ngrx/effects';
 import { Crisis } from './crisis.model';
 import { slices } from '../util';
 import { RESTService } from '../../services/rest.service';
-import * as functions from '../entity/entity.functions';
+import * as entityFunctions from '../entity/entity.functions';
 import { RootState } from '../';
 
 @Injectable()
 export class CrisisEffects {
     @Effect()
-    private loadFromRemote$ = functions.loadFromRemote$(this.actions$, slices.CRISIS, this.dataService, this.store);
+    private loadFromRemote$ = entityFunctions.loadFromRemote$(this.actions$, slices.CRISIS, this.dataService, this.store);
     @Effect()
-    private updateToRemote$ = functions.updateToRemote$(this.actions$, slices.CRISIS, this.dataService, this.store);
+    private updateToRemote$ = entityFunctions.updateToRemote$(this.actions$, slices.CRISIS, this.dataService, this.store);
 
     constructor(
         private store: Store<RootState>,

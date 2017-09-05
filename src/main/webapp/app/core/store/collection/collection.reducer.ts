@@ -1,7 +1,7 @@
 import { createSelector } from 'reselect';
 import { IDs, initialIDs } from '../id/id.model';
 import { slices, typeFor } from '../util';
-import * as functions from '../id/id.functions';
+import * as idFunctions from '../id/id.functions';
 import { actions } from '../id/id.actions';
 import { SliceAction } from '../slice/slice.actions';
 
@@ -9,15 +9,15 @@ export function reducer(state = initialIDs(slices.COLLECTION),
     action: SliceAction): IDs {
     switch (action.type) {
         case typeFor(slices.COLLECTION, actions.LOAD):
-            return functions.addLoadID(state, action);
+            return idFunctions.addLoadID(state, action);
         case typeFor(slices.COLLECTION, actions.LOAD_SUCCESS):
-            return functions.updateIDs(state, action);
+            return idFunctions.updateIDs(state, action);
         case typeFor(slices.COLLECTION, actions.ADD_SUCCESS):
         case typeFor(slices.COLLECTION, actions.DELETE_FAIL):
-            return functions.addID(state, action);
+            return idFunctions.addID(state, action);
         case typeFor(slices.COLLECTION, actions.DELETE_SUCCESS):
         case typeFor(slices.COLLECTION, actions.ADD_FAIL):
-            return functions.deleteID(state, action);
+            return idFunctions.deleteID(state, action);
         default: {
             return state;
         }

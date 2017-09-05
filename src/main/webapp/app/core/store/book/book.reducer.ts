@@ -3,7 +3,7 @@ import { createSelector } from 'reselect';
 import { Book, initialBook } from './book.model';
 import { Entities, initialEntities } from '../entity/entity.model';
 import { slices } from '../util';
-import * as functions from '../entity/entity.functions';
+import * as entityFunctions from '../entity/entity.functions';
 import { typeFor } from '../util';
 import { actions } from '../entity/entity.actions';
 import { EntityAction } from '../entity/entity.actions';
@@ -15,11 +15,11 @@ export function reducer(state: Entities<Book> = initialEntities<Book>(slices.BOO
     switch (action.type) {
         case typeFor(slices.SEARCH, actions.LOAD_SUCCESS):
         case typeFor(slices.COLLECTION, actions.LOAD_SUCCESS):
-            return functions.union(state, <any>action);
+            return entityFunctions.union(state, <any>action);
         case typeFor(slices.BOOK, actions.LOAD):
-            return functions.addToStore<Book>(state, <any>action);
+            return entityFunctions.addToStore<Book>(state, <any>action);
         case typeFor(slices.BOOK, actions.SELECT):
-            return functions.select<Book>(state, <any>action);
+            return entityFunctions.select<Book>(state, <any>action);
         default: {
             return state;
         }

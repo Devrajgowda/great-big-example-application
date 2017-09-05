@@ -30,6 +30,8 @@ export function reducer(state: Entities<Article> = initialEntities<Article>(slic
             return entityFunctions.deleteEntity<Article>(state, <any>action);
         case typeFor(slices.ARTICLE, actions.SELECT):
             return entityFunctions.select<Article>(state, <any>action);
+        case typeFor(slices.ARTICLE, actions.UNLOAD):
+            return entityFunctions.unload<Article>(state, <any>action);
         default:
             return state;
     }

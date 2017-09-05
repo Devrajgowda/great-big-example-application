@@ -117,6 +117,8 @@ function getFullRouteConfigPath(path, firstChild) {
  */
 export function completeAssign(target, ...sources) {
     sources.forEach(source => {
+        if (!source) return;
+
         let descriptors = Object.keys(source).reduce((descriptors, key) => {
             descriptors[key] = Object.getOwnPropertyDescriptor(source, key);
             return descriptors;

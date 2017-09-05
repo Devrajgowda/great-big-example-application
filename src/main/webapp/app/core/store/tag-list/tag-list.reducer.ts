@@ -4,7 +4,7 @@ import { actions } from '../entity/entity.actions';
 import { SliceAction } from '../slice/slice.actions';
 import { initialTagList } from './tag-list.model';
 import { slices } from '../util';
-import * as functions from '../slice/slice.functions';
+import * as sliceFunctions from '../slice/slice.functions';
 import { typeFor } from '../util';
 import { TagList } from './tag-list.model';
 
@@ -13,7 +13,7 @@ export function reducer(state = initialTagList(),
 
     switch (action.type) {
         case typeFor(slices.TAG_LIST, actions.LOAD_ALL_SUCCESS):
-            return functions.loadSuccess(state, <any>action);
+            return sliceFunctions.loadSuccess(state, <any>action);
         default:
             return state;
     }

@@ -4,7 +4,6 @@ import { Actions, Effect } from '@ngrx/effects';
 import { empty } from 'rxjs/observable/empty';
 
 import { Counter, initialCounter } from './counter.model';
-import * as functions from '../entity/entity.functions';
 import { typeFor, slices } from '../util';
 import { actions, SliceAction } from '../slice/slice.actions';
 import * as SliceActions from '../slice/slice.actions';

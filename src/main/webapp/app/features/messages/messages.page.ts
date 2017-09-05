@@ -41,6 +41,8 @@ export class MessagesPage implements OnInit, OnDestroy {
                 this.messages = messages;
             });
         });
+        this.store.dispatch(new EntityActions.Load(slices.MESSAGE, null));
+
     }
 
     ngOnDestroy() {

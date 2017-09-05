@@ -83,6 +83,10 @@ export function selectNext<T extends Entity>(state: Entities<T>, action: EntityA
     return completeAssign({}, state, { selectedEntityId: state.ids[ix] });
 };
 
+export function unload<T extends Entity>(state: Entities<T>, action: EntityActions.Select<T>): Entities<T> {
+    return completeAssign({}, state, { entities: {}, ids: [], selectedEntityId: null });
+};
+
 /**
  * Add entities in the action's payload into the state if they are not yet there
  *
@@ -185,7 +189,8 @@ function reduceOne<T extends Entity>(state: Entities<T>, entity: T = null, actio
         default:
             newState = entity;
     }
-    return setEntityLoading(newState, action);
+    return newState;
+    // return setEntityLoading(newState, action);
 };
 
 function setEntityLoading(state, action) {
@@ -231,7 +236,7 @@ function isPostLoadingAction(verb: string) {
 export function loadFromRemote$(actions$: PayloadActions, slice: keyof RootState, dataService: DataService, store: Store<RootState>): Observable<Action> {  // TODO: should return PayloadAction
     return actions$
         .ofType(typeFor(slice, actions.LOAD))
-        .startWith(new EntityActions.Load(slice, null))
+        // .startWith(new EntityActions.Load(slice, null))  // updated. instead dispatch a load action in the feature's main page
         .withLatestFrom(store)
         .switchMap(([action, state]) =>
             dataService.getEntities(slice, action.payload ? action.payload.query : undefined, state)

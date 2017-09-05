@@ -66,6 +66,9 @@ export class BerniePage implements OnInit, OnDestroy, AfterViewChecked {
             .subscribe((term) => {
                 this.store.dispatch(new SliceActions.Update(slices.LAYOUT, ['berniePage', 'bernieSearchTerm'], term));
             });
+        this.store.dispatch(new EntityActions.Load(slices.CLAIM, null));
+        this.store.dispatch(new EntityActions.Load(slices.CLAIM_REBUTTAL, null));
+        this.store.dispatch(new EntityActions.Load(slices.REBUTTAL, null));
     }
 
     // Push a search term into the observable stream.
