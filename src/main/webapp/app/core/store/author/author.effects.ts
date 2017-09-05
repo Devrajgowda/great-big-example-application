@@ -11,7 +11,7 @@ import { RootState } from '../';
 @Injectable()
 export class AuthorEffects {
     // @Effect()
-    // private loadFromRemote$ = functions.loadFromRemote$(this.actions$, slices.AUTHOR, this.dataService);
+    // private loadFromRemote$ = functions.loadFromRemote$(this.actions$, slices.AUTHOR, this.dataService, this.store);
 
     constructor(
         private store: Store<RootState>,

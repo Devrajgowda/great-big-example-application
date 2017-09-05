@@ -74,8 +74,7 @@ const endpointTransforms = {
     },
     getEntities: {
         article(state: RootState) {
-            const layout = state.layout;
-            return 'articles' + (layout.blogPage.type === 'feed') ? '/feed' : '';
+            return 'articles' + ((state.layout.blogPage.type === 'feed') ? '/feed' : '');
         }
     }
 }

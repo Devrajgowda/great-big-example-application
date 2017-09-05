@@ -519,8 +519,8 @@ export const getTempArticle = createSelector(getArticlesState, fromArticles.getT
 export const getArticles = createSelector(getArticleEntities, getArticleIds, (entities, ids) => {
     return ids.map((id) => entities[id]);
 });
-export const getArticlesForQuery = createSelector(getArticles, getBlogPageLayout, getAuthors,
-    (articles: Article[], blogPageLayout: BlogPageLayout, authors: Author[]) => {
+export const getArticlesForQuery = createSelector(getArticles, getBlogPageLayout,
+    (articles: Article[], blogPageLayout: BlogPageLayout) => {
         return articles.filter((article) => {
             return !blogPageLayout.filters.author || blogPageLayout.filters.author === article.author.username &&
                 !blogPageLayout.filters.tag || article.tagList.some((tag) => tag === blogPageLayout.filters.tag);

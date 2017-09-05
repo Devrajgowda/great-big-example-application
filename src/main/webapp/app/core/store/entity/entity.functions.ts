@@ -13,9 +13,10 @@ import { RootState } from '../';
 import { DataService } from '../../services/data.service';
 
 export function addToStore<T extends Entity>(state: Entities<T>, action: EntityActions.Add<T> | EntityActions.Load<T>): Entities<T> {
-    const entities = Object.assign({}, state.entities);
-    entities[action.payload.id] = reduceOne(state, null, action);
-    let newState = Object.assign({}, state, {
+    const entities = completeAssign({}, state.entities);
+    const newEntity = reduceOne(state, null, action);          // this is like this because id could be an
+    entities[newEntity.id] = reduceOne(state, null, action);   // accessor rather than a regular field
+    let newState = completeAssign({}, state, {
         ids: Object.keys(entities),
         entities,
         selectedEntityId: action.payload.id
@@ -27,9 +28,9 @@ export function addToStore<T extends Entity>(state: Entities<T>, action: EntityA
  * Called after response from an add request returns from the server
  */
 // export function addSuccess<T extends Entity>(state: Entities<T>, action: EntityActions.AddTemp<T>): Entities<T> {
-//     const entities = Object.assign({}, state.entities);
+//     const entities = completeAssign({}, state.entities);
 //     entities[action.payload.id] = reduceOne(state, null, action);
-//     let newState = Object.assign({}, state, {
+//     let newState = completeAssign({}, state, {
 //         ids: Object.keys(entities),
 //         entities,
 //         selectedEntityId: action.payload.id
@@ -54,7 +55,7 @@ export function deleteEntity<T extends Entity>(state: Entities<T>, action: Entit
     const selectedEntityId = idx === -1 ? state.selectedEntityId : state.ids[newIdx];
     const i = state.ids.findIndex((findId) => findId === id);
     const ids = [...state.ids.slice(0, i), ...state.ids.slice(i + 1)];
-    let newState = Object.assign({}, state, { entities, ids, selectedEntityId });
+    let newState = completeAssign({}, state, { entities, ids, selectedEntityId });
     return sliceFunctions.setSliceLoading(newState, action);
 };
 
@@ -63,7 +64,7 @@ export function deleteEntity<T extends Entity>(state: Entities<T>, action: Entit
  */
 export function deleteTemp<T extends Entity>(state: Entities<T>, action: EntityActions.DeleteTemp<T>): Entities<T> {
     let newState = state;
-    const entities = Object.assign({}, state.entities);
+    const entities = completeAssign({}, state.entities);
     if (entities[action.payload.id]) {
         newState = deleteEntity<T>(state, action);
     }
@@ -71,7 +72,7 @@ export function deleteTemp<T extends Entity>(state: Entities<T>, action: EntityA
 }
 
 export function select<T extends Entity>(state: Entities<T>, action: EntityActions.Select<T>): Entities<T> {
-    return Object.assign({}, state, {
+    return completeAssign({}, state, {
         selectedEntityId: action.payload.id || action.payload
     });
 };
@@ -79,7 +80,7 @@ export function select<T extends Entity>(state: Entities<T>, action: EntityActio
 export function selectNext<T extends Entity>(state: Entities<T>, action: EntityActions.SelectNext<T>): Entities<T> {
     let ix = 1 + state.ids.indexOf(state.selectedEntityId);
     if (ix >= state.ids.length) { ix = 0; }
-    return Object.assign({}, state, { selectedEntityId: state.ids[ix] });
+    return completeAssign({}, state, { selectedEntityId: state.ids[ix] });
 };
 
 /**
@@ -94,14 +95,14 @@ export function union<T extends Entity>(state: Entities<T>, action: EntityAction
 
     const newEntityIds = newEntities.map((entity) => entity.id);
     newEntities = newEntities.reduce((ents: { [id: string]: T }, entity: T) => {
-        return Object.assign(ents, {
+        return completeAssign(ents, {
             [entity.id]: entity
         });
     }, {});
 
-    return Object.assign({}, state, {
+    return completeAssign({}, state, {
         ids: [...state.ids, ...newEntityIds],
-        entities: Object.assign({}, state.entities, newEntities),
+        entities: completeAssign({}, state.entities, newEntities),
         selectedEntityId: state.selectedEntityId
     });
 }
@@ -113,10 +114,10 @@ export function union<T extends Entity>(state: Entities<T>, action: EntityAction
  * @param action needs a payload that has an id
  */
 export function update<T extends Entity>(state: Entities<T>, action: EntityActions.Update<T>): Entities<T> {
-    const entities = Object.assign({}, state.entities);
+    const entities = completeAssign({}, state.entities);
     const id = action.payload.id;
     entities[id] = reduceOne(state, entities[id], action);
-    return Object.assign({}, state, {
+    return completeAssign({}, state, {
         ids: Object.keys(entities),
         entities
     });
@@ -133,18 +134,18 @@ export function newEntities<T extends Entity>(state: Entities<T>, action: Entity
         map[obj.id] = obj;
         return map;
     }, {});
-    return Object.assign({}, state, {
+    return completeAssign({}, state, {
         ids: Object.keys(entities),
         entities
     });
 };
 
 export function patchEach<T extends Entity>(state: Entities<T>, action: any): Entities<T> {
-    const entities = Object.assign({}, state.entities);
+    const entities = completeAssign({}, state.entities);
     for (const id of Object.keys(entities)) {
-        entities[id] = Object.assign(entities[id], action.payload);
+        entities[id] = completeAssign(entities[id], action.payload);
     }
-    return Object.assign({}, state, {
+    return completeAssign({}, state, {
         entities
     });
 };
@@ -156,30 +157,30 @@ function reduceOne<T extends Entity>(state: Entities<T>, entity: T = null, actio
 
         case typeFor(state.slice, actions.ADD_TEMP):
         case typeFor(state.slice, actions.ADD_OPTIMISTICALLY):
-            newState = Object.assign({}, state.initialEntity, action.payload, { dirty: true });
+            newState = completeAssign({}, state.initialEntity, action.payload, { dirty: true });
             break;
         case typeFor(state.slice, actions.DELETE):
-            newState = Object.assign({}, entity, action.payload, { deleteMe: true });
+            newState = completeAssign({}, entity, action.payload, { deleteMe: true });
             break;
         case typeFor(state.slice, actions.DELETE_FAIL):
-            newState = Object.assign({}, entity, action.payload, { deleteMe: false });
+            newState = completeAssign({}, entity, action.payload, { deleteMe: false });
             break;
         case typeFor(state.slice, actions.UPDATE):
-            newState = Object.assign({}, action.payload, { dirty: true });
+            newState = completeAssign({}, action.payload, { dirty: true });
             break;
         case typeFor(state.slice, actions.PATCH):
-            newState = Object.assign({}, entity, action.payload, { dirty: true });
+            newState = completeAssign({}, entity, action.payload, { dirty: true });
             break;
         case typeFor(state.slice, actions.ADD_SUCCESS):
             // entity could be a client-side-created object with client-side state not returned by
             // the server. If so, preserve this state by having entity as part of this
-            newState = Object.assign({}, state.initialEntity, entity, action.payload, { dirty: false });
+            newState = completeAssign({}, state.initialEntity, entity, action.payload, { dirty: false });
             break;
         case typeFor(state.slice, actions.LOAD_SUCCESS):
-            newState = Object.assign({}, state.initialEntity, action.payload, { dirty: false });
+            newState = completeAssign({}, state.initialEntity, action.payload, { dirty: false });
             break;
         case typeFor(state.slice, actions.UPDATE_SUCCESS):
-            newState = Object.assign({}, entity, { dirty: false });
+            newState = completeAssign({}, entity, { dirty: false });
             break;
         default:
             newState = entity;

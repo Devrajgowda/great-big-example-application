@@ -101,8 +101,11 @@ export class DeleteTemp<T extends Entity> extends EntityAction<T> {
     }
 }
 
-export class Load<T extends Entity> extends EntityAction<T> {
+export class Load<T extends Entity> extends SliceAction implements PayloadAction {
     protected actionName: string = actions.LOAD;
+    constructor(public slice: string, public payload: any) {  // takes an any, not an entity
+        super(slice, payload);
+    }
 }
 
 export class LoadFail<T extends Entity> extends EntityAction<T> {

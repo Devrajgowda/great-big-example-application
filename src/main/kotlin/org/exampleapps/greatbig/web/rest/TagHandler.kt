@@ -8,5 +8,5 @@ import org.springframework.web.bind.annotation.RestController
 @RestController
 class TagHandler(val repository: TagRepository) {
     @GetMapping("/api/tags")
-    fun allTags() = mapOf("tags" to repository.findAll().map(Tag::name))
+    fun allTags() = repository.findAll().map(Tag::name)
 }

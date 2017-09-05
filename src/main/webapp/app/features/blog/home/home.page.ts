@@ -9,6 +9,7 @@ import { Article } from '../../../core/store/article/article.model';
 import { Account, Principal } from '../../../shared';
 import { User } from '../../../core/store/user/user.model';
 import * as SliceActions from '../../../core/store/slice/slice.actions';
+import * as EntityActions from '../../../core/store/entity/entity.actions';
 import { slices } from '../../../core/store/util';
 import { BlogPageLayout } from '../blog.layout';
 
@@ -59,6 +60,7 @@ export class HomePage implements OnInit, OnDestroy {
 
         // Otherwise, set the list object
         this.store.dispatch(new SliceActions.Patch(slices.LAYOUT, ['blogPage'], { type, filters }));
+        this.store.dispatch(new EntityActions.Load(slices.ARTICLE, { filters }));
     }
 
     ngOnDestroy() {

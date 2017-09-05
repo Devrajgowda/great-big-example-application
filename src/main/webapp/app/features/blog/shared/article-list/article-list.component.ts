@@ -8,13 +8,14 @@ import { Article } from '../../../../core/store/article/article.model';
 import { Layout } from '../../../../core/store/layout/layout.model';
 import { BlogPageLayout } from '../../blog.layout';
 import * as SliceActions from '../../../../core/store/slice/slice.actions';
+import * as EntityActions from '../../../../core/store/entity/entity.actions';
 import { slices } from '../../../../core/store/util';
 
 @Component({
     selector: 'jhi-article-list',
     templateUrl: './article-list.component.html'
 })
-export class ArticleListComponent implements OnDestroy {
+export class ArticleListComponent implements OnInit, OnDestroy {
     articles$: Observable<Article[]>;
     articlesSub: Subscription;
     articles: Article[] = [];
@@ -27,15 +28,17 @@ export class ArticleListComponent implements OnDestroy {
 
     @Input() limit: number;
 
-    ngOninit() {
+    ngOnInit() {
+        let self = this;  // because we need to refer to this.limit inside a function
         this.articles$ = this.store.select(fromRoot.getArticlesForQuery);
         this.articlesSub = this.articles$.subscribe((articles) => {
             // this.loading = articles.loading;
             this.articles = articles;
 
             // Used from http://www.jstips.co/en/create-range-0...n-easily-using-one-line/
-            this.totalPages = Array.from(new Array(Math.ceil(articles.length / this.limit)), (val, index) => index + 1);
+            this.totalPages = Array.from(new Array(Math.ceil(articles.length / self.limit)), (val, index) => index + 1);
         })
+        this.setPageTo(1);
     }
 
     setPageTo(pageNumber) {
@@ -51,6 +54,7 @@ export class ArticleListComponent implements OnDestroy {
         }
 
         this.store.dispatch(new SliceActions.Patch(slices.LAYOUT, ['blogPage'], query));
+        this.store.dispatch(new EntityActions.Load(slices.ARTICLE, { query }));
         this.loading = true;
         this.articles = [];
     }

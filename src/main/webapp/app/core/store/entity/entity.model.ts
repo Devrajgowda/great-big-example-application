@@ -1,5 +1,6 @@
 import { EntityAction } from './entity.actions';
 import { initialSlice, Slice } from '../slice/slice.model';
+import { completeAssign } from '../util';
 
 export interface Entity {
     id: string,
@@ -19,12 +20,12 @@ export interface Entities<T extends Entity> extends Slice {
     initialEntity: T;
 };
 
-export function initialEntities<T extends Entity>(slice: string, initialEntity: T, vals?: T): Entities<T> {
+export function initialEntities<T extends Entity>(slice: string, initialEntity: T, vals = {}): Entities<T> {
 
-    return Object.assign({}, initialSlice(slice), {
+    return completeAssign({}, initialSlice(slice), {
         ids: [],
         entities: {},
         selectedEntityId: null,
-        initialEntity: Object.assign({}, initialBaseEntity, initialEntity)
+        initialEntity: completeAssign({}, initialBaseEntity, initialEntity)
     }, vals);
 };

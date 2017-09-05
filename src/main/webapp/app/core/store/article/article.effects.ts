@@ -23,8 +23,8 @@ import { RootState } from '../';
 
 @Injectable()
 export class ArticleEffects {
-    // @Effect()
-    // private loadFromRemote$ = entityFunctions.loadFromRemote$(this.actions$, slices.ARTICLE, this.dataService);
+    @Effect()
+    private loadFromRemote$ = entityFunctions.loadFromRemote$(this.actions$, slices.ARTICLE, this.dataService, this.store);
     @Effect()
     private updateToRemote$ = entityFunctions.updateToRemote$(this.actions$, slices.ARTICLE, this.dataService, this.store);
     @Effect()
