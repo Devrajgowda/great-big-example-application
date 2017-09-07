@@ -32,7 +32,7 @@ export function type<T>(label: T | ''): T {
 
 const typeForCache: { [slice: string]: { [action: string]: string } } = {};
 
-export function typeFor(slice: string, action: string) {
+export function typeFor(slice: keyof RootState, action: string) {
     if (typeForCache[slice] && typeForCache[slice][action]) {
         return typeForCache[slice][action];
     } else {
@@ -62,7 +62,7 @@ export const slices = {
     REBUTTAL: 'rebuttal' as 'rebuttal',
     SEARCH: 'search' as 'search',
     SESSION: 'session' as 'session',
-    TAG_LIST: 'tagList' as 'tagList',
+    TAG: 'tag' as 'tag',
     TALK: 'talk' as 'talk'
 };
 

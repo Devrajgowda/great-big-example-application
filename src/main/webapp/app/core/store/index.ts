@@ -2,7 +2,6 @@ import { Observable } from 'rxjs/Observable';
 import * as fromRouter from '@ngrx/router-store';
 import { localStorageSync } from 'ngrx-store-localstorage';
 
-
 import { Article } from './article/article.model';
 import { Author } from './author/author.model';
 import { Book } from './book/book.model';
@@ -18,9 +17,10 @@ import { Note } from './note/note.model';
 import { Rebuttal } from './rebuttal/rebuttal.model';
 import { Session } from './session/session.model';
 import { User } from './user/user.model';
-import { TagList } from './tag-list/tag-list.model';
+import { Tag } from './tag/tag.model';
 import { BlogPageLayout } from '../../features/blog/blog.layout';
 import { Talk } from './talk/talk.model';
+import { actions } from './entity/entity.actions';
 
 import {
     ActionReducerMap,
@@ -65,7 +65,7 @@ import * as fromNotes from './note/note.reducer';
 import * as fromRebuttals from './rebuttal/rebuttal.reducer';
 import * as fromSearch from './search/search.reducer';
 import * as fromSession from './session/session.reducer';
-import * as fromTagList from './tag-list/tag-list.reducer';
+import * as fromTags from './tag/tag.reducer';
 import * as fromTalks from './talk/talk.reducer';
 import { gameReducer, gamesReducer, p2pGameReducer } from './game/game.reducer';
 import { Entities } from './entity/entity.model';
@@ -97,7 +97,7 @@ export interface RootState {
     router: fromRouter.RouterReducerState;
     search: IDs;
     session: Session;
-    tagList: TagList;
+    tag: Entities<Tag>;
     talk: Entities<Talk>;
 }
 
@@ -110,8 +110,7 @@ export type RootStateKeys = keyof RootState;
  * wrapping that in storeLogger. Remember that compose applies
  * the result from right to left.
  */
-export const reducers: ActionReducerMap<RootState> = {
-    // ngrx ones
+export let reducers: ActionReducerMap<RootState> = {
     book: fromBooks.reducer,
     article: fromArticles.reducer,
     author: fromAuthors.reducer,
@@ -131,11 +130,14 @@ export const reducers: ActionReducerMap<RootState> = {
     rebuttal: fromRebuttals.reducer,
     router: fromRouter.routerReducer,
     search: fromSearch.reducer,
-    session: fromSession.reducer,
     comment: fromComments.reducer,
     talk: fromTalks.reducer,
-    tagList: fromTagList.reducer
+    tag: fromTags.reducer,
+    session: null
+    // session: fromSession.reducer(this)
 };
+
+reducers.session = fromSession.reducer(reducers)
 
 /**
  * By default, @ngrx/store uses combineReducers with the reducer map to compose
@@ -146,9 +148,9 @@ export const reducers: ActionReducerMap<RootState> = {
 //     ? [logger]
 //     : [];
 
-export const metaReducers: MetaReducer<RootState>[] = process.env.NODE_ENV === 'dev'
+export const metaReducers: MetaReducer<RootState>[] = (process.env.NODE_ENV === 'dev'
     ? [logger]
-    : [];
+    : []).concat(loadingSetter)
 
 // console.log all actions
 function logger(reducer: ActionReducer<RootState>) {
@@ -157,6 +159,75 @@ function logger(reducer: ActionReducer<RootState>) {
         console.log('action', action);
 
         return reducer(state, action);
+    }
+}
+
+// set loading and loaded fields
+function loadingSetter(reducer: ActionReducer<RootState>) {
+    return function (state: RootState, action: any) {
+        let newState = state;
+        if (action.verb) {
+            newState = setLoading(state, action)
+        }
+        return reducer(newState, action);
+    }
+}
+
+function setLoading(state, action) {
+    const loading = isLoadingAction(action.verb);
+    const loadSuccess = isLoadSuccessAction(action.verb);
+    const loadFail = isLoadFailAction(action.verb);
+
+    let newState = state;
+    if (loading) {
+        newState[action.slice].loading = true;
+    }
+    if (loadSuccess || loadFail) {
+        newState[action.slice].loading = false;
+    }
+    if (loadSuccess) {
+        newState[action.slice].loaded = true;
+    }
+    return newState;
+
+}
+
+function isLoadingAction(verb: string) {
+    switch (verb) {
+        case actions.ADD:
+        case actions.DELETE:
+        case actions.LOAD:
+        case actions.PATCH:
+        case actions.UPDATE:
+        case 'ADD_COMMENT':  // TODO: create an ADD_CHILD action verb to handle this
+            return true;
+        default:
+            return false;
+    }
+}
+
+function isLoadSuccessAction(verb: string) {
+    switch (verb) {
+        case actions.ADD_SUCCESS:
+        case actions.DELETE_SUCCESS:
+        case actions.LOAD_SUCCESS:
+        case actions.PATCH_SUCCESS:
+        case actions.UPDATE_SUCCESS:
+            return true;
+        default:
+            return false;
+    }
+}
+
+function isLoadFailAction(verb: string) {
+    switch (verb) {
+        case actions.ADD_UPDATE_FAIL:
+        case actions.DELETE_FAIL:
+        case actions.LOAD_FAIL:
+        case actions.PATCH_FAIL:
+            return true;
+        default:
+            return false;
     }
 }
 
@@ -505,7 +576,12 @@ export const getAuthors = createSelector(getAuthorEntities, getAuthorIds, (entit
 /**
  * TagList Selectors
  */
-export const getTags = (state: RootState): string[] => state.tagList.tags;
+export const getTagsState = (state: RootState): Entities<Tag> => state.tag;
+export const getTagEntities = createSelector(getTagsState, fromTags.getEntities);
+export const getTagIds = createSelector(getTagsState, fromTags.getIds);
+export const getTags = createSelector(getTagEntities, getTagIds, (entities, ids) => {
+    return ids.map((id) => entities[id].name);
+});
 
 /**
  * Articles Selectors
@@ -523,7 +599,7 @@ export const getArticlesForQuery = createSelector(getArticles, getBlogPageLayout
     (articles: Article[], blogPageLayout: BlogPageLayout) => {
         return articles.filter((article) => {
             return !blogPageLayout.filters.author || blogPageLayout.filters.author === article.author.username &&
-                !blogPageLayout.filters.tag || article.tagList.some((tag) => tag === blogPageLayout.filters.tag);
+                !blogPageLayout.filters.tag || article.tag.some((tag) => tag === blogPageLayout.filters.tag);
         });
     });
 

@@ -118,13 +118,13 @@ class ArticleHandler(val repository: ArticleRepository,
         val currentAuthor = authorRepository.findById(currentUser.getId())
 
         // search for tags
-        val tagList = newArticle.tagList.map {
+        val tags = newArticle.tags.map {
             tagRepository.findByName(it) ?: tagRepository.save(Tag(name = it))
         }
 
         val article = Article(slug = slug,
                 author = currentAuthor, title = newArticle.title!!, description = newArticle.description!!,
-                body = newArticle.body!!, tags = tagList.toMutableList())
+                body = newArticle.body!!, tags = tags.toMutableList())
 
         return articleView(repository.save(article), currentAuthor)
     }
@@ -164,7 +164,7 @@ class ArticleHandler(val repository: ArticleRepository,
             }
 
             // search for tags
-            val tagList = article.tagList?.map {
+            val tags = article.tags?.map {
                 tagRepository.findByName(it) ?: tagRepository.save(Tag(name = it))
             }
 
@@ -173,8 +173,8 @@ class ArticleHandler(val repository: ArticleRepository,
                     body = article.body ?: it.body,
                     slug = slug,
                     updatedAt = OffsetDateTime.now(),
-                    tags = if (tagList == null || tagList.isEmpty()) it.tags
-                    else tagList.toMutableList())
+                    tags = if (tags == null || tags.isEmpty()) it.tags
+                    else tags.toMutableList())
 
             return articleView(repository.save(updated), currentAuthor)
         }

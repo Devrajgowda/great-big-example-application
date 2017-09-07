@@ -16,6 +16,7 @@ import { HeaderComponent } from './shared/header/header.component';
 import { ArticleEffects } from '../../core/store/article/article.effects';
 import { CommentEffects } from '../../core/store/comment/comment.effects';
 import { AuthorEffects } from '../../core/store/author/author.effects';
+import { TagEffects } from '../../core/store/tag/tag.effects';
 
 @NgModule({
     imports: [
@@ -28,7 +29,8 @@ import { AuthorEffects } from '../../core/store/author/author.effects';
         EffectsModule.forRoot([
             ArticleEffects,
             AuthorEffects,
-            CommentEffects
+            CommentEffects,
+            TagEffects
         ]),
     ],
     declarations: [

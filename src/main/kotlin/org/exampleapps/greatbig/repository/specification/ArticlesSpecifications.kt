@@ -12,8 +12,8 @@ object ArticlesSpecifications {
             val predicates = mutableListOf<Predicate>()
 
             tag?.let {
-                val tagList = root.get<Collection<Tag>>("tagList")
-                predicates.add(cb.isMember(tag, tagList))
+                val tags = root.get<Collection<Tag>>("tags")
+                predicates.add(cb.isMember(tag, tags))
             }
 
             author?.let {

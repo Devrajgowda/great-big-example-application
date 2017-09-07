@@ -10,9 +10,9 @@ import * as EntityActions from '../entity/entity.actions';
 import { RootState } from '../';
 
 @Injectable()
-export class TagListEffects {
+export class TagEffects {
     @Effect()
-    private loadFromRemote$ = entityFunctions.loadFromRemote$(this.actions$, slices.TAG_LIST, this.dataService, this.store);
+    private loadFromRemote$ = entityFunctions.loadFromRemote$(this.actions$, slices.TAG, this.dataService, this.store);
 
     constructor(
         private store: Store<RootState>,

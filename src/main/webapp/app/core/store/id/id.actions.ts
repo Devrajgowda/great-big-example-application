@@ -3,6 +3,7 @@ import { Action } from '@ngrx/store';
 import { typeFor } from '../util';
 import { SliceAction } from '../slice/slice.actions';
 import { actions as sliceActions } from '../slice/slice.actions';
+import { RootState } from '../';
 
 export const actions = {
     ...sliceActions,
@@ -28,7 +29,7 @@ export class AddFail extends SliceAction {
 
 export class Load extends SliceAction {
     protected actionName: string = actions.LOAD;
-    constructor(public slice: string, query: string = null) {
+    constructor(public slice: keyof RootState, query: string = null) {
         super(slice, query);
     }
 }

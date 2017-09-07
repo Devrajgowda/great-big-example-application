@@ -70,7 +70,7 @@ export class AddPage implements OnInit, OnDestroy {
     }
 
     submitForm() {
-        this.loading = true;
+        // this.loading = true;
         this.store.dispatch(new EntityActions.Add(slices.ARTICLE,
             { ...this.article, ...this.articleForm.value }));
     }

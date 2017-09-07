@@ -18,5 +18,5 @@ class NewArticle {
     @Size(min = 1, message = "can't be empty")
     var body: String? = ""
 
-    var tagList: List<String> = listOf()
+    var tags: List<String> = listOf()
 }

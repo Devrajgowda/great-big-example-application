@@ -3,6 +3,7 @@ import { Entity } from './entity.model';
 import { SliceAction } from '../slice/slice.actions';
 import { actions as sliceActions } from '../slice/slice.actions';
 import { typeFor } from '../util';
+import { RootState } from '../';
 
 export const actions = {
     ...sliceActions,
@@ -30,14 +31,14 @@ export const actions = {
 export const TEMP = 'TEMP_ID_VALUE';
 
 export class EntityAction<T extends Entity> extends SliceAction implements PayloadAction {
-    constructor(public slice: string, public payload: T) {
+    constructor(public slice: keyof RootState, public payload: T) {
         super(slice, payload);
     }
 }
 
 export class Add<T extends Entity> extends EntityAction<T> {
     protected actionName: string = actions.ADD;
-    constructor(public slice: string, public payload: any = {}) {
+    constructor(public slice: keyof RootState, public payload: any = {}) {
         super(slice, Object.assign({}, { dirty: true }, payload));
     }
     // If the payload contains the temp ID value, that means
@@ -59,7 +60,7 @@ export class Add<T extends Entity> extends EntityAction<T> {
  */
 export class AddTemp<T extends Entity> extends EntityAction<T> {
     protected actionName: string = actions.ADD_TEMP;
-    constructor(public slice: string, payload: any = {}) {
+    constructor(public slice: keyof RootState, payload: any = {}) {
         super(slice, Object.assign({}, payload, (payload.id ? {} : { id: TEMP })));
     }
 }
@@ -70,7 +71,7 @@ export class AddTemp<T extends Entity> extends EntityAction<T> {
  */
 export class AddOptimistically<T extends Entity> extends Add<T> {
     protected actionName: string = actions.ADD_OPTIMISTICALLY;
-    constructor(public slice: string, payload: any = {}) {
+    constructor(public slice: keyof RootState, payload: any = {}) {
         super(slice, Object.assign({}, { id: TEMP }, payload));
     }
 }
@@ -97,14 +98,14 @@ export class DeleteSuccess<T extends Entity> extends EntityAction<T> {
 
 export class DeleteTemp<T extends Entity> extends EntityAction<T> {
     protected actionName: string = actions.DELETE_TEMP;
-    constructor(public slice: string) {
+    constructor(public slice: keyof RootState) {
         super(slice, <T>{ id: TEMP })
     }
 }
 
 export class Load<T extends Entity> extends SliceAction implements PayloadAction {
     protected actionName: string = actions.LOAD;
-    constructor(public slice: string, public payload: any) {  // takes an any, not an entity
+    constructor(public slice: keyof RootState, public payload: any) {  // takes an any, not an entity
         super(slice, payload);
     }
 }
@@ -159,14 +160,14 @@ export class Select<T extends Entity> extends EntityAction<T> {
 
 export class SelectNext<T extends Entity> extends EntityAction<T> {
     protected actionName: string = actions.SELECT_NEXT;
-    constructor(public slice: string) {
+    constructor(public slice: keyof RootState) {
         super(slice, null);
     }
 }
 
 export class Unload<T extends Entity> extends EntityAction<T> {
     protected actionName: string = actions.UNLOAD;
-    constructor(public slice: string) {
+    constructor(public slice: keyof RootState) {
         super(slice, null);
     }
 }

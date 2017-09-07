@@ -84,7 +84,7 @@ export function selectNext<T extends Entity>(state: Entities<T>, action: EntityA
 };
 
 export function unload<T extends Entity>(state: Entities<T>, action: EntityActions.Select<T>): Entities<T> {
-    return completeAssign({}, state, { entities: {}, ids: [], selectedEntityId: null });
+    return completeAssign({}, state, { entities: {}, ids: [], selectedEntityId: null, loaded: false });
 };
 
 /**
@@ -193,39 +193,39 @@ function reduceOne<T extends Entity>(state: Entities<T>, entity: T = null, actio
     // return setEntityLoading(newState, action);
 };
 
-function setEntityLoading(state, action) {
-    let newState = state;
-    if (isLoadingAction(action.verb)) {
-        newState = { ...state, loading: true };
-    } else if (isPostLoadingAction(action.verb)) {
-        newState = { ...state, loading: false };
-    }
-    return newState;
+// function setEntityLoading(state, action) {
+//     let newState = state;
+//     if (isLoadingAction(action.verb)) {
+//         newState = { ...state, loading: true };
+//     } else if (isPostLoadingAction(action.verb)) {
+//         newState = { ...state, loading: false };
+//     }
+//     return newState;
 
-}
+// }
 
-function isLoadingAction(verb: string) {
-    switch (verb) {
-        case actions.ADD:
-        case actions.LOAD:
-        case 'ADD_COMMENT':  // TODO: create an ADD_CHILD action verb to handle this
-            return true;
-        default:
-            return false;
-    }
-}
+// function isLoadingAction(verb: string) {
+//     switch (verb) {
+//         case actions.ADD:
+//         case actions.LOAD:
+//         case 'ADD_COMMENT':  // TODO: create an ADD_CHILD action verb to handle this
+//             return true;
+//         default:
+//             return false;
+//     }
+// }
 
-function isPostLoadingAction(verb: string) {
-    switch (verb) {
-        case actions.ADD_SUCCESS:
-        case actions.ADD_UPDATE_FAIL:
-        case actions.DELETE_FAIL:
-        case actions.DELETE_SUCCESS:
-            return true;
-        default:
-            return false;
-    }
-}
+// function isPostLoadingAction(verb: string) {
+//     switch (verb) {
+//         case actions.ADD_SUCCESS:
+//         case actions.ADD_UPDATE_FAIL:
+//         case actions.DELETE_FAIL:
+//         case actions.DELETE_SUCCESS:
+//             return true;
+//         default:
+//             return false;
+//     }
+// }
 
 /**
  *

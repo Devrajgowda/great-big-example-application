@@ -4,13 +4,13 @@ import { completeAssign } from '../util';
 
 export interface Entity {
     id: string,
-    loading?: boolean;
+    // loading?: boolean;
     [field: string]: any
 }
 
 const initialBaseEntity = {
     id: null,
-    loading: false
+    // loading: false
 };
 
 export interface Entities<T extends Entity> extends Slice {

@@ -10,7 +10,6 @@ data class Author(@Id
                 var id: Long = 0,
                 var bio: String = "",
                 @MapsId
-                // @OneToOne(cascade = CascadeType.ALL)
                 @OneToOne
                 @JoinColumn(name = "id")
 	            var user: User = User(),

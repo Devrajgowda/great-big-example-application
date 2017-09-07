@@ -13,7 +13,7 @@ import { RESTService } from '../../services/rest.service';
 export class ProfileEffects {
 
     @Effect()
-    private follow$ = sliceFunctions.postToRemote$(this.actions$, slices.ARTICLE, this.dataService, actions.FOLLOW, new ProfileActions.FollowSuccess(), new ProfileActions.FollowFail());
+    private follow$ = sliceFunctions.postToRemote$(this.actions$, slices.AUTHOR, this.dataService, actions.FOLLOW, new ProfileActions.FollowSuccess(), new ProfileActions.FollowFail());
 
     constructor(
         private actions$: Actions,

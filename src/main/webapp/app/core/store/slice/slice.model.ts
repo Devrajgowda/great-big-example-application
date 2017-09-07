@@ -1,9 +1,10 @@
 import { completeAssign } from '../util';
+import { RootState } from '../';
 
 export interface Slice {
     loaded: boolean;
     loading: boolean;
-    slice: string;
+    slice: keyof RootState;
     hasError: boolean;
 };
 

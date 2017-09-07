@@ -3,7 +3,6 @@ import { Http, URLSearchParams, Response, Headers } from '@angular/http';
 import { Observable } from 'rxjs/Observable';
 import { Subject } from 'rxjs/Subject';
 import { Store } from '@ngrx/store';
-// import { normalize } from 'normalizr';
 
 import { Claim } from '../store/claim/claim.model';
 import { ClaimRebuttal } from '../store/claim-rebuttal/claim-rebuttal.model';
@@ -14,7 +13,6 @@ import { Hero } from '../store/hero/hero.model';
 import { Note } from '../store/note/note.model';
 import { Rebuttal } from '../store/rebuttal/rebuttal.model';
 import { AppConfig } from '../../app.config';
-// import { articleSchema } from '../store/article/article.model';
 import { DataService } from './data.service';
 import { RootState } from '../store';
 import { Entity } from '../store/entity/entity.model';
@@ -37,31 +35,23 @@ const endpoints = {
     hero: 'heroes',
     note: 'notes',
     rebuttal: 'rebuttals',
-    talk: 'talks'
+    talk: 'talks',
+    tag: 'tags'
 };
-
-// const schemas = {
-//     article: articleSchema
-// }
 
 const requestTransforms = {
     add: {
-        comment(response: any, state: RootState) {
-            // return { comment: { body: comment.body } };
-            return { body: response.body };
-        }
+        comment: (response: any, state: RootState) => ({ body: response.body })
     }
 }
 
 const responseTransforms = {
-    get: {
-        // From ng-redux demo. Not needed now
-        // session(response: any, state: RootState) {
-        //     return {
-        //         token: response.meta.token,
-        //         user: { firstName: response.meta.profile.firstName, lastName: response.meta.profile.lastName }
-        //     };
-        // }
+    getEntity: {
+    },
+    getEntities: {
+        tag: (resp) => resp.map(tag => {
+            return { id: tag, name: tag };
+        })
     }
 }
 
@@ -99,18 +89,14 @@ export class RESTService implements DataService {
 
         return this.http.get(`${this.config.apiUrl}/${endpoint}`, { search: params })
             .map(this.extractData)
-            .map(responseTransforms.get[table] || ((resp) => resp))
+            .map(responseTransforms.getEntities[table] || ((resp) => resp))
             .catch(this.handleError);
     }
-
-    // getEntitiesThenNormalize(route: string, query, table: string): Observable<any> {
-    //     return this.getEntities(table, query, route, (obj) => normalize(obj, schemas[table]));
-    // }
 
     getEntity(table: keyof RootState, id: string): Observable<any> {
         return this.http.get(`${this.config.apiUrl}/${endpoints[table]}/${id}`)
             .map(this.extractData)
-            .map(responseTransforms.get[table] || ((resp) => resp))
+            .map(responseTransforms.getEntity[table] || ((resp) => resp))
             .catch(this.handleError);
     }
 
@@ -122,8 +108,6 @@ export class RESTService implements DataService {
             payload = requestTransforms.add[table](payload, state);
         }
 
-        // store.dispatch(new SliceActions.ToggleLoading(table, { loading: true }));
-        // store.dispatch(new EntityActions.ToggleLoading(table, { id: entity.id, loading: true }));
         return this.http.post(`${this.config.apiUrl}/${endpoint}`, payload)
             .map((result) => {
                 const tempEntity = state[table].entities[EntityActions.TEMP];
@@ -140,11 +124,7 @@ export class RESTService implements DataService {
                 }
                 return completeAssign(oldObject, newObject);
             })
-            .catch(this.handleError)
-            .finally(() => {
-                // store.dispatch(new SliceActions.ToggleLoading(table, { loading: false }));
-                // store.dispatch(new EntityActions.ToggleLoading(table, { id: entity.id, loading: false }));
-            });
+            .catch(this.handleError);
     }
 
     get(route: string): Observable<any> {

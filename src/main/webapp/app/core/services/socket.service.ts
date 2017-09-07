@@ -123,7 +123,7 @@ export class SocketService implements DataService {
         return this.listener;
     }
 
-    subscribe(service: string) {
+    subscribe(service: keyof RootState) {
         this.connection.then(() => {
             this.subscriber = this.stompClient.subscribe('/topic/' + service, (data) => {
                 this.listenerObserver.next(JSON.parse(data.body));

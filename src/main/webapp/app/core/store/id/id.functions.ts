@@ -11,6 +11,7 @@ import * as IDActions from './id.actions';
 import { SliceAction } from '../slice/slice.actions';
 import { PayloadAction } from '../util';
 import * as sliceFunctions from '../slice/slice.functions';
+import { RootState } from '../';
 
 import { of } from 'rxjs/observable/of';
 import { empty } from 'rxjs/observable/empty';
@@ -52,7 +53,7 @@ export function deleteID(state: IDs, action: SliceAction): IDs {
 /**
  * Effects
  */
-export function loadFromLocal$<T>(actions$: Actions, slice: string, db, localStoreKey: string): Observable<{}> {  // TODO: should return PayloadAction
+export function loadFromLocal$<T>(actions$: Actions, slice: keyof RootState, db, localStoreKey: string): Observable<{}> {  // TODO: should return PayloadAction
     return actions$
         .ofType(typeFor(slice, actions.LOAD))
         .startWith(new IDActions.Load(slice, null))
@@ -72,7 +73,7 @@ export function loadFromLocal$<T>(actions$: Actions, slice: string, db, localSto
  * @param dataService a service that gets data from a remote source
  * @param dataGetter a method of the service that takes a query string parameter
  */
-export function loadFromRemote$(actions$: Actions, slice: string, dataService, dataGetter: string, debounce = 300, scheduler?): Observable<{}> {  // TODO: should return PayloadAction
+export function loadFromRemote$(actions$: Actions, slice: keyof RootState, dataService, dataGetter: string, debounce = 300, scheduler?): Observable<{}> {  // TODO: should return PayloadAction
     return actions$
         .ofType(typeFor(slice, actions.LOAD))
         .debounceTime(debounce, this.scheduler || async)
@@ -91,7 +92,7 @@ export function loadFromRemote$(actions$: Actions, slice: string, dataService, d
         });
 }
 
-export function addToLocal$(actions$: Actions, slice: string, db, localStoreKey: string): Observable<{}> {  // TODO: should return PayloadAction
+export function addToLocal$(actions$: Actions, slice: keyof RootState, db, localStoreKey: string): Observable<{}> {  // TODO: should return PayloadAction
     return actions$
         .ofType(typeFor(slice, actions.ADD))
         .map((action) =>
@@ -102,7 +103,7 @@ export function addToLocal$(actions$: Actions, slice: string, db, localStoreKey:
                 .catch(() => of(new IDActions.AddFail(slice, entity)))
         );
 }
-export function deleteFromLocal$(actions$: Actions, slice: string, db, localStoreKey: string): Observable<{}> {  // TODO: should return PayloadAction
+export function deleteFromLocal$(actions$: Actions, slice: keyof RootState, db, localStoreKey: string): Observable<{}> {  // TODO: should return PayloadAction
     return actions$
         .ofType(typeFor(slice, actions.DELETE))
         .map(toPayload)

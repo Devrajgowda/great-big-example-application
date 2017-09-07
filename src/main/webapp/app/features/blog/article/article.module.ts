@@ -7,6 +7,7 @@ import { MarkdownPipe } from './markdown.pipe';
 import { SharedModule } from '../shared/shared.module';
 import { ArticleRouting } from './article.routing';
 import { GreatBigExampleApplicationSharedModule } from '../../../shared/shared.module';
+import { customHttpProvider } from '../../../core/interceptor/http.provider';
 
 @NgModule({
     imports: [
@@ -20,6 +21,7 @@ import { GreatBigExampleApplicationSharedModule } from '../../../shared/shared.m
         MarkdownPipe
     ],
     providers: [
+        customHttpProvider()
     ]
 })
 export class ArticleModule { }

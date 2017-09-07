@@ -22,5 +22,6 @@ export class BlogPage implements OnInit {
 
         // this.userService.populate();
         this.store.dispatch(new EntityActions.Load(slices.ARTICLE, null));
+        this.store.dispatch(new EntityActions.Load(slices.TAG, null));
     }
 }

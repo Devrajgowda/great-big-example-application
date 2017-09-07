@@ -13,7 +13,7 @@ export const actions = {
 
 class ProfileAction extends SliceAction {
     constructor(obj = {}) {
-        super(slices.PROFILE, obj);
+        super(slices.AUTHOR, obj);
     }
 }
 

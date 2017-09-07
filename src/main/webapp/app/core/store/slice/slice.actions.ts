@@ -1,7 +1,7 @@
 import { Action } from '@ngrx/store';
 
 import { typeFor } from '../util';
-
+import { RootState } from '../';
 export const actions = {
     LOAD: 'LOAD',
     LOAD_FAIL: 'LOAD_FAIL',
@@ -17,7 +17,7 @@ export class SliceAction implements Action {
         return typeFor(this.slice, this.actionName);
     }
 
-    constructor(public slice: string, public payload?: any) { }
+    constructor(public slice: keyof RootState, public payload?: any) { }
     get verb() {
         return this.actionName;
     }
@@ -37,14 +37,14 @@ export class LoadSuccess extends SliceAction {
 
 export class Patch extends SliceAction {
     protected actionName: string = actions.PATCH;
-    constructor(public slice: string, public path: string[], public val: any) {
+    constructor(public slice: keyof RootState, public path: string[], public val: any) {
         super(slice, { path, val });
     }
 }
 
 export class Update extends SliceAction {
     protected actionName: string = actions.UPDATE;
-    constructor(public slice: string, public path: string[], public val: any) {
+    constructor(public slice: keyof RootState, public path: string[], public val: any) {
         super(slice, { path, val });
     }
 }

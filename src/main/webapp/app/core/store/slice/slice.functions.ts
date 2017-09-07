@@ -8,6 +8,7 @@ import { typeFor } from '../util';
 import { actions } from './slice.actions';
 import * as ActionClasses from './slice.actions';
 import { PayloadAction } from '../util';
+import { RootState } from '../';
 
 const merge = require('lodash/merge');
 
@@ -124,7 +125,7 @@ function isPostLoadingAction(verb: string) {
 /**
  * Effects
  */
-export function loadFromRemote$(actions$: Actions, slice: string, dataService, dataGetter: string): Observable<Action> {
+export function loadFromRemote$(actions$: Actions, slice: keyof RootState, dataService, dataGetter: string): Observable<Action> {
     return actions$
         .ofType(typeFor(slice, actions.LOAD))
         .switchMap((action: PayloadAction) =>
@@ -135,19 +136,19 @@ export function loadFromRemote$(actions$: Actions, slice: string, dataService, d
         );
 }
 
-export function postToRemote$(actions$: Actions, slice: string, dataService, triggerAction: string, successAction: SliceAction, errorAction: SliceAction, responseTransform: Function = ((resp) => resp)): Observable<Action> {
+export function postToRemote$(actions$: Actions, slice: keyof RootState, dataService, triggerAction: string, successAction: SliceAction, errorAction: SliceAction, responseTransform: Function = ((resp) => resp)): Observable<Action> {
     return httpToRemote$('post', actions$, slice, dataService, triggerAction, successAction, errorAction, responseTransform);
 }
 
-export function deleteFromRemote$(actions$: Actions, slice: string, dataService, triggerAction: string, successAction: SliceAction, errorAction: SliceAction, responseTransform: Function = ((resp) => resp)): Observable<Action> {
+export function deleteFromRemote$(actions$: Actions, slice: keyof RootState, dataService, triggerAction: string, successAction: SliceAction, errorAction: SliceAction, responseTransform: Function = ((resp) => resp)): Observable<Action> {
     return httpToRemote$('delete', actions$, slice, dataService, triggerAction, successAction, errorAction, responseTransform);
 }
 
-export function getFromRemote$(actions$: Actions, slice: string, dataService, triggerAction: string, successAction: SliceAction, errorAction: SliceAction, responseTransform: Function = ((resp) => resp)): Observable<Action> {
+export function getFromRemote$(actions$: Actions, slice: keyof RootState, dataService, triggerAction: string, successAction: SliceAction, errorAction: SliceAction, responseTransform: Function = ((resp) => resp)): Observable<Action> {
     return httpToRemote$('get', actions$, slice, dataService, triggerAction, successAction, errorAction, responseTransform);
 }
 
-function httpToRemote$(method: string, actions$: Actions, slice: string, dataService, triggerAction: string, successAction: SliceAction, errorAction: SliceAction, responseTransform: Function = ((resp) => resp)): Observable<Action> {
+function httpToRemote$(method: string, actions$: Actions, slice: keyof RootState, dataService, triggerAction: string, successAction: SliceAction, errorAction: SliceAction, responseTransform: Function = ((resp) => resp)): Observable<Action> {
     return actions$
         .ofType(typeFor(slice, triggerAction))
         .switchMap((action: PayloadAction) =>

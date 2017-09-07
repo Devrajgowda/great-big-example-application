@@ -17,10 +17,10 @@ export function reducer(state = initialEntities<Claim>(slices.CLAIM, initialClai
         case typeFor(slices.CLAIM, actions.PATCH_EACH):
             return entityFunctions.patchEach<Claim>(state, <any>action);
         case typeFor(slices.CLAIM, actions.UPDATE):
-            if (action instanceof SliceAction) {
-                return sliceFunctions.update(state, action);
-            } else {
+            if (action instanceof EntityAction) {
                 return entityFunctions.update<Claim>(state, <any>action);
+            } else {
+                return sliceFunctions.update(state, action);
             }
         default: {
             return state;
