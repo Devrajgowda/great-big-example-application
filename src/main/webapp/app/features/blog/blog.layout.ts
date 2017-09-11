@@ -13,6 +13,9 @@ export interface BlogPageLayout {
 
 export const initialBlogPageLayout = {
     type: 'all',
-    filters: {},
+    filters: {
+        limit: 10,
+        offset: 0
+    },
     currentPage: 1
 };

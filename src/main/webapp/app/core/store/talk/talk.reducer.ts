@@ -22,9 +22,9 @@ export function reducer(state: Entities<Talk> = initialEntities<Talk>(slices.TAL
     switch (action.type) {
         case typeFor(slices.TALK, actions.ADD_SUCCESS):
         case typeFor(slices.TALK, actions.LOAD_SUCCESS):
-            return entityFunctions.addToStore<Talk>(state, <any>action);
+            return entityFunctions.addEntityToStore<Talk>(state, <any>action);
         case typeFor(slices.TALK, actions.LOAD_ALL_SUCCESS):
-            return entityFunctions.newEntities<Talk>(state, <any>action);
+            return entityFunctions.addEntitiesToStore<Talk>(state, <any>action);
         case typeFor(slices.TALK, actions.PATCH):
             // This case has a twist so we can't use the regular update method.
             // It sets the talk.rating field in the store, but the talk.yourRating field on the server

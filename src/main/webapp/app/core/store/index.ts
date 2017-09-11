@@ -21,6 +21,7 @@ import { Tag } from './tag/tag.model';
 import { BlogPageLayout } from '../../features/blog/blog.layout';
 import { Talk } from './talk/talk.model';
 import { actions } from './entity/entity.actions';
+import { completeAssign } from './util';
 
 import {
     ActionReducerMap,
@@ -178,7 +179,7 @@ function setLoading(state, action) {
     const loadSuccess = isLoadSuccessAction(action.verb);
     const loadFail = isLoadFailAction(action.verb);
 
-    let newState = state;
+    let newState = completeAssign({}, state);
     if (loading) {
         newState[action.slice].loading = true;
     }
@@ -210,7 +211,8 @@ function isLoadSuccessAction(verb: string) {
     switch (verb) {
         case actions.ADD_SUCCESS:
         case actions.DELETE_SUCCESS:
-        case actions.LOAD_SUCCESS:
+        // case actions.LOAD_ALL:
+        case actions.LOAD_ALL_SUCCESS:
         case actions.PATCH_SUCCESS:
         case actions.UPDATE_SUCCESS:
             return true;
@@ -595,13 +597,6 @@ export const getTempArticle = createSelector(getArticlesState, fromArticles.getT
 export const getArticles = createSelector(getArticleEntities, getArticleIds, (entities, ids) => {
     return ids.map((id) => entities[id]);
 });
-export const getArticlesForQuery = createSelector(getArticles, getBlogPageLayout,
-    (articles: Article[], blogPageLayout: BlogPageLayout) => {
-        return articles.filter((article) => {
-            return !blogPageLayout.filters.author || blogPageLayout.filters.author === article.author.username &&
-                !blogPageLayout.filters.tag || article.tag.some((tag) => tag === blogPageLayout.filters.tag);
-        });
-    });
 
 export const getCommentsForSelectedArticle = createSelector(getComments, getSelectedArticleId, (comments, articleId) => {
     return comments.filter((comment) => comment.articleId === articleId);

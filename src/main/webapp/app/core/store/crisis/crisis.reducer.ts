@@ -14,7 +14,7 @@ export function reducer(state: Entities<Crisis> =
         case typeFor(slices.CRISIS, actions.ADD_SUCCESS):
         case typeFor(slices.CRISIS, actions.ADD_TEMP):
         case typeFor(slices.CRISIS, actions.LOAD_SUCCESS):
-            return entityFunctions.addToStore<Crisis>(state, <any>action);
+            return entityFunctions.addEntityToStore<Crisis>(state, <any>action);
         case typeFor(slices.CRISIS, actions.PATCH):
         case typeFor(slices.CRISIS, actions.PATCH_SUCCESS):
             return entityFunctions.update<Crisis>(state, <any>action);

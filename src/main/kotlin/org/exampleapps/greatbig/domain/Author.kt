@@ -8,6 +8,7 @@ import javax.persistence.*
 @JsonRootName("author")
 data class Author(@Id
                 var id: Long = 0,
+                @Lob
                 var bio: String = "",
                 @MapsId
                 @OneToOne

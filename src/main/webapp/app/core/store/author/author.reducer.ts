@@ -13,7 +13,7 @@ export function reducer(state = initialEntities<Author>(slices.AUTHOR, initialAu
         case typeFor(slices.AUTHOR, actions.ADD_SUCCESS):
         case typeFor(slices.AUTHOR, actions.ADD_TEMP):
         case typeFor(slices.AUTHOR, actions.LOAD_SUCCESS):
-            return entityFunctions.addToStore<Author>(state, <any>action);
+            return entityFunctions.addEntityToStore<Author>(state, <any>action);
         case typeFor(slices.AUTHOR, actions.PATCH_EACH):
             return entityFunctions.patchEach<Author>(state, <any>action);
         case typeFor(slices.AUTHOR, actions.UPDATE):

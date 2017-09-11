@@ -10,5 +10,5 @@ export interface DataService {
     update(slice: keyof RootState, obj: Entity, state: RootState, store: Store<RootState>): any,
     remove(slice: keyof RootState, obj: Entity, state: RootState, store: Store<RootState>): any,
     getEntities(table: keyof RootState,
-        query: { [key: string]: string | number }, state: RootState): Observable<any[]>
+        query: { [key: string]: string | number }, state: RootState): Observable<Entity[]>
 }

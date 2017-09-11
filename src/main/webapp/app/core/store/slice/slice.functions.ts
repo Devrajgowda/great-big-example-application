@@ -81,7 +81,11 @@ function patchOrUpdate(state: any, action: SliceAction, update: boolean): any {
         result[path[i - 1]] = mutation;
     }
 
-    return merge({}, state, result);
+    if (update) {
+        return { ...state, ...result }
+    } else {
+        return merge({}, state, result);
+    }
 }
 
 function evaluate(val, state) {

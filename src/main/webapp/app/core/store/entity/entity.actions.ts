@@ -114,10 +114,6 @@ export class LoadFail<T extends Entity> extends EntityAction<T> {
     protected actionName: string = actions.LOAD_FAIL;
 }
 
-export class LoadSuccess<T extends Entity> extends EntityAction<T> {
-    protected actionName: string = actions.LOAD_SUCCESS;
-}
-
 export class LoadAll<T extends Entity> extends EntityAction<T> {
     protected actionName: string = actions.LOAD_ALL;
 }
@@ -128,6 +124,13 @@ export class LoadAllFail<T extends Entity> extends EntityAction<T> {
 
 export class LoadAllSuccess<T extends Entity> extends SliceAction {
     protected actionName: string = actions.LOAD_ALL_SUCCESS;
+    constructor(public slice: keyof RootState, public payload: T[]) {
+        super(slice, payload);
+    }
+}
+
+export class LoadSuccess<T extends Entity> extends LoadAllSuccess<T> {  // this makes Effect loadFromRemote$ work
+    protected actionName: string = actions.LOAD_SUCCESS;
 }
 
 export class Patch<T> extends SliceAction {

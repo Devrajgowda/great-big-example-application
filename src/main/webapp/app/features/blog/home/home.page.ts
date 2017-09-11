@@ -11,7 +11,7 @@ import { User } from '../../../core/store/user/user.model';
 import * as SliceActions from '../../../core/store/slice/slice.actions';
 import * as EntityActions from '../../../core/store/entity/entity.actions';
 import { slices } from '../../../core/store/util';
-import { BlogPageLayout } from '../blog.layout';
+import { BlogPageLayout, initialBlogPageLayout } from '../blog.layout';
 
 @Component({
     selector: 'home-page',
@@ -59,10 +59,7 @@ export class HomePage implements OnInit, OnDestroy {
         }
 
         // Otherwise, set the list object
-        this.store.dispatch(new SliceActions.Patch(slices.LAYOUT, ['blogPage'], { type, filters }));
-        this.store.dispatch(new EntityActions.Unload(slices.ARTICLE));
-        this.store.dispatch(new EntityActions.Load(slices.ARTICLE, { query: filters }));
-        return false;
+        this.store.dispatch(new SliceActions.Update(slices.LAYOUT, ['blogPage'], { type, filters, currentPage: 1 }));
     }
 
     ngOnDestroy() {

@@ -39,7 +39,7 @@
                     <p>Popular Tags</p>
 
                     <div class="tag-list">
-                        <a href="#" *ngFor="let tag of tags$ | async" (click)="setListTo('all', {tag: tag})" class="tag-default tag-pill">
+                        <a href="javascript:void(0);" *ngFor="let tag of tags$ | async" (click)="setListTo('all', {tag: tag})" class="tag-default tag-pill">
                {{ tag }}
             </a>
                     </div>

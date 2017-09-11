@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { Store } from '@ngrx/store';
 import { Actions, Effect } from '@ngrx/effects';
 import { Observable } from 'rxjs/Observable';
+import { filter } from 'rxjs/operator/filter';
 import { ActivatedRoute, Router, ActivatedRouteSnapshot } from '@angular/router';
 import { of } from 'rxjs/observable/of';
 
@@ -24,7 +25,7 @@ import { RootState } from '../';
 @Injectable()
 export class ArticleEffects {
     @Effect()
-    private loadFromRemote$ = entityFunctions.loadFromRemote$(this.actions$, slices.ARTICLE, this.dataService, this.store);
+    private loadFromRemote$ = entityFunctions.loadFromRemote$(this.actions$, slices.ARTICLE, this.dataService, this.store, initialArticle);
     @Effect()
     private updateToRemote$ = entityFunctions.updateToRemote$(this.actions$, slices.ARTICLE, this.dataService, this.store);
     @Effect()

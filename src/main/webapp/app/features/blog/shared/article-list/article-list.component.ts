@@ -22,6 +22,9 @@ export class ArticleListComponent implements OnInit, OnDestroy {
     articles: Article[] = [];
     loading = false;
     totalPages: Array<number> = [1];
+    layout$: Store<BlogPageLayout>;
+    layoutSub: Subscription;
+    layout: BlogPageLayout;
 
     constructor(
         private store: Store<fromRoot.RootState>
@@ -34,33 +37,36 @@ export class ArticleListComponent implements OnInit, OnDestroy {
         this.articles$ = this.store.select(fromRoot.getArticlesState);
         this.articlesSub = this.articles$.subscribe((articles) => {
             this.loading = articles.loading;
-            this.articles = articles.ids.map((id) => articles.entities[id]);
+            this.articles = articles.ids.map((id) => articles.entities[id]) || [];
 
             // Used from http://www.jstips.co/en/create-range-0...n-easily-using-one-line/
             this.totalPages = Array.from(new Array(Math.ceil(articles.ids.length / self.limit)), (val, index) => index + 1);
+        })
+        this.layout$ = this.store.select(fromRoot.getBlogPageLayout);
+        this.layoutSub = this.layout$.subscribe((layout) => {
+            this.layout = layout;
+            this.store.dispatch(new EntityActions.Unload(slices.ARTICLE));
+            this.store.dispatch(new EntityActions.Load(slices.ARTICLE, { query: layout.filters }));
         })
         this.setPageTo(1);
     }
 
     setPageTo(pageNumber) {
+
         // Create limit and offset filter (if necessary)
-        let query: any = {
-            currentPage: pageNumber,
-        };
+        let query: any = {}
         if (this.limit) {
             query.filters = {
                 limit: this.limit,
-                offset: (this.limit * (pageNumber - 1))
-            };
+                offset: (this.limit * (this.layout.currentPage - 1))
+            }
         }
 
-        this.store.dispatch(new SliceActions.Patch(slices.LAYOUT, ['blogPage'], query));
-        this.store.dispatch(new EntityActions.Load(slices.ARTICLE, { query }));
-        this.loading = true;
-        this.articles = [];
+        this.store.dispatch(new SliceActions.Patch(slices.LAYOUT, ['blogPageLayout'], { pageNumber, query }));
     }
 
     ngOnDestroy() {
         this.articlesSub && this.articlesSub.unsubscribe();
+        this.layoutSub && this.layoutSub.unsubscribe();
     }
 }

@@ -13,7 +13,7 @@ export function reducer(state: Entities<Tag> = initialEntities<Tag>(
 
     switch (action.type) {
         case typeFor(slices.TAG, actions.LOAD_SUCCESS):
-            return entityFunctions.addToStore(state, <any>action);
+            return entityFunctions.addEntityToStore(state, <any>action);
         default:
             return state;
     }

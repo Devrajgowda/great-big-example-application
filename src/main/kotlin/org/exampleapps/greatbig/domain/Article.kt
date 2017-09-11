@@ -1,11 +1,12 @@
 package org.exampleapps.greatbig.domain
 
-import org.hibernate.annotations.Cache;
-import org.hibernate.annotations.CacheConcurrencyStrategy;
-import org.springframework.data.elasticsearch.annotations.Document;
+import org.hibernate.annotations.Cache
+import org.hibernate.annotations.CacheConcurrencyStrategy
+import org.springframework.data.elasticsearch.annotations.Document
 import java.time.OffsetDateTime
 import javax.persistence.*
-import javax.validation.constraints.*;
+import javax.validation.constraints.*
+import java.sql.Clob
 
 @Entity
 @Table(name = "article")
@@ -22,6 +23,7 @@ data class Article(
     @Column(name = "description", nullable = false)
     var description: String = "",
 
+    @Lob
     @Column(name = "jhi_body", nullable = false)
     var body: String = "",
 

@@ -14,7 +14,7 @@ export function reducer(state: Entities<Comment> = initialEntities<Comment>(slic
         // case typeFor(slices.COMMENT, actions.ADD_SUCCESS):
         // case typeFor(slices.COMMENT, actions.ADD_TEMP):
         // case typeFor(slices.COMMENT, actions.LOAD_SUCCESS):
-        //     return entityFunctions.addToStore<Comment>(state, <any>action);
+        //     return entityFunctions.addEntityToStore<Comment>(state, <any>action);
         // case typeFor(slices.COMMENT, actions.UPDATE):
         // case typeFor(slices.COMMENT, actions.UPDATE_SUCCESS):
         //     return entityFunctions.update<Comment>(state, <any>action);

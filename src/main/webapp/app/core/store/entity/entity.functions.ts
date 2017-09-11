@@ -12,7 +12,7 @@ import * as sliceFunctions from '../slice/slice.functions';
 import { RootState } from '../';
 import { DataService } from '../../services/data.service';
 
-export function addToStore<T extends Entity>(state: Entities<T>, action: EntityActions.Add<T> | EntityActions.Load<T>): Entities<T> {
+export function addEntityToStore<T extends Entity>(state: Entities<T>, action: EntityActions.Add<T> | EntityActions.Load<T>): Entities<T> {
     const entities = completeAssign({}, state.entities);
     const newEntity = reduceOne(state, null, action);          // this is like this because id could be an
     entities[newEntity.id] = reduceOne(state, null, action);   // accessor rather than a regular field
@@ -22,6 +22,23 @@ export function addToStore<T extends Entity>(state: Entities<T>, action: EntityA
         selectedEntityId: action.payload.id
     });
     return sliceFunctions.setSliceLoading(newState, action);
+};
+
+/**
+ * @whatItDoes updates a given slice with a whole new set of entities in one fell swoop
+ *
+ * @param state  the set of entities
+ * @param action needs a payload that is an array of entities
+ */
+export function addEntitiesToStore<T extends Entity>(state: Entities<T>, action: EntityActions.Update<T>): Entities<T> {
+    const entities = action.payload.reduce(function (map, obj) {
+        map[obj.id] = completeAssign({}, state.initialEntity, obj, { dirty: false });
+        return map;
+    }, {});
+    return completeAssign({}, state, {
+        ids: Object.keys(entities),
+        entities
+    });
 };
 
 /**
@@ -127,23 +144,6 @@ export function update<T extends Entity>(state: Entities<T>, action: EntityActio
     });
 };
 
-/**
- * @whatItDoes updates a given slice with a whole new set of entities in one fell swoop
- *
- * @param state  the set of entities
- * @param action needs a payload that is an array of entities
- */
-export function newEntities<T extends Entity>(state: Entities<T>, action: EntityActions.Update<T>): Entities<T> {
-    const entities = action.payload.reduce(function (map, obj) {
-        map[obj.id] = obj;
-        return map;
-    }, {});
-    return completeAssign({}, state, {
-        ids: Object.keys(entities),
-        entities
-    });
-};
-
 export function patchEach<T extends Entity>(state: Entities<T>, action: any): Entities<T> {
     const entities = completeAssign({}, state.entities);
     for (const id of Object.keys(entities)) {
@@ -181,7 +181,7 @@ function reduceOne<T extends Entity>(state: Entities<T>, entity: T = null, actio
             newState = completeAssign({}, state.initialEntity, entity, action.payload, { dirty: false });
             break;
         case typeFor(state.slice, actions.LOAD_SUCCESS):
-            newState = completeAssign({}, state.initialEntity, action.payload, { dirty: false });
+            newState = completeAssign({}, state.initialEntity, action.payload, { dirty: false }); // maybe remove initialEntity. it is merged in the effect
             break;
         case typeFor(state.slice, actions.UPDATE_SUCCESS):
             newState = completeAssign({}, entity, { dirty: false });
@@ -233,19 +233,32 @@ function reduceOne<T extends Entity>(state: Entities<T>, entity: T = null, actio
  *
  */
 
-export function loadFromRemote$(actions$: PayloadActions, slice: keyof RootState, dataService: DataService, store: Store<RootState>): Observable<Action> {  // TODO: should return PayloadAction
+export function loadFromRemote$(actions$: PayloadActions, slice: keyof RootState, dataService: DataService, store: Store<RootState>, initialEntity: Entity): Observable<Action> {  // TODO: should return PayloadAction
     return actions$
-        .ofType(typeFor(slice, actions.LOAD))
+        .ofType(typeFor(slice, actions.LOAD), typeFor(slice, actions.LOAD_ALL_SUCCESS))
         // .startWith(new EntityActions.Load(slice, null))  // updated. instead dispatch a load action in the feature's main page
         .withLatestFrom(store)
-        .switchMap(([action, state]) =>
-            dataService.getEntities(slice, action.payload ? action.payload.query : undefined, state)
-                .mergeMap((fetchedEntities) => Observable.from(fetchedEntities))
-                .map((fetchedEntity) => new EntityActions.LoadSuccess(slice, fetchedEntity))  // one action per entity
-                .catch((err) => {
-                    console.log(err);
-                    return Observable.of(new EntityActions.AddUpdateFail(slice, null));
-                })
+        .switchMap(([action, state]) => {
+
+            // First this happens
+            // for actions.LOAD - dispatch a LoadAllSuccess
+            if (action.type === typeFor(slice, actions.LOAD)) {
+                return dataService.getEntities(slice, action.payload ? action.payload.query : undefined, state)
+                    .mergeMap((responseEntities) => Observable.of(new EntityActions.LoadAllSuccess(slice, responseEntities)))
+                    .catch((err) => {
+                        console.log(err);
+                        return Observable.of(new EntityActions.AddUpdateFail(slice, null));
+                    });
+            }
+
+            // Then this happens
+            // for actions.LOAD_ALL_SUCCESS - dispatch a LoadSuccess for each entity returned
+            else {
+                return Observable.from(action.payload)
+                    .map((responseEntity) => new EntityActions.LoadSuccess(slice, completeAssign({}, initialEntity, responseEntity)))  // one action per entity
+            }
+
+        }
         );
 }
 

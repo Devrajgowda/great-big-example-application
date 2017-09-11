@@ -17,7 +17,7 @@ export function reducer(state: Entities<Book> = initialEntities<Book>(slices.BOO
         case typeFor(slices.COLLECTION, actions.LOAD_SUCCESS):
             return entityFunctions.union(state, <any>action);
         case typeFor(slices.BOOK, actions.LOAD):
-            return entityFunctions.addToStore<Book>(state, <any>action);
+            return entityFunctions.addEntityToStore<Book>(state, <any>action);
         case typeFor(slices.BOOK, actions.SELECT):
             return entityFunctions.select<Book>(state, <any>action);
         default: {

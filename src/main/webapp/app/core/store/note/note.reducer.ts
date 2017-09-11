@@ -15,7 +15,7 @@ export function reducer(state: Entities<Note> = initialEntities<Note>(slices.NOT
         case typeFor(slices.NOTE, actions.ADD_TEMP):
         case typeFor(slices.NOTE, actions.ADD_OPTIMISTICALLY):
         case typeFor(slices.NOTE, actions.LOAD_SUCCESS):
-            return entityFunctions.addToStore<Note>(state, <any>action);
+            return entityFunctions.addEntityToStore<Note>(state, <any>action);
         case typeFor(slices.NOTE, actions.PATCH):
         case typeFor(slices.NOTE, actions.PATCH_SUCCESS):
         case typeFor(slices.NOTE, actions.DELETE):

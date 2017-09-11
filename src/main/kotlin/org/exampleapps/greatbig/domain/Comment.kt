@@ -1,10 +1,11 @@
 package org.exampleapps.greatbig.domain
 
-import org.hibernate.annotations.Cache;
-import org.hibernate.annotations.CacheConcurrencyStrategy;
-import org.springframework.data.elasticsearch.annotations.Document;
+import org.hibernate.annotations.Cache
+import org.hibernate.annotations.CacheConcurrencyStrategy
+import org.springframework.data.elasticsearch.annotations.Document
 import java.time.OffsetDateTime
 import javax.persistence.*
+import java.sql.Clob
 
 @Entity
 @Embeddable
@@ -19,6 +20,7 @@ data class Comment(
     @Column(name = "updated_at")
     var updatedAt: OffsetDateTime = OffsetDateTime.now(),
 
+    @Lob
     @Column(name = "jhi_body", nullable = false)
     var body: String = "",
 
