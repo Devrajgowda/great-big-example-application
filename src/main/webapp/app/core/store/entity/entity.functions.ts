@@ -14,8 +14,8 @@ import { DataService } from '../../services/data.service';
 
 export function addEntityToStore<T extends Entity>(state: Entities<T>, action: EntityActions.Add<T> | EntityActions.Load<T>): Entities<T> {
     const entities = completeAssign({}, state.entities);
-    const newEntity = reduceOne(state, null, action);          // this is like this because id could be an
-    entities[newEntity.id] = reduceOne(state, null, action);   // accessor rather than a regular field
+    const newEntity = reduceOne(state, null, action);       // this is like this because id could be an
+    entities[newEntity.id] = newEntity;                     // accessor rather than a regular field
     let newState = completeAssign({}, state, {
         ids: Object.keys(entities),
         entities,
@@ -138,6 +138,9 @@ export function update<T extends Entity>(state: Entities<T>, action: EntityActio
     const entities = completeAssign({}, state.entities);
     const id = action.payload.id;
     entities[id] = reduceOne(state, entities[id], action);
+
+    // const newEntity = reduceOne(state, null, action);       // this is like this because id could be an
+    // entities[newEntity.id] = newEntity;                     // accessor rather than a regular field
     return completeAssign({}, state, {
         ids: Object.keys(entities),
         entities
@@ -170,8 +173,6 @@ function reduceOne<T extends Entity>(state: Entities<T>, entity: T = null, actio
             newState = completeAssign({}, entity, action.payload, { deleteMe: false });
             break;
         case typeFor(state.slice, actions.UPDATE):
-            newState = completeAssign({}, action.payload, { dirty: true });
-            break;
         case typeFor(state.slice, actions.PATCH):
             newState = completeAssign({}, entity, action.payload, { dirty: true });
             break;
@@ -184,7 +185,7 @@ function reduceOne<T extends Entity>(state: Entities<T>, entity: T = null, actio
             newState = completeAssign({}, state.initialEntity, action.payload, { dirty: false }); // maybe remove initialEntity. it is merged in the effect
             break;
         case typeFor(state.slice, actions.UPDATE_SUCCESS):
-            newState = completeAssign({}, entity, { dirty: false });
+            newState = completeAssign({}, entity, action.payload, { dirty: false });
             break;
         default:
             newState = entity;
@@ -285,18 +286,13 @@ export function addToRemote$(actions$: Actions, slice: keyof RootState, dataServ
  * @param dataService
  * @param store
  */
-export function updateToRemote$(actions$: Actions, slice: keyof RootState, dataService: DataService, store: Store<RootState>): Observable<Action> {
+export function updateToRemote$(actions$: Actions, slice: keyof RootState, dataService: DataService, store: Store<RootState>, initialEntity: Entity): Observable<Action> {
     return actions$
         .ofType(typeFor(slice, actions.UPDATE), typeFor(slice, actions.PATCH))
         .withLatestFrom(store)
-        .switchMap(([{ }, state]) => { // first element is action, but it isn't used
-            let entities = state[slice];
-            return Observable
-                .from((<any>entities).ids)
-                .filter((id: string) => (<any>entities).entities[id].dirty)
-                .switchMap((id: string) => dataService.update(slice, (<any>entities).entities[id], state, store))
-                .map((responseEntity: Entity) => new EntityActions.UpdateSuccess(slice, responseEntity))
-        });
+        .switchMap(([action, state]) =>
+            dataService.update(slice, (<EntityAction<any>>action).payload, state, store))
+        .map((responseEntity: Entity) => new EntityActions.UpdateSuccess(slice, completeAssign({}, initialEntity, responseEntity)));
 }
 
 export function deleteFromRemote$(actions$: Actions, slice: keyof RootState, dataService: DataService, store: Store<RootState>): Observable<EntityAction<any>> {  // TODO: fix this any

@@ -23,6 +23,9 @@ export function reducer(state: Entities<Article> = initialEntities<Article>(slic
         case typeFor(slices.ARTICLE, actions.ADD_COMMENT):  // this is here to set loading=true
         case typeFor(slices.ARTICLE, actions.DELETE):
         case typeFor(slices.ARTICLE, actions.DELETE_FAIL):
+        case typeFor(slices.ARTICLE, actions.PATCH):
+        case typeFor(slices.ARTICLE, actions.UPDATE):
+        case typeFor(slices.ARTICLE, actions.UPDATE_SUCCESS):
             return entityFunctions.update(state, <any>action);
         case typeFor(slices.ARTICLE, actions.DELETE_TEMP):
             return entityFunctions.deleteTemp<Article>(state, <any>action);
@@ -42,6 +45,8 @@ export const getEntities = (state: Entities<Article>): { [id: string]: Article }
 export const getIds = (state: Entities<Article>): string[] => state.ids;
 
 export const getSelectedId = (state: Entities<Article>): string => state.selectedEntityId;
+
+export const getLoading = (state: Entities<Article>): boolean => state.loading;
 
 export const getSelected = createSelector(getEntities, getSelectedId, (entities, selectedId) => {
     return entities[selectedId];

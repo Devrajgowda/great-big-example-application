@@ -3,7 +3,9 @@ import { Store } from '@ngrx/store';
 
 import * as fromRoot from '../../../../core/store';
 import { Article } from '../../../../core/store/article/article.model';
-import * as ArticleActions from '../../../../core/store/article/article.actions';
+// import * as ArticleActions from '../../../../core/store/article/article.actions';
+import * as EntityActions from '../../../../core/store/entity/entity.actions';
+import { slices } from '../../../../core/store/util';
 
 @Component({
     selector: 'jhi-article-preview',
@@ -18,13 +20,20 @@ export class ArticlePreviewComponent {
 
     onToggleFavorite(favorited: boolean) {
         //     this.article.favorited = favorited;
-
+        let favoritesCount;
         if (favorited) {
-            this.store.dispatch(new ArticleActions.Favorite(this.article.slug));
-            // this.article.favoritesCount++;
+            favoritesCount = this.article.favoritesCount + 1;
         } else {
-            this.store.dispatch(new ArticleActions.Unfavorite(this.article.slug));
-            // this.article.favoritesCount--;
+            favoritesCount = this.article.favoritesCount - 1;
         }
+        this.store.dispatch(new EntityActions.Patch(slices.ARTICLE, { id: this.article.id, favorited, favoritesCount }));
+
+        // if (favorited) {
+        //     // this.store.dispatch(new ArticleActions.Favorite(this.article.slug));
+        //     // this.article.favoritesCount++;
+        // } else {
+        //     this.store.dispatch(new ArticleActions.Unfavorite(this.article.slug));
+        //     // this.article.favoritesCount--;
+        // }
     }
 }

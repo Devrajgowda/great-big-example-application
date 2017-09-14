@@ -189,6 +189,9 @@ function setLoading(state, action) {
     if (loadSuccess) {
         newState[action.slice].loaded = true;
     }
+    if (action.verb === actions.UNLOAD) {
+        newState[action.slice].loaded = false;
+    }
     return newState;
 
 }
@@ -566,14 +569,16 @@ export const getComments = createSelector(getCommentEntities, getCommentIds, (en
 export const getAuthorsState = (state: RootState): Entities<Author> => state.author;
 export const getAuthorEntities = createSelector(getAuthorsState, fromAuthors.getEntities);
 export const getAuthorIds = createSelector(getAuthorsState, fromAuthors.getIds);
-export const getAuthors = createSelector(getAuthorEntities, getAuthorIds, (entities, ids) => {
+export const getAuthors = createSelector(getAuthorEntities, getAuthorIds, getUserState, (entities, ids, users) => {
     return ids.map((id) => {
-        return entities[id];
+        let user = users[id];
+        return { ...entities[id], ...user };
         // const following = false;
         // entities[id].followers.some((follower) => follower.login === currentUser.login)
         // return { ...entities[id], following };
     });
 });
+// export const getCurrentAuthor = createSelector(getAuthors, )
 
 /**
  * TagList Selectors
@@ -591,8 +596,11 @@ export const getTags = createSelector(getTagEntities, getTagIds, (entities, ids)
 export const getArticlesState = (state: RootState): Entities<Article> => state.article;
 export const getArticleEntities = createSelector(getArticlesState, fromArticles.getEntities);
 export const getArticleIds = createSelector(getArticlesState, fromArticles.getIds);
+export const getArticleLoaded = createSelector(getArticlesState, fromArticles.getLoading);
 export const getSelectedArticleId = createSelector(getArticlesState, fromArticles.getSelectedId);
-export const getSelectedArticle = createSelector(getArticlesState, fromArticles.getSelected);
+export const getSelectedArticle = createSelector(getArticlesState, (articles) => {
+    return completeAssign({}, articles.entities[articles.selectedEntityId], articles.loading);
+});
 export const getTempArticle = createSelector(getArticlesState, fromArticles.getTemp);
 export const getArticles = createSelector(getArticleEntities, getArticleIds, (entities, ids) => {
     return ids.map((id) => entities[id]);
@@ -613,3 +621,13 @@ export const getTalkIds = createSelector(getTalksState, fromTalks.getIds);
 export const getTalks = createSelector(getTalkEntities, getTalkIds, (entities, ids) => {
     return ids.map((id) => entities[id]);
 });
+
+export const getEntityState = (slice: keyof RootState) => {
+    return (state: RootState) => state[slice];
+}
+
+export const getEntityLoaded = (slice: keyof RootState) => {
+    return (state: RootState) => {
+        return state[slice].loaded;
+    }
+}

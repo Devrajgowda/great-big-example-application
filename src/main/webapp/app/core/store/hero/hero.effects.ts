@@ -13,7 +13,7 @@ export class HeroEffects {
     @Effect()
     private loadFromRemote$ = entityFunctions.loadFromRemote$(this.actions$, slices.HERO, this.dataService, this.store, initialHero);
     @Effect()
-    private updateToRemote$ = entityFunctions.updateToRemote$(this.actions$, slices.HERO, this.dataService, this.store);
+    private updateToRemote$ = entityFunctions.updateToRemote$(this.actions$, slices.HERO, this.dataService, this.store, initialHero);
     @Effect()
     private deleteFromRemote$ = entityFunctions.deleteFromRemote$(this.actions$, slices.HERO, this.dataService, this.store);
     @Effect()

@@ -64,16 +64,7 @@ export class ArticleComponent implements OnInit, OnDestroy {
     }
 
     onToggleFavorite(favorited: boolean) {
-
-        //     this.article.favorited = favorited;
-
-        if (favorited) {
-            this.store.dispatch(new ArticleActions.Favorite(this.article.slug));
-            // this.article.favoritesCount++;
-        } else {
-            this.store.dispatch(new ArticleActions.Unfavorite(this.article.slug));
-            // this.article.favoritesCount--;
-        }
+        this.store.dispatch(new EntityActions.Patch(slices.ARTICLE, { id: this.article.id, favorited }));
     }
 
     onToggleFollowing(following: boolean) {

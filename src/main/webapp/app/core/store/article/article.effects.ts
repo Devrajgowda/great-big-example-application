@@ -27,7 +27,7 @@ export class ArticleEffects {
     @Effect()
     private loadFromRemote$ = entityFunctions.loadFromRemote$(this.actions$, slices.ARTICLE, this.dataService, this.store, initialArticle);
     @Effect()
-    private updateToRemote$ = entityFunctions.updateToRemote$(this.actions$, slices.ARTICLE, this.dataService, this.store);
+    private updateToRemote$ = entityFunctions.updateToRemote$(this.actions$, slices.ARTICLE, this.dataService, this.store, initialArticle);
     @Effect()
     private addToRemote$ = entityFunctions.addToRemote$(this.actions$, slices.ARTICLE, this.dataService, this.store, initialArticle);
     @Effect()
@@ -60,13 +60,13 @@ export class ArticleEffects {
     });
 
     @Effect()
-    selectArticle$ = entityFunctions.select$(this.actions$, slices.ARTICLE, this.dataService, this.store, initialArticle);
+    private selectArticle$ = entityFunctions.select$(this.actions$, slices.ARTICLE, this.dataService, this.store, initialArticle);
 
-    @Effect()
-    private favorite$ = sliceFunctions.postToRemote$(this.actions$, slices.ARTICLE, this.dataService, actions.FAVORITE, new ArticleActions.FavoriteSuccess(), new ArticleActions.FavoriteFail());
+    // @Effect()
+    // private favorite$ = sliceFunctions.postToRemote$(this.actions$, slices.ARTICLE, this.dataService, actions.FAVORITE, new ArticleActions.FavoriteSuccess(), new ArticleActions.FavoriteFail());
 
-    @Effect()
-    private unFavorite$ = sliceFunctions.deleteFromRemote$(this.actions$, slices.ARTICLE, this.dataService, actions.UNFAVORITE, new ArticleActions.UnfavoriteSuccess(), new ArticleActions.UnfavoriteFail());
+    // @Effect()
+    // private unFavorite$ = sliceFunctions.deleteFromRemote$(this.actions$, slices.ARTICLE, this.dataService, actions.UNFAVORITE, new ArticleActions.UnfavoriteSuccess(), new ArticleActions.UnfavoriteFail());
 
     @Effect()
     private addComment$ = sliceFunctions.postToRemote$(this.actions$, slices.ARTICLE, this.dataService, actions.ADD_COMMENT, new ArticleActions.AddCommentSuccess(), new ArticleActions.AddCommentFail());

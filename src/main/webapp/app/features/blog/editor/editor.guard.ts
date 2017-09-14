@@ -27,7 +27,7 @@ export class EditorGuard implements CanActivate {
             if (articles.filter((article) => article.slug === slug && article.author.username === user.login).length === 1) {
                 return true;
             } else {
-                this.router.navigateByUrl('/');
+                this.router.navigateByUrl('/features/blog');
                 return false;
             }
         }).toPromise();

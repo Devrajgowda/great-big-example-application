@@ -2,7 +2,9 @@ import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 
 import { ArticleComponent } from './article.component';
+import { EntityExistsGuard } from '../../../core/services/entity-exists.guard';
 import { UserRouteAccessService } from '../../../shared';
+import { slices } from '../../../core/store/util';
 
 const routes: Routes = [
     {
@@ -10,9 +12,10 @@ const routes: Routes = [
         component: ArticleComponent,
         data: {
             authorities: ['ROLE_USER'],
-            pageTitle: 'greatBigExampleApplicationApp.blog.home.title'
+            pageTitle: 'greatBigExampleApplicationApp.blog.home.title',
+            slice: slices.ARTICLE
         },
-        canActivate: [UserRouteAccessService]
+        canActivate: [UserRouteAccessService, EntityExistsGuard],
     }
 ];
 

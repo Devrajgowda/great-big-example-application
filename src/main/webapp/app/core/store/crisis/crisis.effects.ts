@@ -13,7 +13,7 @@ export class CrisisEffects {
     @Effect()
     private loadFromRemote$ = entityFunctions.loadFromRemote$(this.actions$, slices.CRISIS, this.dataService, this.store, initialCrisis);
     @Effect()
-    private updateToRemote$ = entityFunctions.updateToRemote$(this.actions$, slices.CRISIS, this.dataService, this.store);
+    private updateToRemote$ = entityFunctions.updateToRemote$(this.actions$, slices.CRISIS, this.dataService, this.store, initialCrisis);
 
     constructor(
         private store: Store<RootState>,

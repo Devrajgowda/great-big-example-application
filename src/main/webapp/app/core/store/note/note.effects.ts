@@ -13,7 +13,7 @@ export class NoteEffects {
     @Effect()
     private loadFromRemote$ = entityFunctions.loadFromRemote$(this.actions$, slices.NOTE, this.dataService, this.store, initialNote);
     @Effect()
-    private updateToRemote$ = entityFunctions.updateToRemote$(this.actions$, slices.NOTE, this.dataService, this.store);
+    private updateToRemote$ = entityFunctions.updateToRemote$(this.actions$, slices.NOTE, this.dataService, this.store, initialNote);
     @Effect()
     private deleteFromRemote$ = entityFunctions.deleteFromRemote$(this.actions$, slices.NOTE, this.dataService, this.store);
     @Effect()

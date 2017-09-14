@@ -13,7 +13,7 @@ export class ContactEffects {
     @Effect()
     private loadFromRemote$ = entityFunctions.loadFromRemote$(this.actions$, slices.CONTACT, this.dataService, this.store, initialContact);
     @Effect()
-    private updateToRemote$ = entityFunctions.updateToRemote$(this.actions$, slices.CONTACT, this.dataService, this.store);
+    private updateToRemote$ = entityFunctions.updateToRemote$(this.actions$, slices.CONTACT, this.dataService, this.store, initialContact);
     @Effect()
     private addToRemote$ = entityFunctions.addToRemote$(this.actions$, slices.CONTACT, this.dataService, this.store, initialContact);
 

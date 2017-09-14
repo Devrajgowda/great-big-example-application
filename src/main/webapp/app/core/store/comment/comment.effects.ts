@@ -13,7 +13,7 @@ export class CommentEffects {
     // @Effect()
     // private loadFromRemote$ = functions.loadFromRemote$(this.actions$, slices.COMMENT, this.dataService);
     @Effect()
-    private updateToRemote$ = entityFunctions.updateToRemote$(this.actions$, slices.COMMENT, this.dataService, this.store);
+    private updateToRemote$ = entityFunctions.updateToRemote$(this.actions$, slices.COMMENT, this.dataService, this.store, initialComment);
     @Effect()
     private addToRemote$ = entityFunctions.addToRemote$(this.actions$, slices.COMMENT, this.dataService, this.store, initialComment);
 

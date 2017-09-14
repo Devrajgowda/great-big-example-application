@@ -1,4 +1,3 @@
-import { RouterAction, ROUTER_NAVIGATION, RouterNavigationAction } from '@ngrx/router-store';
 import { Params, ActivatedRouteSnapshot } from '@angular/router';
 import { Actions, Effect } from '@ngrx/effects';
 import { Injectable } from '@angular/core';

@@ -57,17 +57,92 @@ const responseTransforms = {
 
 const endpointTransforms = {
     add: {
-        comment(comment: Comment, state: RootState) {
+        comment: (comment: Comment, state: RootState) => {
             let slug = comment.articleId;
             return `articles/${slug}/comments`;
         }
     },
+    update: {
+        article: (article, state: RootState) => {
+            let slug = state.article.entities[article.id].slug;
+            if (article.favorited === true || article.favorited === false) {
+                return `articles/${slug}/favorite`;
+            }
+            return 'articles';
+        }
+    },
     getEntities: {
-        article(state: RootState) {
+        article: (state: RootState) => {
             return 'articles' + ((state.layout.blogPage.type === 'feed') ? '/feed' : '');
         }
     }
 }
+
+const methodTransforms = {
+    update: {
+        article(article, state: RootState) {
+            if (article.favorited === true) {
+                return 'post';
+            } else if (article.favorited === false) {
+                return 'delete';
+            }
+            return 'put';
+        }
+    }
+}
+
+const GOOGLE_ROOT = 'https://www.googleapis.com/books/v1/volumes';
+const apis = {
+    book: {
+        get: {
+            endpoint: (book, state: RootState) => {
+                return `${GOOGLE_ROOT}/${book.id}`;
+            }
+        },
+        getEntities: {
+            endpoint: (book, state: RootState) => {
+                return `${GOOGLE_ROOT}/${book.id}`;
+            }
+        }
+    },
+    comment: {
+        add: {
+            requestBody: (response: any, state: RootState) => ({ body: response.body }),
+            endpoint: (comment: Comment, state: RootState) => {
+                let slug = comment.articleId;
+                return `articles/${slug}/comments`;
+            }
+        }
+    },
+    tag: {
+        getEntities: {
+            responseBody: (resp) => resp.map(tag => {
+                return { id: tag, name: tag };
+            })
+        }
+    },
+    article: {
+        update: {
+            endpoint: (article, state: RootState) => {
+                let slug = state.article.entities[article.id].slug;
+                if (article.favorited === true || article.favorited === false) {
+                    return `articles/${slug}/favorite`;
+                }
+                return 'articles';
+            },
+            getEntities: {
+                endpoint: (state: RootState) => {
+                    return 'articles' + ((state.layout.blogPage.type === 'feed') ? '/feed' : '');
+                }
+            }
+        }
+    }
+}
+
+
+
+
+
 
 @Injectable()
 export class RESTService implements DataService {
@@ -140,7 +215,11 @@ export class RESTService implements DataService {
     }
 
     update(table: keyof RootState, entity: Entity, state: RootState, store: Store<RootState>): Observable<any> {
-        return this.http.put(`${this.config.apiUrl}/${endpoints[table]}`, this.prepareRecord(entity))
+        let endpoint = endpointTransforms.update[table] && endpointTransforms.update[table](entity, state) || `${endpoints[table]}`;
+        let method = methodTransforms.update[table] && methodTransforms.update[table](entity, state) || 'put';
+        let payload = this.prepareRecord(entity);
+
+        return this.http[method](`${this.config.apiUrl}/${endpoint}`, this.prepareRecord(entity))
             .map(this.extractData)
             .catch(this.handleError);
     }
