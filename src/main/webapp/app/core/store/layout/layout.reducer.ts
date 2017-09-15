@@ -6,7 +6,6 @@ import { actions } from '../slice/slice.actions';
 import * as SliceActions from '../slice/slice.actions';
 import { Contact } from '../contact/contact.model';
 
-
 // TODO: put all of this in reducers for the respective features
 
 export function reducer(state: Layout = initialLayout(), action: SliceAction): Layout {

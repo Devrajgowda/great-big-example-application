@@ -46,7 +46,7 @@ const apis: { [entity: string]: EntityConfig } = {
         url: 'articles',
         update: {
             url: (article, state) => {
-                let slug = state.article.entities[article.id].slug;
+                const slug = state.article.entities[article.id].slug;
                 if (article.favorited === true || article.favorited === false) {
                     return `articles/${slug}/favorite`;
                 }
@@ -81,7 +81,7 @@ const apis: { [entity: string]: EntityConfig } = {
         add: {
             response: (resp: any) => ({ body: resp.body }),
             url: (comment: Comment, state: RootState) => {
-                let slug = comment.articleId;
+                const slug = comment.articleId;
                 return `articles/${slug}/comments`;
             }
         }
@@ -121,7 +121,7 @@ const apis: { [entity: string]: EntityConfig } = {
     tag: {
         url: 'tags',
         getEntities: {
-            response: (resp) => resp.map(tag => {
+            response: (resp) => resp.map((tag) => {
                 return { id: tag, name: tag };
             })
         }
@@ -172,27 +172,27 @@ export class RESTService implements DataService {
     constructor(private http: Http, private config: AppConfig) { }
 
     private getUrl(slice: keyof RootState, state: RootState, entity: any, query: QueryPayload, job: string): string {
-        return apis[slice][job] && (typeof apis[slice][job].url === "function") && apis[slice][job].url(entity, state, query)
-            || (typeof apis.defaults[job].url === "function") && apis.defaults[job].url(entity, state, query, slice);
+        return apis[slice][job] && (typeof apis[slice][job].url === 'function') && apis[slice][job].url(entity, state, query)
+            || (typeof apis.defaults[job].url === 'function') && apis.defaults[job].url(entity, state, query, slice);
     }
 
     private getOptions(slice: keyof RootState, state: RootState, entity: any, query: QueryPayload, job: string): RequestOptionsArgs {
         // remove the infrastructure parts of the entity
-        let newEntity = { ...this.prepareRecord(entity) };
+        const newEntity = { ...this.prepareRecord(entity) };
 
-        return apis[slice][job] && (typeof apis[slice][job].options === "function") && apis[slice][job].options(newEntity, state, query)
-            || (typeof apis.defaults[job].options === "function") && apis.defaults[job].options(newEntity, state, query)
-            || (typeof apis.defaults.options === "function") && apis.defaults.options(newEntity, state, query);
+        return apis[slice][job] && (typeof apis[slice][job].options === 'function') && apis[slice][job].options(newEntity, state, query)
+            || (typeof apis.defaults[job].options === 'function') && apis.defaults[job].options(newEntity, state, query)
+            || (typeof apis.defaults.options === 'function') && apis.defaults.options(newEntity, state, query);
     }
 
     private getMethod(slice: keyof RootState, state: RootState, entity: any, query: QueryPayload, job: string): string {
-        return apis[slice][job] && (typeof apis[slice][job].method === "function") && apis[slice][job].method(entity, state)
+        return apis[slice][job] && (typeof apis[slice][job].method === 'function') && apis[slice][job].method(entity, state)
             || apis.defaults[job].method;
     }
 
     private getResponse(slice: keyof RootState, job: string): any {
         return (resp: any) => {
-            return apis[slice][job] && (typeof apis[slice][job].response === "function") && apis[slice][job].response(resp)
+            return apis[slice][job] && (typeof apis[slice][job].response === 'function') && apis[slice][job].response(resp)
                 || resp;
         }
     }
@@ -200,8 +200,8 @@ export class RESTService implements DataService {
     getEntities(slice: keyof RootState, query: QueryPayload = null,
         state: RootState): Observable<any[]> {
 
-        let url = this.getUrl(slice, state, null, query, 'getEntities');
-        let options = this.getOptions(slice, state, null, query, 'getEntities');
+        const url = this.getUrl(slice, state, null, query, 'getEntities');
+        const options = this.getOptions(slice, state, null, query, 'getEntities');
 
         return this.http.get(url, options)
             .map(this.extractData)
@@ -210,8 +210,8 @@ export class RESTService implements DataService {
     }
 
     getEntity(slice: keyof RootState, id: string): Observable<any> {
-        let url = this.getUrl(slice, null, { id }, null, 'getEntity');
-        let options = this.getOptions(slice, null, null, null, 'getEntity');
+        const url = this.getUrl(slice, null, { id }, null, 'getEntity');
+        const options = this.getOptions(slice, null, null, null, 'getEntity');
         return this.http.get(url, options)
             .map(this.extractData)
             .map(this.getResponse(slice, 'getEntity'))
@@ -219,8 +219,8 @@ export class RESTService implements DataService {
     }
 
     add(slice: keyof RootState, entity: Entity, state: RootState, store: Store<RootState>): Observable<any> {
-        let url = this.getUrl(slice, state, entity, null, 'add');
-        let options = this.getOptions(slice, state, entity, null, 'add');
+        const url = this.getUrl(slice, state, entity, null, 'add');
+        const options = this.getOptions(slice, state, entity, null, 'add');
 
         return this.http.post(url, options)
             .map((result) => {
@@ -254,9 +254,9 @@ export class RESTService implements DataService {
     }
 
     update(slice: keyof RootState, entity: Entity, state: RootState, store: Store<RootState>): Observable<any> {
-        let url = this.getUrl(slice, state, entity, null, 'update');
-        let method = this.getMethod(slice, state, entity, null, 'update');
-        let options = this.getOptions(slice, state, entity, null, 'update');
+        const url = this.getUrl(slice, state, entity, null, 'update');
+        const method = this.getMethod(slice, state, entity, null, 'update');
+        const options = this.getOptions(slice, state, entity, null, 'update');
 
         return this.http[method](url, options)
             .map(this.extractData)
@@ -264,7 +264,7 @@ export class RESTService implements DataService {
     }
 
     remove(slice: keyof RootState, entity: Entity, state: RootState, store: Store<RootState>): Observable<any> {
-        let url = this.getUrl(slice, state, entity, null, 'remove');
+        const url = this.getUrl(slice, state, entity, null, 'remove');
         return this.http.delete(url)
             .map(this.extractData)
             .catch(this.handleError);

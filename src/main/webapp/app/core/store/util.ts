@@ -111,7 +111,6 @@ function getFullRouteConfigPath(path, firstChild) {
     return getFullRouteConfigPath(path + (firstChild.routeConfig.path ? '/' + firstChild.routeConfig.path : ''), firstChild.firstChild);
 }
 
-
 /**
  * @whatItDoes This is here to copy accessors (getters/setters) of entities which Object.assign doesn't do.
  * It's useful for the case of entities that use slugs for keys instead of ids. When that happens you should
@@ -120,16 +119,16 @@ function getFullRouteConfigPath(path, firstChild) {
  * @param sources
  */
 export function completeAssign(target, ...sources) {
-    sources.forEach(source => {
+    sources.forEach((source) => {
         if (!source) return;
 
-        let descriptors = Object.keys(source).reduce((descriptors, key) => {
+        const descriptors = Object.keys(source).reduce((descriptors, key) => {
             descriptors[key] = Object.getOwnPropertyDescriptor(source, key);
             return descriptors;
         }, {});
         // by default, Object.assign copies enumerable Symbols too
-        Object.getOwnPropertySymbols(source).forEach(sym => {
-            let descriptor = Object.getOwnPropertyDescriptor(source, sym);
+        Object.getOwnPropertySymbols(source).forEach((sym) => {
+            const descriptor = Object.getOwnPropertyDescriptor(source, sym);
             if (descriptor.enumerable) {
                 descriptors[sym] = descriptor;
             }

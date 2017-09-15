@@ -13,21 +13,21 @@ import { RootState } from '../';
 const merge = require('lodash/merge');
 
 export function load(state: {}, action: SliceAction): any {
-    let newState = merge({}, state, {
+    const newState = merge({}, state, {
         hasError: false
     });
     return setSliceLoading(newState, action);
 };
 
 export function loadFail(state, action: SliceAction): any {
-    let newState = merge({}, state, {
+    const newState = merge({}, state, {
         hasError: true,
     });
     return setSliceLoading(newState, action);
 }
 
 export function loadSuccess(state, action): any {
-    let newState = merge({}, state, action.payload, {
+    const newState = merge({}, state, action.payload, {
         hasError: false,
     });
     return setSliceLoading(newState, action);

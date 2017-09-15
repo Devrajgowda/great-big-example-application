@@ -155,7 +155,7 @@ export const metaReducers: MetaReducer<RootState>[] = (process.env.NODE_ENV === 
 
 // console.log all actions
 function logger(reducer: ActionReducer<RootState>) {
-    return function (state: RootState, action: any) {
+    return function(state: RootState, action: any) {
         console.log('state', state);
         console.log('action', action);
 
@@ -165,7 +165,7 @@ function logger(reducer: ActionReducer<RootState>) {
 
 // set loading and loaded fields
 function loadingSetter(reducer: ActionReducer<RootState>) {
-    return function (state: RootState, action: any) {
+    return function(state: RootState, action: any) {
         let newState = state;
         if (action.verb) {
             newState = setLoading(state, action)
@@ -179,7 +179,7 @@ function setLoading(state, action) {
     const loadSuccess = isLoadSuccessAction(action.verb);
     const loadFail = isLoadFailAction(action.verb);
 
-    let newState = completeAssign({}, state);
+    const newState = completeAssign({}, state);
     if (loading) {
         newState[action.slice].loading = true;
     }
@@ -571,7 +571,7 @@ export const getAuthorEntities = createSelector(getAuthorsState, fromAuthors.get
 export const getAuthorIds = createSelector(getAuthorsState, fromAuthors.getIds);
 export const getAuthors = createSelector(getAuthorEntities, getAuthorIds, getUserState, (entities, ids, users) => {
     return ids.map((id) => {
-        let user = users[id];
+        const user = users[id];
         return { ...entities[id], ...user };
         // const following = false;
         // entities[id].followers.some((follower) => follower.login === currentUser.login)

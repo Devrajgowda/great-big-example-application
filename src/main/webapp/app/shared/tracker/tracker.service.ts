@@ -1,7 +1,6 @@
 import { Injectable, Inject } from '@angular/core';
 import { Router, NavigationEnd } from '@angular/router';
 
-
 import { CSRFService } from '../auth/csrf.service';
 import { WindowRef } from '../services/window.service';
 import { AuthServerProvider } from '../auth/auth-jwt.service';

@@ -17,7 +17,7 @@ export function addEntityToStore<T extends Entity>(state: Entities<T>, action: E
     const entities = completeAssign({}, state.entities);
     const newEntity = reduceOne(state, null, action);       // this is like this because id could be an
     entities[newEntity.id] = newEntity;                     // accessor rather than a regular field
-    let newState = completeAssign({}, state, {
+    const newState = completeAssign({}, state, {
         ids: Object.keys(entities),
         entities,
         selectedEntityId: action.payload.id
@@ -32,7 +32,7 @@ export function addEntityToStore<T extends Entity>(state: Entities<T>, action: E
  * @param action needs a payload that is an array of entities
  */
 export function addEntitiesToStore<T extends Entity>(state: Entities<T>, action: EntityActions.Update<T>): Entities<T> {
-    const entities = action.payload.reduce(function (map, obj) {
+    const entities = action.payload.reduce(function(map, obj) {
         map[obj.id] = completeAssign({}, state.initialEntity, obj, { dirty: false });
         return map;
     }, {});
@@ -73,7 +73,7 @@ export function deleteEntity<T extends Entity>(state: Entities<T>, action: Entit
     const selectedEntityId = idx === -1 ? state.selectedEntityId : state.ids[newIdx];
     const i = state.ids.findIndex((findId) => findId === id);
     const ids = [...state.ids.slice(0, i), ...state.ids.slice(i + 1)];
-    let newState = completeAssign({}, state, { entities, ids, selectedEntityId });
+    const newState = completeAssign({}, state, { entities, ids, selectedEntityId });
     return sliceFunctions.setSliceLoading(newState, action);
 };
 

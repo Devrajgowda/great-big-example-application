@@ -33,7 +33,7 @@ export class ArticleListComponent implements OnInit, OnDestroy {
     @Input() limit: number;
 
     ngOnInit() {
-        let self = this;  // because we need to refer to this.limit inside a function
+        const self = this;  // because we need to refer to this.limit inside a function
         this.articles$ = this.store.select(fromRoot.getArticlesState);
         this.articlesSub = this.articles$.subscribe((articles) => {
             this.loading = articles.loading;
@@ -54,7 +54,7 @@ export class ArticleListComponent implements OnInit, OnDestroy {
     setPageTo(pageNumber) {
 
         // Create limit and offset filter (if necessary)
-        let query: any = {}
+        const query: any = {}
         if (this.limit) {
             query.filters = {
                 limit: this.limit,
