@@ -18,6 +18,6 @@ export class TalksPage {
     }
 
     ngOnInit() {
-        this.store.dispatch(new EntityActions.Load(slices.TALK, null));
+        this.store.dispatch(new EntityActions.Load(slices.TALK));
     }
 }

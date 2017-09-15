@@ -17,8 +17,8 @@ export class HeroesPage implements OnInit {
     }
 
     ngOnInit() {
-        this.store.dispatch(new EntityActions.Load(slices.HERO, null));
-        this.store.dispatch(new EntityActions.Load(slices.CRISIS, null));
+        this.store.dispatch(new EntityActions.Load(slices.HERO));
+        this.store.dispatch(new EntityActions.Load(slices.CRISIS));
     }
 }
 

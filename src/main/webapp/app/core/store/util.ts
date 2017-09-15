@@ -73,6 +73,10 @@ export class PayloadAction implements Action {
     }
 }
 
+export type QueryPayload = {
+    query: string | { [key: string]: string | number }
+}
+
 export type PayloadActions = Actions<PayloadAction>;
 
 /**

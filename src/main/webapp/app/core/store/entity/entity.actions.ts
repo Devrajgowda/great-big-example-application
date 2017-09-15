@@ -2,7 +2,7 @@ import { PayloadAction } from '../util';
 import { Entity } from './entity.model';
 import { SliceAction } from '../slice/slice.actions';
 import { actions as sliceActions } from '../slice/slice.actions';
-import { typeFor } from '../util';
+import { typeFor, QueryPayload } from '../util';
 import { RootState } from '../';
 
 export const actions = {
@@ -105,7 +105,7 @@ export class DeleteTemp<T extends Entity> extends EntityAction<T> {
 
 export class Load<T extends Entity> extends SliceAction implements PayloadAction {
     protected actionName: string = actions.LOAD;
-    constructor(public slice: keyof RootState, public payload: any) {  // takes an any, not an entity
+    constructor(public slice: keyof RootState, public payload: QueryPayload = null) {  // takes an any, not an entity
         super(slice, payload);
     }
 }

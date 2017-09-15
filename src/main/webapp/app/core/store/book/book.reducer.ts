@@ -13,7 +13,7 @@ export function reducer(state: Entities<Book> = initialEntities<Book>(slices.BOO
     action: EntityAction<Book> | SliceAction): Entities<Book> {
     // console.log(`${action.type}`);
     switch (action.type) {
-        case typeFor(slices.SEARCH, actions.LOAD_SUCCESS):
+        case typeFor(slices.SEARCH, actions.LOAD_ALL_SUCCESS):
         case typeFor(slices.COLLECTION, actions.LOAD_SUCCESS):
             return entityFunctions.union(state, <any>action);
         case typeFor(slices.BOOK, actions.LOAD):

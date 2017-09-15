@@ -10,12 +10,12 @@ import { slices } from '../../../../core/store/util';
 
 @Injectable()
 export class CrisisDetailResolver implements Resolve<Crisis> {
-    constructor(private ds: RESTService, private router: Router) { }
+    constructor(private dataService: RESTService, private router: Router) { }
 
     resolve(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Promise<Crisis> {
         const id = route.params['id'];
 
-        return this.ds.getEntity(slices.CRISIS, id).toPromise().then((crisis) => {
+        return this.dataService.getEntity(slices.CRISIS, id).toPromise().then((crisis) => {
             if (crisis) {
                 return crisis;
             } else { // id not found

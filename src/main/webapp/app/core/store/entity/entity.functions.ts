@@ -2,6 +2,7 @@ import { Observable } from 'rxjs/Observable';
 import { of } from 'rxjs/observable/of';
 import { empty } from 'rxjs/observable/empty';
 import { toPayload, Actions } from '@ngrx/effects';
+import { async } from 'rxjs/scheduler/async';
 import { Action, Store } from '@ngrx/store';
 
 import { Entities, Entity } from './entity.model';
@@ -234,21 +235,27 @@ function reduceOne<T extends Entity>(state: Entities<T>, entity: T = null, actio
  *
  */
 
-export function loadFromRemote$(actions$: PayloadActions, slice: keyof RootState, dataService: DataService, store: Store<RootState>, initialEntity: Entity): Observable<Action> {  // TODO: should return PayloadAction
+export function loadFromRemote$(actions$: PayloadActions, slice: keyof RootState, dataService: DataService, store: Store<RootState>, initialEntity: Entity, debounce = 0, scheduler?): Observable<Action> {  // TODO: should return PayloadAction
     return actions$
         .ofType(typeFor(slice, actions.LOAD), typeFor(slice, actions.LOAD_ALL_SUCCESS))
-        // .startWith(new EntityActions.Load(slice, null))  // updated. instead dispatch a load action in the feature's main page
+        .debounceTime(debounce, this.scheduler || async)
         .withLatestFrom(store)
         .switchMap(([action, state]) => {
-
             // First this happens
             // for actions.LOAD - dispatch a LoadAllSuccess
             if (action.type === typeFor(slice, actions.LOAD)) {
+                if (action.payload && action.payload.query === '') {
+                    return empty();
+                }
+
+                const nextSearch$ = actions$.ofType(typeFor(slice, actions.LOAD)).skip(1);
+
                 return dataService.getEntities(slice, action.payload ? action.payload.query : undefined, state)
+                    .takeUntil(nextSearch$)
                     .mergeMap((responseEntities) => Observable.of(new EntityActions.LoadAllSuccess(slice, responseEntities)))
                     .catch((err) => {
                         console.log(err);
-                        return Observable.of(new EntityActions.AddUpdateFail(slice, null));
+                        return Observable.of(new EntityActions.LoadAllFail(slice, null));
                     });
             }
 

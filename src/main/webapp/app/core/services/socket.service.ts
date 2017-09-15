@@ -13,6 +13,7 @@ import { WindowRef } from '../../shared/services/window.service';
 import { AuthServerProvider } from '../../shared/auth/auth-jwt.service';
 import * as EntityActions from '../store/entity/entity.actions';
 import { DataService } from './data.service';
+import { QueryPayload } from '../store/util';
 
 // const io = require('socket.io-client');
 // const hooks = require('feathers-hooks');
@@ -62,7 +63,7 @@ export class SocketService implements DataService {
         return this.sendData(`/topic/${service}`, entity);
     }
     getEntities(table: keyof RootState,
-        query: { [key: string]: string | number } = {}, state: RootState): Observable<any[]> {
+        query: QueryPayload = null, state: RootState): Observable<any[]> {
         return this.sendData(`/topic/${table}`, query);
     }
 

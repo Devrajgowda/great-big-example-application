@@ -18,16 +18,16 @@ export const features = [
         tags: ['local storage']
     },
     {
-        id: 'blog',
-        link: 'features/blog',
-        source: 'https://github.com/gothinkster/angular-realworld-example-app',
-        tags: ['blog', 'rest api', 'pagination']
-    },
-    {
         id: 'booksFind',
         link: 'features/books/find',
         source: 'https://github.com/ngrx/example-app',
         tags: ['API']
+    },
+    {
+        id: 'blog',
+        link: 'features/blog',
+        source: 'https://github.com/gothinkster/angular-realworld-example-app',
+        tags: ['blog', 'rest api', 'pagination']
     },
     {
         id: 'chat',

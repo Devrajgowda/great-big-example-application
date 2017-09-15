@@ -30,7 +30,7 @@ export class LayoutEffects {
         .filter((action: SliceAction) => action.payload.filters)   // TODO: make this a better test for this being the blog page layout
         .withLatestFrom(this.store)
         .switchMap(([action, state]) => {
-            return this.dataService.getEntities(slices.ARTICLE, state.layout.blogPage.filters, state)
+            return this.dataService.getEntities(slices.ARTICLE, { query: state.layout.blogPage.filters }, state)
                 .mergeMap((fetchedEntities) => Observable.from(fetchedEntities))
                 .map((fetchedEntity) => new EntityActions.LoadSuccess(slices.ARTICLE, fetchedEntity))  // one action per entity
                 .catch((err) => {

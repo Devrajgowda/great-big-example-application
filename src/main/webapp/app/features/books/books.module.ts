@@ -13,7 +13,6 @@ import { BookSearchComponent } from './book-search/book-search.component';
 import { AddCommasPipe } from './add-commas/add-commas.pipe';
 import { EllipsisPipe } from './ellipsis/ellipsis.pipe';
 // import { NavigatorModule } from '../core/navigator/navigator.module';
-import { GoogleBooksService } from './services/google-books.service';
 import { CollectionPage } from './collection.page';
 import { FindBookPage } from './find-book.page';
 import { SelectedBookPage } from './selected-book.page';
@@ -51,8 +50,7 @@ export const COMPONENTS = [
     declarations: COMPONENTS,
     exports: COMPONENTS,
     providers: [
-        customHttpProvider(),
-        GoogleBooksService
+        customHttpProvider()
     ],
 })
 export class BooksModule { }

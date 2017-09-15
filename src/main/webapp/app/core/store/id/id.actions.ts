@@ -1,6 +1,6 @@
 import { Action } from '@ngrx/store';
 
-import { typeFor } from '../util';
+import { typeFor, QueryPayload } from '../util';
 import { SliceAction } from '../slice/slice.actions';
 import { actions as sliceActions } from '../slice/slice.actions';
 import { RootState } from '../';
@@ -29,7 +29,7 @@ export class AddFail extends SliceAction {
 
 export class Load extends SliceAction {
     protected actionName: string = actions.LOAD;
-    constructor(public slice: keyof RootState, query: string = null) {
+    constructor(public slice: keyof RootState, query: QueryPayload = null) {
         super(slice, query);
     }
 }

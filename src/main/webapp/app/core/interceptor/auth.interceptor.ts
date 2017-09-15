@@ -17,7 +17,7 @@ export class AuthInterceptor extends JhiHttpInterceptor {
      */
     requestIntercept(options?: RequestOptionsArgs): RequestOptionsArgs {
         // if (!/^api\//.test(options.url)) return options;
-        if (/^http/.test(options.url)) return options;
+        if (!options || !options.url || /^http/.test(options.url)) return options;
 
         const token = this.localStorage.retrieve('authenticationToken') || this.sessionStorage.retrieve('authenticationToken');
         if (!!token) {

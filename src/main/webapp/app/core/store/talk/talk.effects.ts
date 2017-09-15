@@ -22,7 +22,7 @@ export class TalkEffects {
     @Effect()
     navigateToTalks$ = handleNavigation(this.store, this.actions$, '/features/talks', (r: ActivatedRouteSnapshot, state: RootState) => {
         const filters = createFilters(r.firstChild.firstChild.params);
-        return this.dataService.getEntities(slices.TALK, { speaker: filters.speaker, title: filters.title, minRating: '' + filters.minRating }, state)
+        return this.dataService.getEntities(slices.TALK, { query: { speaker: filters.speaker, title: filters.title, minRating: '' + filters.minRating } }, state)
             .map((fetchedEntities) => new EntityActions.LoadAllSuccess(slices.TALK, fetchedEntities));
     });
 

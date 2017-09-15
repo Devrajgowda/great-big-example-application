@@ -1,5 +1,5 @@
 import { Injectable, OnInit } from '@angular/core';
-import { Http, URLSearchParams, Response, Headers } from '@angular/http';
+import { Http, URLSearchParams, Response, Headers, RequestOptionsArgs } from '@angular/http';
 import { Observable } from 'rxjs/Observable';
 import { Subject } from 'rxjs/Subject';
 import { Store } from '@ngrx/store';
@@ -18,174 +18,213 @@ import { RootState } from '../store';
 import { Entity } from '../store/entity/entity.model';
 import * as SliceActions from '../store/slice/slice.actions';
 import * as EntityActions from '../store/entity/entity.actions';
-import { completeAssign } from '../store/util';
+import { completeAssign, QueryPayload } from '../store/util';
+import * as config from '../../app.config';
 
-/**
- * This mapping exists because I don't like pluralization of entity names. The JHipster
- * approach uses plurals so this takes care of that.
- */
-const endpoints = {
-    article: 'articles',
-    author: 'authors',
-    claim: 'claims',
-    claimRebuttal: 'claim-rebuttals',
-    comment: 'comments',
-    contact: 'contacts',
-    crisis: 'crises',
-    hero: 'heroes',
-    note: 'notes',
-    rebuttal: 'rebuttals',
-    talk: 'talks',
-    tag: 'tags'
-};
-
-const requestTransforms = {
-    add: {
-        comment: (response: any, state: RootState) => ({ body: response.body })
-    }
+type APIConfig = {
+    url?: ((entity?: any, state?: RootState, query?: QueryPayload, slice?: keyof RootState) => string) | string,
+    options?: (entity?: any, state?: RootState, query?: QueryPayload) => RequestOptionsArgs,
+    method?: ((entity?: any, state?: RootState) => string) | string
+    response?: (resp: any) => any,
 }
 
-const responseTransforms = {
-    getEntity: {
-    },
-    getEntities: {
-        tag: (resp) => resp.map(tag => {
-            return { id: tag, name: tag };
-        })
-    }
-}
+type EntityConfig = {
+    url?: ((entity?: any, state?: RootState, query?: QueryPayload) => string) | string,
+    options?: (entity?: any, state?: RootState, query?: QueryPayload) => RequestOptionsArgs,
 
-const endpointTransforms = {
-    add: {
-        comment: (comment: Comment, state: RootState) => {
-            let slug = comment.articleId;
-            return `articles/${slug}/comments`;
-        }
-    },
-    update: {
-        article: (article, state: RootState) => {
-            let slug = state.article.entities[article.id].slug;
-            if (article.favorited === true || article.favorited === false) {
-                return `articles/${slug}/favorite`;
-            }
-            return 'articles';
-        }
-    },
-    getEntities: {
-        article: (state: RootState) => {
-            return 'articles' + ((state.layout.blogPage.type === 'feed') ? '/feed' : '');
-        }
-    }
-}
-
-const methodTransforms = {
-    update: {
-        article(article, state: RootState) {
-            if (article.favorited === true) {
-                return 'post';
-            } else if (article.favorited === false) {
-                return 'delete';
-            }
-            return 'put';
-        }
-    }
+    getEntity?: APIConfig,
+    getEntities?: APIConfig,
+    update?: APIConfig,
+    remove?: APIConfig,
+    add?: APIConfig,
 }
 
 const GOOGLE_ROOT = 'https://www.googleapis.com/books/v1/volumes';
-const apis = {
-    book: {
-        get: {
-            endpoint: (book, state: RootState) => {
-                return `${GOOGLE_ROOT}/${book.id}`;
-            }
-        },
-        getEntities: {
-            endpoint: (book, state: RootState) => {
-                return `${GOOGLE_ROOT}/${book.id}`;
-            }
-        }
-    },
-    comment: {
-        add: {
-            requestBody: (response: any, state: RootState) => ({ body: response.body }),
-            endpoint: (comment: Comment, state: RootState) => {
-                let slug = comment.articleId;
-                return `articles/${slug}/comments`;
-            }
-        }
-    },
-    tag: {
-        getEntities: {
-            responseBody: (resp) => resp.map(tag => {
-                return { id: tag, name: tag };
-            })
-        }
-    },
+
+const apis: { [entity: string]: EntityConfig } = {
     article: {
+        url: 'articles',
         update: {
-            endpoint: (article, state: RootState) => {
+            url: (article, state) => {
                 let slug = state.article.entities[article.id].slug;
                 if (article.favorited === true || article.favorited === false) {
                     return `articles/${slug}/favorite`;
                 }
                 return 'articles';
             },
-            getEntities: {
-                endpoint: (state: RootState) => {
-                    return 'articles' + ((state.layout.blogPage.type === 'feed') ? '/feed' : '');
+            method: (article, state) => {
+                if (Object.keys(article).length === 2 && article.favorited === true) {
+                    return 'post';
                 }
+                if (Object.keys(article).length === 2 && article.favorited === false) {
+                    return 'delete';
+                }
+                return 'put';
             }
+        },
+        getEntities: {
+            url: (entity, state: RootState) => {
+                return `${config.apiUrl}/articles` + ((state.layout.blogPage.type === 'feed') ? '/feed' : '');
+            },
+            options: (entity, state, query) =>
+                ({ params: getParamsFromQuery(query) })
+        }
+    },
+    claim: {
+        url: 'claims'
+    },
+    claimRebuttal: {
+        url: 'claimRebuttals'
+    },
+    comment: {
+        url: 'comments',
+        add: {
+            response: (resp: any) => ({ body: resp.body }),
+            url: (comment: Comment, state: RootState) => {
+                let slug = comment.articleId;
+                return `articles/${slug}/comments`;
+            }
+        }
+    },
+    contact: {
+        url: 'contacts'
+    },
+    crisis: {
+        url: 'crises'
+    },
+    hero: {
+        url: 'heroes'
+    },
+    note: {
+        url: 'notes'
+    },
+    rebuttal: {
+        url: 'rebuttals'
+    },
+    search: {
+        url: 'books',
+        getEntity: {
+            url: (book, state, query) => {
+                return `${GOOGLE_ROOT}/${book.id}`;
+            }
+        },
+        getEntities: {
+            url: (book, state, query) => {
+                if (typeof query === 'object') {
+                    throw new Error(`Invalid parameter [query] passed to book getEntities: ${query}`);
+                }
+                return `${GOOGLE_ROOT}?q=${query}`;
+            },
+            response: (resp) => resp.items
+        }
+    },
+    tag: {
+        url: 'tags',
+        getEntities: {
+            response: (resp) => resp.map(tag => {
+                return { id: tag, name: tag };
+            })
+        }
+    },
+    talk: {
+        url: 'talks'
+    },
+    defaults: {
+        options: (entity, state, query) => entity,
+        add: {
+            url: (entity, state, query, slice) => `${config.apiUrl}/${apis[slice].url}`,
+            method: 'post',
+        },
+        update: {
+            url: (entity, state, query, slice) => `${config.apiUrl}/${apis[slice].url}`,
+            method: 'put'
+        },
+        getEntity: {
+            url: (entity, state, query, slice) => `${config.apiUrl}/${apis[slice].url}/${entity.id}`
+        },
+        getEntities: {
+            url: (entity, state, query, slice) => `${config.apiUrl}/${apis[slice].url}`
+        },
+        remove: {
+            url: (entity, state, query, slice) => `${config.apiUrl}/${apis[slice].url}/${entity.id}`
         }
     }
 }
 
+const getParamsFromQuery = (query: QueryPayload) => {
 
+    const params: URLSearchParams = new URLSearchParams();
 
-
-
-
-@Injectable()
-export class RESTService implements DataService {
-    constructor(private http: Http, private config: AppConfig) { }
-
-    getEntities(table: keyof RootState,
-        query: { [key: string]: string | number } = {}, state: RootState): Observable<any[]> {
-
-        let endpoint = endpointTransforms.getEntities[table] ? endpointTransforms.getEntities[table](state) : `${endpoints[table]}` || table;
-
-        const params: URLSearchParams = new URLSearchParams();
-
+    if (typeof query === 'object') {
         Object.keys(query)
             .forEach((key) => {
                 if (query[key] !== null) {
                     params.set(key, '' + query[key]);
                 }
             });
-
-        return this.http.get(`${this.config.apiUrl}/${endpoint}`, { search: params })
-            .map(this.extractData)
-            .map(responseTransforms.getEntities[table] || ((resp) => resp))
-            .catch(this.handleError);
     }
 
-    getEntity(table: keyof RootState, id: string): Observable<any> {
-        return this.http.get(`${this.config.apiUrl}/${endpoints[table]}/${id}`)
-            .map(this.extractData)
-            .map(responseTransforms.getEntity[table] || ((resp) => resp))
-            .catch(this.handleError);
+    return params;
+}
+
+@Injectable()
+export class RESTService implements DataService {
+    constructor(private http: Http, private config: AppConfig) { }
+
+    private getUrl(slice: keyof RootState, state: RootState, entity: any, query: QueryPayload, job: string): string {
+        return apis[slice][job] && (typeof apis[slice][job].url === "function") && apis[slice][job].url(entity, state, query)
+            || (typeof apis.defaults[job].url === "function") && apis.defaults[job].url(entity, state, query, slice);
     }
 
-    add(table: keyof RootState, entity: Entity, state: RootState, store: Store<RootState>): Observable<any> {
-        let endpoint = endpointTransforms.add[table] && endpointTransforms.add[table](entity, state) || `${endpoints[table]}`;
-        let payload = this.prepareRecord(entity);
+    private getOptions(slice: keyof RootState, state: RootState, entity: any, query: QueryPayload, job: string): RequestOptionsArgs {
+        // remove the infrastructure parts of the entity
+        let newEntity = { ...this.prepareRecord(entity) };
 
-        if (requestTransforms.add[table]) {
-            payload = requestTransforms.add[table](payload, state);
+        return apis[slice][job] && (typeof apis[slice][job].options === "function") && apis[slice][job].options(newEntity, state, query)
+            || (typeof apis.defaults[job].options === "function") && apis.defaults[job].options(newEntity, state, query)
+            || (typeof apis.defaults.options === "function") && apis.defaults.options(newEntity, state, query);
+    }
+
+    private getMethod(slice: keyof RootState, state: RootState, entity: any, query: QueryPayload, job: string): string {
+        return apis[slice][job] && (typeof apis[slice][job].method === "function") && apis[slice][job].method(entity, state)
+            || apis.defaults[job].method;
+    }
+
+    private getResponse(slice: keyof RootState, job: string): any {
+        return (resp: any) => {
+            return apis[slice][job] && (typeof apis[slice][job].response === "function") && apis[slice][job].response(resp)
+                || resp;
         }
+    }
 
-        return this.http.post(`${this.config.apiUrl}/${endpoint}`, payload)
+    getEntities(slice: keyof RootState, query: QueryPayload = null,
+        state: RootState): Observable<any[]> {
+
+        let url = this.getUrl(slice, state, null, query, 'getEntities');
+        let options = this.getOptions(slice, state, null, query, 'getEntities');
+
+        return this.http.get(url, options)
+            .map(this.extractData)
+            .map(this.getResponse(slice, 'getEntities'))
+            .catch(this.handleError);
+    }
+
+    getEntity(slice: keyof RootState, id: string): Observable<any> {
+        let url = this.getUrl(slice, null, { id }, null, 'getEntity');
+        let options = this.getOptions(slice, null, null, null, 'getEntity');
+        return this.http.get(url, options)
+            .map(this.extractData)
+            .map(this.getResponse(slice, 'getEntity'))
+            .catch(this.handleError);
+    }
+
+    add(slice: keyof RootState, entity: Entity, state: RootState, store: Store<RootState>): Observable<any> {
+        let url = this.getUrl(slice, state, entity, null, 'add');
+        let options = this.getOptions(slice, state, entity, null, 'add');
+
+        return this.http.post(url, options)
             .map((result) => {
-                const tempEntity = state[table].entities[EntityActions.TEMP];
+                const tempEntity = state[slice].entities[EntityActions.TEMP];
                 let oldObject = {};
                 if (tempEntity) {
                     oldObject = completeAssign({}, ...tempEntity);
@@ -195,7 +234,7 @@ export class RESTService implements DataService {
                 }
                 const newObject = this.extractData(result);
                 if (tempEntity) {
-                    store.dispatch(new EntityActions.DeleteTemp(table));
+                    store.dispatch(new EntityActions.DeleteTemp(slice));
                 }
                 return completeAssign(oldObject, newObject);
             })
@@ -214,18 +253,19 @@ export class RESTService implements DataService {
             .catch(this.handleError);
     }
 
-    update(table: keyof RootState, entity: Entity, state: RootState, store: Store<RootState>): Observable<any> {
-        let endpoint = endpointTransforms.update[table] && endpointTransforms.update[table](entity, state) || `${endpoints[table]}`;
-        let method = methodTransforms.update[table] && methodTransforms.update[table](entity, state) || 'put';
-        let payload = this.prepareRecord(entity);
+    update(slice: keyof RootState, entity: Entity, state: RootState, store: Store<RootState>): Observable<any> {
+        let url = this.getUrl(slice, state, entity, null, 'update');
+        let method = this.getMethod(slice, state, entity, null, 'update');
+        let options = this.getOptions(slice, state, entity, null, 'update');
 
-        return this.http[method](`${this.config.apiUrl}/${endpoint}`, this.prepareRecord(entity))
+        return this.http[method](url, options)
             .map(this.extractData)
             .catch(this.handleError);
     }
 
-    remove(table: keyof RootState, entity: Entity, state: RootState, store: Store<RootState>): Observable<any> {
-        return this.http.delete(`${this.config.apiUrl}/${endpoints[table]}/${entity.id}`)
+    remove(slice: keyof RootState, entity: Entity, state: RootState, store: Store<RootState>): Observable<any> {
+        let url = this.getUrl(slice, state, entity, null, 'remove');
+        return this.http.delete(url)
             .map(this.extractData)
             .catch(this.handleError);
     }

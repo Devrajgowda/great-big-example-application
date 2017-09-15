@@ -56,7 +56,7 @@ export function deleteID(state: IDs, action: SliceAction): IDs {
 export function loadFromLocal$<T>(actions$: Actions, slice: keyof RootState, db, localStoreKey: string): Observable<{}> {  // TODO: should return PayloadAction
     return actions$
         .ofType(typeFor(slice, actions.LOAD))
-        .startWith(new IDActions.Load(slice, null))
+        .startWith(new IDActions.Load(slice))
         .switchMap(() => db.query(localStoreKey)
             .toArray()
             .map((entities: T[]) => new IDActions.LoadSuccess(slice, entities))
