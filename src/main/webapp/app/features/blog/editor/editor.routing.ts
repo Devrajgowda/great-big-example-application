@@ -14,8 +14,7 @@ const routes: Routes = [
             authorities: ['ROLE_USER'],
             pageTitle: 'greatBigExampleApplicationApp.blog.home.title'
         },
-        // canActivate: [UserRouteAccessService, EditorGuard]
-        canActivate: [UserRouteAccessService]
+        canActivate: [UserRouteAccessService, EditorGuard]
     },
     {
         path: ':slug',
@@ -24,8 +23,7 @@ const routes: Routes = [
             authorities: ['ROLE_USER'],
             pageTitle: 'greatBigExampleApplicationApp.blog.home.title'
         },
-        // canActivate: [UserRouteAccessService, EditorGuard]
-        canActivate: [UserRouteAccessService]
+        canActivate: [UserRouteAccessService, EditorGuard]
     }
 ];
 

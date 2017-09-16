@@ -3,7 +3,7 @@ import * as fromRouter from '@ngrx/router-store';
 import { localStorageSync } from 'ngrx-store-localstorage';
 
 import { Article } from './article/article.model';
-import { Author } from './author/author.model';
+// import { Author } from './author/author.model';
 import { Book } from './book/book.model';
 import { Claim } from './claim/claim.model';
 import { Comment } from './comment/comment.model';
@@ -14,6 +14,7 @@ import { Counter } from './counter/counter.model';
 import { Hero } from './hero/hero.model';
 import { Layout } from './layout/layout.model';
 import { Note } from './note/note.model';
+import { Profile } from './profile/profile.model';
 import { Rebuttal } from './rebuttal/rebuttal.model';
 import { Session } from './session/session.model';
 import { User } from './user/user.model';
@@ -49,7 +50,7 @@ import { storeFreeze } from 'ngrx-store-freeze';
  * notation packages up all of the exports into a single object.
  */
 import * as fromArticles from './article/article.reducer';
-import * as fromAuthors from './author/author.reducer';
+// import * as fromAuthors from './author/author.reducer';
 import * as fromBooks from './book/book.reducer';
 import * as fromClaimRebuttals from './claim-rebuttal/claim-rebuttal.reducer';
 import * as fromClaims from './claim/claim.reducer';
@@ -63,6 +64,7 @@ import * as fromHeroes from './hero/hero.reducer';
 import * as fromLayout from './layout/layout.reducer';
 import * as fromMessages from './message/message.reducer';
 import * as fromNotes from './note/note.reducer';
+import * as fromProfiles from './profile/profile.reducer';
 import * as fromRebuttals from './rebuttal/rebuttal.reducer';
 import * as fromSearch from './search/search.reducer';
 import * as fromSession from './session/session.reducer';
@@ -79,7 +81,7 @@ import { IDs } from './id/id.model';
 export interface RootState {
     book: Entities<Book>;
     article: Entities<Article>;
-    author: Entities<Author>;
+    // author: Entities<Author>;
     claimRebuttal: Entities<ClaimRebuttal>;
     claim: Entities<Claim>;
     collection: IDs;
@@ -94,6 +96,7 @@ export interface RootState {
     message: any;
     note: Entities<Note>;
     p2pGame;
+    profile: Entities<Profile>;
     rebuttal: Entities<Rebuttal>;
     router: fromRouter.RouterReducerState;
     search: IDs;
@@ -114,7 +117,7 @@ export type RootStateKeys = keyof RootState;
 export let reducers: ActionReducerMap<RootState> = {
     book: fromBooks.reducer,
     article: fromArticles.reducer,
-    author: fromAuthors.reducer,
+    // author: fromAuthors.reducer,
     claim: fromClaims.reducer,
     claimRebuttal: fromClaimRebuttals.reducer,
     contact: fromContacts.reducer,
@@ -128,17 +131,16 @@ export let reducers: ActionReducerMap<RootState> = {
     message: fromMessages.reducer,
     note: fromNotes.reducer,
     p2pGame: p2pGameReducer,
+    profile: fromProfiles.reducer,
     rebuttal: fromRebuttals.reducer,
     router: fromRouter.routerReducer,
     search: fromSearch.reducer,
     comment: fromComments.reducer,
     talk: fromTalks.reducer,
     tag: fromTags.reducer,
-    session: null
-    // session: fromSession.reducer(this)
+    session: fromSession.reducer
 };
 
-reducers.session = fromSession.reducer(reducers)
 
 /**
  * By default, @ngrx/store uses combineReducers with the reducer map to compose
@@ -155,7 +157,7 @@ export const metaReducers: MetaReducer<RootState>[] = (process.env.NODE_ENV === 
 
 // console.log all actions
 function logger(reducer: ActionReducer<RootState>) {
-    return function(state: RootState, action: any) {
+    return function (state: RootState, action: any) {
         console.log('state', state);
         console.log('action', action);
 
@@ -165,7 +167,7 @@ function logger(reducer: ActionReducer<RootState>) {
 
 // set loading and loaded fields
 function loadingSetter(reducer: ActionReducer<RootState>) {
-    return function(state: RootState, action: any) {
+    return function (state: RootState, action: any) {
         let newState = state;
         if (action.verb) {
             newState = setLoading(state, action)
@@ -434,6 +436,17 @@ export const getClaimIds = createSelector(getClaimsState, fromClaims.getIds);
 export const getClaims = createSelector(getClaimEntities, getClaimIds, (entities, ids) => {
     return ids.map((id) => entities[id]);
 });
+
+/**
+ * Profiles Selectors
+ */
+export const getProfilesState = (state: RootState): Entities<Profile> => state.profile;
+export const getProfileEntities = createSelector(getProfilesState, fromProfiles.getEntities);
+export const getProfileIds = createSelector(getProfilesState, fromProfiles.getIds);
+export const getProfiles = createSelector(getProfileEntities, getProfileIds, (entities, ids) => {
+    return ids.map((id) => entities[id]);
+});
+
 // export const getBerniePage = createSelector(getBerniePageState, getClaims, (berniePage, claims) => {
 
 //     let _dirty = false;
@@ -566,22 +579,22 @@ export const getComments = createSelector(getCommentEntities, getCommentIds, (en
 /**
  * Authors Selectors
  */
-export const getAuthorsState = (state: RootState): Entities<Author> => state.author;
-export const getAuthorEntities = createSelector(getAuthorsState, fromAuthors.getEntities);
-export const getAuthorIds = createSelector(getAuthorsState, fromAuthors.getIds);
-export const getAuthors = createSelector(getAuthorEntities, getAuthorIds, getUserState, (entities, ids, users) => {
-    return ids.map((id) => {
-        const user = users[id];
-        return { ...entities[id], ...user };
-        // const following = false;
-        // entities[id].followers.some((follower) => follower.login === currentUser.login)
-        // return { ...entities[id], following };
-    });
-});
+// export const getAuthorsState = (state: RootState): Entities<Author> => state.author;
+// export const getAuthorEntities = createSelector(getAuthorsState, fromAuthors.getEntities);
+// export const getAuthorIds = createSelector(getAuthorsState, fromAuthors.getIds);
+// export const getAuthors = createSelector(getAuthorEntities, getAuthorIds, getUserState, (entities, ids, users) => {
+//     return ids.map((id) => {
+//         const user = users[id];
+//         return { ...entities[id], ...user };
+//         // const following = false;
+//         // entities[id].followers.some((follower) => follower.login === currentUser.login)
+//         // return { ...entities[id], following };
+//     });
+// });
 // export const getCurrentAuthor = createSelector(getAuthors, )
 
 /**
- * TagList Selectors
+ * Tags Selectors
  */
 export const getTagsState = (state: RootState): Entities<Tag> => state.tag;
 export const getTagEntities = createSelector(getTagsState, fromTags.getEntities);

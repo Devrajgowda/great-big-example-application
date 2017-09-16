@@ -11,10 +11,10 @@ export function reducer(state: Entities<Comment> = initialEntities<Comment>(slic
     action: EntityAction<Comment>): Entities<Comment> {
 
     switch (action.type) {
-        // case typeFor(slices.COMMENT, actions.ADD_SUCCESS):
-        // case typeFor(slices.COMMENT, actions.ADD_TEMP):
-        // case typeFor(slices.COMMENT, actions.LOAD_SUCCESS):
-        //     return entityFunctions.addEntityToStore<Comment>(state, <any>action);
+        case typeFor(slices.COMMENT, actions.ADD_SUCCESS):
+        case typeFor(slices.COMMENT, actions.ADD_TEMP):
+        case typeFor(slices.COMMENT, actions.LOAD_SUCCESS):
+            return entityFunctions.addEntityToStore<Comment>(state, <any>action);
         // case typeFor(slices.COMMENT, actions.UPDATE):
         // case typeFor(slices.COMMENT, actions.UPDATE_SUCCESS):
         //     return entityFunctions.update<Comment>(state, <any>action);
@@ -22,8 +22,8 @@ export function reducer(state: Entities<Comment> = initialEntities<Comment>(slic
         //     return entityFunctions.deleteEntity<Comment>(state, <any>action);
         // case typeFor(slices.COMMENT, actions.DELETE_TEMP):
         //     return entityFunctions.deleteTemp<Comment>(state, <any>action);
-        // case typeFor(slices.COMMENT, actions.SELECT):
-        //     return entityFunctions.select<Comment>(state, <any>action);
+        case typeFor(slices.COMMENT, actions.SELECT):
+            return entityFunctions.select<Comment>(state, <any>action);
         // case typeFor(slices.COMMENT, actions.SELECT_NEXT):
         //     return entityFunctions.selectNext<Comment>(state, <any>action);
         default:

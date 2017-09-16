@@ -5,8 +5,8 @@ import { Store } from '@ngrx/store';
 import * as fromRoot from '../../../../core/store';
 import { Profile } from '../../../../core/store/profile/profile.model';
 import { Principal } from '../../../../shared/auth/principal.service';
-import * as ProfileActions from '../../../../core/store/profile/profile.actions';
 import { slices } from '../../../../core/store/util';
+import * as EntityActions from '../../../../core/store/entity/entity.actions';
 
 @Component({
     selector: 'jhi-follow-button',
@@ -28,36 +28,12 @@ export class FollowButtonComponent {
 
         // Not authenticated? Push to login screen
         if (!this.principal.isAuthenticated()) {
-            this.router.navigateByUrl('/login');
+            this.router.navigateByUrl('/');
             return;
         }
 
-        // Follow this profile if we aren't already
-        if (!this.profile.following) {
-            this.store.dispatch(new ProfileActions.Follow(this.profile.username));
+        // TODO: it would be better to pass this.profile.id and hide the fact that username is used for profile.id
+        this.store.dispatch(new EntityActions.Patch(slices.PROFILE, { id: this.profile.username, following: !this.profile.following }));
 
-            // this.profilesService.follow(this.profile.username)
-            //     .subscribe(
-            //     data => {
-            //         this.isSubmitting = false;
-            //         this.onToggle.emit(true);
-            //     },
-            //     err => this.isSubmitting = false
-            //     );
-
-            // Otherwise, unfollow this profile
-        } else {
-            this.store.dispatch(new ProfileActions.Unfollow(this.profile.username));
-            //     this.profilesService.unfollow(this.profile.username)
-            //         .subscribe(
-            //         data => {
-            //             this.isSubmitting = false;
-            //             this.onToggle.emit(false);
-            //         },
-            //         err => this.isSubmitting = false
-            //         );
-            // }
-
-        }
     }
 }

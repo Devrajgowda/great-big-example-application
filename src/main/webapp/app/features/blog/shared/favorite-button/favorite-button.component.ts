@@ -9,7 +9,6 @@ import { Profile } from '../../../../core/store/profile/profile.model';
 import { User } from '../../../../core/store/user/user.model';
 import { Principal } from '../../../../shared';
 import { slices } from '../../../../core/store/util';
-import * as ArticleActions from '../../../../core/store/article/article.actions';
 import * as EntityActions from '../../../../core/store/entity/entity.actions';
 
 @Component({
@@ -25,7 +24,6 @@ export class FavoriteButtonComponent implements OnInit {
     ) { }
 
     @Input() article: Article;
-    // @Output() onToggle = new EventEmitter<boolean>();
     isSubmitting = false;
 
     ngOnInit() {
@@ -41,32 +39,6 @@ export class FavoriteButtonComponent implements OnInit {
 
         // Favorite the article if it isn't favorited yet
         this.store.dispatch(new EntityActions.Patch(slices.ARTICLE, { id: this.article.id, favorited: !this.article.favorited }));
-        // if (!this.article.favorited) {
-        //     this.store.dispatch(new ArticleActions.Favorite(this.article.slug));
-
-        //     this.articlesService.favorite(this.article.slug)
-        //         .subscribe(
-        //         data => {
-        //             this.isSubmitting = false;
-        //             this.onToggle.emit(true);
-        //         },
-        //         err => this.isSubmitting = false
-        //         );
-
-        //     // Otherwise, unfavorite the article
-        // } else {
-        //     this.store.dispatch(new ArticleActions.Unfavorite(this.article.slug));
-        //     this.articlesService.unfavorite(this.article.slug)
-        //         .subscribe(
-        //         data => {
-        //             this.isSubmitting = false;
-        //             this.onToggle.emit(false);
-        //         },
-        //         err => this.isSubmitting = false
-        //         );
-        // }
-
-        // }
 
     }
 }

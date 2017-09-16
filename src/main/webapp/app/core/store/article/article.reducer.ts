@@ -8,8 +8,7 @@ import * as sliceFunctions from '../slice/slice.functions';
 import { typeFor } from '../util';
 import { EntityAction } from '../entity/entity.actions';
 import * as EntityActions from '../entity/entity.actions';
-import * as ArticleActions from '../article/article.actions';
-import { actions } from '../article/article.actions';
+import { actions } from '../entity/entity.actions';
 
 export function reducer(state: Entities<Article> = initialEntities<Article>(slices.ARTICLE, initialArticle),
     action: EntityAction<Article>): Entities<Article> {
@@ -20,7 +19,6 @@ export function reducer(state: Entities<Article> = initialEntities<Article>(slic
         case typeFor(slices.ARTICLE, actions.LOAD_SUCCESS):
         case typeFor(slices.ARTICLE, actions.DELETE_FAIL):
             return entityFunctions.addEntityToStore<Article>(state, <any>action);
-        case typeFor(slices.ARTICLE, actions.ADD_COMMENT):  // this is here to set loading=true
         case typeFor(slices.ARTICLE, actions.DELETE):
         case typeFor(slices.ARTICLE, actions.DELETE_FAIL):
         case typeFor(slices.ARTICLE, actions.PATCH):

@@ -12,10 +12,9 @@ import { RESTService } from '../../services/rest.service';
 import * as entityFunctions from '../entity/entity.functions';
 import * as sliceFunctions from '../slice/slice.functions';
 import { typeFor } from '../util';
-import { actions } from './article.actions';
+import { actions } from '../entity/entity.actions';
 import { SliceAction } from '../slice/slice.actions';
 import * as EntityActions from '../entity/entity.actions';
-import * as ArticleActions from './article.actions';
 import { initialBlogPageLayout } from '../../../features/blog/blog.layout';
 import * as SliceActions from '../slice/slice.actions';
 import * as fromRoot from '../../../core/store';
@@ -61,15 +60,6 @@ export class ArticleEffects {
 
     @Effect()
     private selectArticle$ = entityFunctions.select$(this.actions$, slices.ARTICLE, this.dataService, this.store, initialArticle);
-
-    // @Effect()
-    // private favorite$ = sliceFunctions.postToRemote$(this.actions$, slices.ARTICLE, this.dataService, actions.FAVORITE, new ArticleActions.FavoriteSuccess(), new ArticleActions.FavoriteFail());
-
-    // @Effect()
-    // private unFavorite$ = sliceFunctions.deleteFromRemote$(this.actions$, slices.ARTICLE, this.dataService, actions.UNFAVORITE, new ArticleActions.UnfavoriteSuccess(), new ArticleActions.UnfavoriteFail());
-
-    @Effect()
-    private addComment$ = sliceFunctions.postToRemote$(this.actions$, slices.ARTICLE, this.dataService, actions.ADD_COMMENT, new ArticleActions.AddCommentSuccess(), new ArticleActions.AddCommentFail());
 
     constructor(
         private store: Store<RootState>,

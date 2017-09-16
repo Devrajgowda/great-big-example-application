@@ -22,10 +22,10 @@ import { completeAssign, QueryPayload } from '../store/util';
 import * as config from '../../app.config';
 
 type APIConfig = {
+    method?: ((entity?: any, state?: RootState) => string) | string,
     url?: ((entity?: any, state?: RootState, query?: QueryPayload, slice?: keyof RootState) => string) | string,
     options?: (entity?: any, state?: RootState, query?: QueryPayload) => RequestOptionsArgs,
-    method?: ((entity?: any, state?: RootState) => string) | string
-    response?: (resp: any) => any,
+    response?: (resp: any, entity?: any) => any
 }
 
 type EntityConfig = {
@@ -48,9 +48,9 @@ const apis: { [entity: string]: EntityConfig } = {
             url: (article, state) => {
                 const slug = state.article.entities[article.id].slug;
                 if (article.favorited === true || article.favorited === false) {
-                    return `articles/${slug}/favorite`;
+                    return `${config.apiUrl}/articles/${slug}/favorite`;
                 }
-                return 'articles';
+                return `${config.apiUrl}/articles`;
             },
             method: (article, state) => {
                 if (Object.keys(article).length === 2 && article.favorited === true) {
@@ -60,14 +60,14 @@ const apis: { [entity: string]: EntityConfig } = {
                     return 'delete';
                 }
                 return 'put';
-            }
+            },
+            options: (article, state, query) => (Object.keys(article).length === 2 && typeof article.favorited !== 'undefined') ? null : article
         },
         getEntities: {
             url: (entity, state: RootState) => {
                 return `${config.apiUrl}/articles` + ((state.layout.blogPage.type === 'feed') ? '/feed' : '');
             },
-            options: (entity, state, query) =>
-                ({ params: getParamsFromQuery(query) })
+            options: (entity, state, query) => ({ params: getParamsFromQuery(query) })
         }
     },
     claim: {
@@ -79,11 +79,12 @@ const apis: { [entity: string]: EntityConfig } = {
     comment: {
         url: 'comments',
         add: {
-            response: (resp: any) => ({ body: resp.body }),
             url: (comment: Comment, state: RootState) => {
                 const slug = comment.articleId;
-                return `articles/${slug}/comments`;
-            }
+                return `${config.apiUrl}/articles/${slug}/comments`;
+            },
+            options: (entity, state, query) => ({ body: entity.body }),
+            response: (resp, comment) => ({ ...resp, articleId: comment.articleId })
         }
     },
     contact: {
@@ -97,6 +98,28 @@ const apis: { [entity: string]: EntityConfig } = {
     },
     note: {
         url: 'notes'
+    },
+    profile: {
+        url: 'profiles',
+        update: {
+            method: (profile, state) => {
+                if (Object.keys(profile).length === 2 && profile.following === true) {
+                    return 'post';
+                }
+                if (Object.keys(profile).length === 2 && profile.following === false) {
+                    return 'delete';
+                }
+                return 'put';
+            },
+            url: (profile, state) => {
+                const username = state.profile.entities[profile.id].username;
+                if (profile.following === true || profile.following === false) {
+                    return `${config.apiUrl}/profiles/${username}/follow`;
+                }
+                return `${config.apiUrl}/profiles`;
+            },
+            options: (profile, state, query) => (Object.keys(profile).length === 2 && typeof profile.following !== 'undefined') ? null : profile
+        },
     },
     rebuttal: {
         url: 'rebuttals'
@@ -115,7 +138,7 @@ const apis: { [entity: string]: EntityConfig } = {
                 }
                 return `${GOOGLE_ROOT}?q=${query}`;
             },
-            response: (resp) => resp.items
+            response: (resp, entity) => resp.items
         }
     },
     tag: {
@@ -132,12 +155,12 @@ const apis: { [entity: string]: EntityConfig } = {
     defaults: {
         options: (entity, state, query) => entity,
         add: {
-            url: (entity, state, query, slice) => `${config.apiUrl}/${apis[slice].url}`,
             method: 'post',
+            url: (entity, state, query, slice) => `${config.apiUrl}/${apis[slice].url}`
         },
         update: {
-            url: (entity, state, query, slice) => `${config.apiUrl}/${apis[slice].url}`,
-            method: 'put'
+            method: 'put',
+            url: (entity, state, query, slice) => `${config.apiUrl}/${apis[slice].url}`
         },
         getEntity: {
             url: (entity, state, query, slice) => `${config.apiUrl}/${apis[slice].url}/${entity.id}`
@@ -190,9 +213,9 @@ export class RESTService implements DataService {
             || apis.defaults[job].method;
     }
 
-    private getResponse(slice: keyof RootState, job: string): any {
+    private getResponse(slice: keyof RootState, state: RootState, entity: any, query: QueryPayload, job: string): any {
         return (resp: any) => {
-            return apis[slice][job] && (typeof apis[slice][job].response === 'function') && apis[slice][job].response(resp)
+            return apis[slice][job] && (typeof apis[slice][job].response === 'function') && apis[slice][job].response(resp, entity)
                 || resp;
         }
     }
@@ -205,7 +228,7 @@ export class RESTService implements DataService {
 
         return this.http.get(url, options)
             .map(this.extractData)
-            .map(this.getResponse(slice, 'getEntities'))
+            .map(this.getResponse(slice, state, null, query, 'getEntities'))
             .catch(this.handleError);
     }
 
@@ -214,7 +237,7 @@ export class RESTService implements DataService {
         const options = this.getOptions(slice, null, null, null, 'getEntity');
         return this.http.get(url, options)
             .map(this.extractData)
-            .map(this.getResponse(slice, 'getEntity'))
+            .map(this.getResponse(slice, null, null, null, 'getEntity'))
             .catch(this.handleError);
     }
 
@@ -238,6 +261,7 @@ export class RESTService implements DataService {
                 }
                 return completeAssign(oldObject, newObject);
             })
+            .map(this.getResponse(slice, state, entity, null, 'add'))
             .catch(this.handleError);
     }
 

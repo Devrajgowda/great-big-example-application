@@ -5,23 +5,20 @@ import { actions, SliceAction } from '../slice/slice.actions';
 import { RootState } from '../';
 import { ActionReducerMap } from '@ngrx/store';
 
-export function reducer(reducers: ActionReducerMap<RootState>) {
+export function reducer(state: Session = initialSession(), action: SliceAction): Session {
+    const o = {};
+    switch (action.type) {
 
-    return (state: Session = initialSession(), action: SliceAction): Session => {
-        const o = {};
-        switch (action.type) {
-
-            case typeFor(slices.SESSION, actions.LOAD):
-                return sliceFunctions.load(state, action);
-            case typeFor(slices.SESSION, actions.LOAD_SUCCESS):
-                return sliceFunctions.loadSuccess(state, action);
-            case typeFor(slices.SESSION, actions.LOAD_FAIL):
-                return sliceFunctions.loadFail(state, action);
-            case typeFor(slices.SESSION, actions.UPDATE):
-                return sliceFunctions.update(state, action);
-            default:
-                return state;
-        }
+        case typeFor(slices.SESSION, actions.LOAD):
+            return sliceFunctions.load(state, action);
+        case typeFor(slices.SESSION, actions.LOAD_SUCCESS):
+            return sliceFunctions.loadSuccess(state, action);
+        case typeFor(slices.SESSION, actions.LOAD_FAIL):
+            return sliceFunctions.loadFail(state, action);
+        case typeFor(slices.SESSION, actions.UPDATE):
+            return sliceFunctions.update(state, action);
+        default:
+            return state;
     }
 }
 

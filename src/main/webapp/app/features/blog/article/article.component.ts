@@ -13,8 +13,6 @@ import { Comment } from '../../../core/store/comment/comment.model';
 import { User } from '../../../core/store/user/user.model';
 import { slices } from '../../../core/store/util';
 import * as EntityActions from '../../../core/store/entity/entity.actions';
-import * as ArticleActions from '../../../core/store/article/article.actions';
-import * as ProfileActions from '../../../core/store/profile/profile.actions';
 import { Account, Principal } from '../../../shared';
 
 @Component({
@@ -68,23 +66,13 @@ export class ArticleComponent implements OnInit, OnDestroy {
     }
 
     onToggleFollowing(following: boolean) {
-        if (following) {
-            this.store.dispatch(new ProfileActions.Follow(this.article.author.username));
-        } else {
-            this.store.dispatch(new ProfileActions.Unfollow(this.article.author.username));
-        }
-        // this.article.author.following = following;
+        this.store.dispatch(new EntityActions.Patch(slices.PROFILE, { id: this.article.author.username, following: !this.article.author.following }));
     }
 
     deleteArticle() {
         this.isDeleting = true;
         this.store.dispatch(new EntityActions.Delete(slices.ARTICLE, this.article));
     }
-
-    // populateComments() {
-    //     this.commentsService.getAll(this.article.slug)
-    //         .subscribe((comments) => this.comments = comments);
-    // }
 
     addComment() {
         // this.isSubmitting = true;
